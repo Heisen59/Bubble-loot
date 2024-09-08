@@ -1,0 +1,18 @@
+## Interface: 11502
+## Title: LootArchive
+## Notes: Raid loot distribution history
+## Author: zergrael
+## Version: 0.5.2
+## Revision: 5948638
+## SavedVariables: LootArchive
+## X-Curse-Project-ID: 545767
+## X-Website: https://www.curseforge.com/wow/addons/lootarchive
+
+embeds.xml
+locales.xml
+
+LootArchive.lua
+GUI.lua
+HybridScrollFrame.xml
+options.lua
+utils.lua

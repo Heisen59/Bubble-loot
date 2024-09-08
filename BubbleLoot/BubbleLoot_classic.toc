@@ -1,0 +1,16 @@
+## Interface: 11503, 40400
+## Title: Bubble Loot
+## Notes: Lightweight addon for recording /rolls to simplify items distribution.
+## Author: RomainLGD
+## Version: 1.0.0
+## SavedVariablesPerCharacter: RaidRollsShown
+
+main.lua
+configuration.lua
+gui.lua
+slashCommands.lua
+eventFunctions.lua
+eventFrames.lua
+roller.lua
+rollerCollection.lua
+playerInfo.lua
