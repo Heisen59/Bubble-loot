@@ -31,25 +31,29 @@ end
 -- Look for "pass" in the group channels.
 function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
     local name, server = strsplit("-", playerName)
-	print("point 1")
+	--print("point 1")
     if text:lower() == "pass" then
-		print("point 2")
+		--print("point 2")
         BubbleLoot_G.rollerCollection:Save(name, 0)
         BubbleLoot_G:Draw()
     end
 	if text:lower() == "+1" then
-        print("point 3")
+        --print("point 3")
 		-- Perform some action, e.g., print a message to the player
-        print(playerName .. " has typed +1 in the chat!")
+        --print(playerName .. " has typed +1 in the chat!")
 		BubbleLoot_G.rollerCollection:Save(name, 1)
         BubbleLoot_G:Draw()
     end
 	if text:lower() == "+2" then
-        print("point 4")
+        --print("point 4")
 		-- Perform some action, e.g., print a message to the player
-        print(playerName .. " has typed +1 in the chat!")
+        --print(playerName .. " has typed +2 in the chat!")
 		BubbleLoot_G.rollerCollection:Save(name, 2)
         BubbleLoot_G:Draw()
+    end
+	if text:lower() == "+3" then
+		BubbleLoot_G.rollerCollection:Save(name, 3)
+		BubbleLoot_G:Draw()
     end
 	
 end

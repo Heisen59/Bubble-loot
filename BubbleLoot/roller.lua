@@ -1,5 +1,5 @@
 -- Store info about individual rollers.
--- `roller = { name, characterText, subgroup, unitChanged, roll, repeated, rollChanged }`.
+-- `roller = { name, characterText, subgroup, unitChanged, need, repeated, rollChanged }`.
 -- Populate `BubbleLoot_G.rollerCollection`.
 
 local cfg = BubbleLoot_G.configuration
@@ -11,23 +11,23 @@ local cfg = BubbleLoot_G.configuration
 ---@field subgroup string
 ---@field groupTypeUnit string
 ---@field unitChanged boolean has unit info changed since the last draw?
----@field roll integer
----@field repeated boolean has the player rolled multiple times?
----@field rollChanged boolean has the roll changed since the last draw?
----@field UpdateRoll fun(self: Roller, roll: integer)
+---@field need integer
+---@field repeated boolean has the player needed multiple times?
+---@field needChanged boolean has the need changed since the last draw?
+---@field UpdateNeed fun(self: Roller, need: integer)
 ---@field UpdateGroup fun(self: Roller, subgroup: string, groupTypeUnit: GroupTypeEnum)
 ---@field MakeUnitText fun(self: Roller) -> string
----@field MakeRollText fun(self: Roller) -> string
+---@field MakeNeedText fun(self: Roller) -> string
 
 
 -- Methods of the roller "instance".
 local methods = {}
 
--- Update roll and set connected flags.
-function methods.UpdateRoll(self, roll)
+-- Update need and set connected flags.
+function methods.UpdateNeed(self, need)
     self.repeated = true
-    self.roll = roll
-    self.rollChanged = true
+    self.need = need
+    self.needChanged = true
 end
 
 -- Update raid subgroup or group state.
@@ -44,14 +44,25 @@ function methods.MakeUnitText(self)
 end
 
 --
-function methods.MakeRollText(self)
-    if self.roll == 0 then
+function methods.MakeNeedText(self)
+	print(self.need)
+    if self.need == 0 then
         return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
-    elseif self.repeated then
-        return WrapTextInColorCode(self.roll, cfg.colors.MULTIROLL)
-    else
-        return tostring(self.roll)
-    end
+	elseif self.need == 1 then
+		return self.ColorTextIfMulti("+1", self.repeated)
+	elseif self.need == 2 then
+		return self.ColorTextIfMulti("+2", self.repeated)
+	else
+		return self.ColorTextIfMulti("Other", self.repeated)
+	end
+end
+
+function methods.ColorTextIfMulti(text, multi)
+	if(multi) then
+		return WrapTextInColorCode(text, cfg.colors.MULTINEED)
+	else
+		return text
+	end
 end
 
 --
@@ -69,10 +80,10 @@ end
 
 ---Create new "instance" of the Roller.
 ---@param name string
----@param roll integer
+---@param need integer
 ---@param playerInfo PlayerInfo
 ---@return Roller
-function BubbleLoot_G.roller.New(name, roll, playerInfo)
+function BubbleLoot_G.roller.New(name, need, playerInfo)
     local characterText = MakeCharacterText(name, playerInfo.class, playerInfo.classFilename)
     -- Add fields.
     local roller = {
@@ -81,9 +92,9 @@ function BubbleLoot_G.roller.New(name, roll, playerInfo)
         subgroup = playerInfo.subgroup,
         groupTypeUnit = playerInfo.groupTypeUnit,
         unitChanged = true,
-        roll = roll,
+        need = need,
         repeated = false,
-        rollChanged = true,
+        needChanged = true,
     }
     -- Add methods.
     for funcName, func in pairs(methods) do

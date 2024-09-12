@@ -1,5 +1,5 @@
 -- Main file. Info and globals.
--- Globals: `BubbleLoot_G`, `RaidRollsShown`, `BubbleLoot_OnAddonCompartmentClick`
+-- Globals: `BubbleLoot_G`, `BubbleLootShown`, `BubbleLoot_OnAddonCompartmentClick`
 
 -- Global locals (this addon's global namespace).
 BubbleLoot_G = {}
@@ -51,7 +51,7 @@ end
 
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
-    BubbleLoot_G.gui:SetVisibility(not RaidRollsShown)
+    BubbleLoot_G.gui:SetVisibility(not BubbleLootShown)
 end
 
 -- Initialize self, plugins, saved variables
@@ -63,10 +63,10 @@ function BubbleLoot_G.Initialize(self)
     end
 
     -- Load saved variables.
-    if RaidRollsShown == nil then -- Initialize when first loaded.
-        RaidRollsShown = true;
+    if BubbleLootShown == nil then -- Initialize when first loaded.
+        BubbleLootShown = true;
     end
-    self.gui:SetVisibility(RaidRollsShown)
+    self.gui:SetVisibility(BubbleLootShown)
 
     -- Starting in a group?
     if IsInGroup() then

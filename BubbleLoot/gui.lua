@@ -3,7 +3,7 @@
 
 local cfg = BubbleLoot_G.configuration
 
--- Collection of { unit, roll } to be used to show data rows.
+-- Collection of { unit, need } to be used to show data rows.
 BubbleLoot_G.gui.rowPool = {}
 
 -- From "AARRGGBB" to { r, g, b, a } for values between 0 and 1.
@@ -57,15 +57,24 @@ function BubbleLoot_G.gui.Initialize(self)
     unitHeader:SetText(cfg.texts.UNIT_HEADER)
     unitHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     self.unitHeader = unitHeader
-    -- ROLL
-    local rollHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    rollHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -16, -5)
-    rollHeader:SetHeight(cfg.size.ROW_HEIGHT)
-    rollHeader:SetJustifyH("LEFT")
-    rollHeader:SetJustifyV("TOP")
-    rollHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
-    rollHeader:SetText(cfg.texts.NEED_HEADER)
-    self.rollHeader = rollHeader
+    -- NEED
+    local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -55, -5)
+    needHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    needHeader:SetJustifyH("LEFT")
+    needHeader:SetJustifyV("TOP")
+    needHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    needHeader:SetText(cfg.texts.NEED_HEADER)
+    self.needHeader = needHeader
+	    -- SCORE
+    local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    scoreHeader:SetJustifyH("LEFT")
+    scoreHeader:SetJustifyV("TOP")
+    scoreHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    scoreHeader:SetText(cfg.texts.SCORE_HEADER)
+    self.scoreHeader = scoreHeader
 
     return unitHeader -- relativePoint
 end
@@ -75,39 +84,39 @@ end
 -- Return i-th row (create if necessary). Zero gives headers.
 function BubbleLoot_G.gui.GetRow(self, i)
     if i == 0 then
-        return { unit = self.unitHeader, roll = self.rollHeader }
+        return { unit = self.unitHeader, need = self.needHeader }
     end
 
     local row = self.rowPool[i]
     if row then
         row.unit:Show()
-        row.roll:Show()
+        row.need:Show()
     else
         local unit = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-        local roll = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+        local need = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 
         local parents = self:GetRow(i - 1)
         unit:SetPoint("TOPLEFT", parents.unit, "BOTTOMLEFT")
-        roll:SetPoint("TOPLEFT", parents.roll, "BOTTOMLEFT")
+        need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")
 
         unit:SetHeight(cfg.size.ROW_HEIGHT)
-        roll:SetHeight(cfg.size.ROW_HEIGHT)
+        need:SetHeight(cfg.size.ROW_HEIGHT)
 
-        row = { unit = unit, roll = roll }
+        row = { unit = unit, need = need }
         tinsert(self.rowPool, row)
     end
 
     return row
 end
 
--- Write character name and their roll to the given row index. Skip `nil`.
-function BubbleLoot_G.gui.WriteRow(self, i, unitText, rollText)
+-- Write character name and their need to the given row index. Skip `nil`.
+function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText)
     local row = self:GetRow(i)
     if unitText ~= nil then
         row.unit:SetText(unitText)
     end
-    if rollText ~= nil then
-        row.roll:SetText(rollText)
+    if needText ~= nil then		
+		row.need:SetText(needText)
     end
 end
 
@@ -116,14 +125,14 @@ function BubbleLoot_G.gui.HideTailRows(self, fromIndex)
     while fromIndex <= #self.rowPool do
         local row = self:GetRow(fromIndex)
         row.unit:Hide()
-        row.roll:Hide()
+        row.need:Hide()
         fromIndex = fromIndex + 1
     end
 end
 
 -- Show or hide the GUI.
 function BubbleLoot_G.gui.SetVisibility(self, bool)
-    RaidRollsShown = bool
+    BubbleLootShown = bool
     self.mainFrame:SetShown(bool)
 end
 

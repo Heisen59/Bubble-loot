@@ -23,7 +23,9 @@ function BubbleLoot_G.rollerCollection.UpdateGroup(self)
 end
 
 -- Redraw `unitText` of the roller who changed group (or left). Maybe all after group type change.
--- Redraw `RollText` of all rollers and reorder (new roller or new roll).
+-- Redraw `needText` of all rollers and reorder (new roller or new roll).
+-- Redraw `scoreText` of all rollers and reorder (new roller or new roll).
+
 function BubbleLoot_G.rollerCollection.Draw(self)
     local currentRow = 0
     local orderChanged = false
@@ -45,13 +47,15 @@ function BubbleLoot_G.rollerCollection.Draw(self)
             roller.unitChanged = false
         end
         -- roll
-        local rollText = nil
+        local needText = nil
         if orderChanged or roller.rollChanged then
-            rollText = roller:MakeRollText()
+            needText = roller:MakeNeedText()
             roller.rollChanged = false
         end
+		-- score
+		
         -- write
-        BubbleLoot_G.gui:WriteRow(index, unitText, rollText)
+        BubbleLoot_G.gui:WriteRow(index, unitText, needText)
         currentRow = index
     end
 
@@ -73,14 +77,14 @@ function BubbleLoot_G.rollerCollection.FindRoller(self, name)
 end
 
 -- Update `roller` (if exists) or create a new one.
-function BubbleLoot_G.rollerCollection.Save(self, name, roll)
+function BubbleLoot_G.rollerCollection.Save(self, name, need)
     local roller = self:FindRoller(name)
     if roller ~= nil then
-        roller:UpdateRoll(roll)
+        roller:UpdateNeed(need)
     else
         local groupType = BubbleLoot_G:GetGroupType()
         local playerInfo = BubbleLoot_G.playerInfo:Get(name, groupType)
-        roller = BubbleLoot_G.roller.New(name, roll, playerInfo)
+        roller = BubbleLoot_G.roller.New(name, need, playerInfo)
         table.insert(self.values, roller)
     end
     self.isSorted = false

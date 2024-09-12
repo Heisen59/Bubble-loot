@@ -10,7 +10,7 @@ BubbleLoot_G.configuration.ADDON_NAME = "BubbleLoot"
 BubbleLoot_G.configuration.size = {
     EMPTY_HEIGHT = 30, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
-    FRAME_WIDTH = 220, -- Default value.
+    FRAME_WIDTH = 250, -- Default value.
 }
 
 local systemMessageColor = "FFFFFF00"
@@ -27,7 +27,7 @@ BubbleLoot_G.configuration.colors = {
     BACKGROUND = "B2333333",     -- RGBA = { 0.2, 0.2, 0.2, 0.7 }
     HEADER = systemMessageColor, -- RGBA = { 1.0, 1.0, 0.0, 1.0 }
     MASTERLOOTER = "FFFF0000",
-    MULTIROLL = "FFFF0000",
+    MULTINEED = "FFFF0000",
     PASS = "FF00CCFF",
 
     -- MISC.
@@ -43,6 +43,7 @@ BubbleLoot_G.configuration.texts = {
     LIST_CMDS = "Commands: show, hide, toggle, help, reset, resize, test.",
     UNIT_HEADER = "Player (class)[subgroup]",
     NEED_HEADER = "Need",
+	SCORE_HEADER = "Score",
 	UNIT_LOOT_SCORE_HEADER = "Loot Score",
     PASS = "pass",
 
