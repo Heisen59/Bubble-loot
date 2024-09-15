@@ -34,7 +34,7 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
 	--print("point 1")
     if text:lower() == "pass" then
 		--print("point 2")
-        BubbleLoot_G.rollerCollection:Save(name, 0)
+        BubbleLoot_G.rollerCollection:Save(name, 9)
         BubbleLoot_G:Draw()
     end
 	if text:lower() == "+1" then
@@ -59,10 +59,11 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
 end
 
 -- CHAT_MSG_SYSTEM
--- Look for "/roll" in system messages.
+-- Look for "/roll" in system messages from ML
 function BubbleLoot_G.eventFunctions.OnSystemMsg(self, event, text)
-    if string.find(text, "rolls") ~= nil then
-        local name, roll, minRoll, maxRoll = text:match("^(.+) rolls (%d+) %((%d+)%-(%d+)%)$")
+	
+    if string.find(text, "obtient") ~= nil then
+		local name, roll, minRoll, maxRoll = text:match("^(.+) obtient un (%d+) %((%d+)%-(%d+)%).$")
 
         minRoll = tonumber(minRoll)
         maxRoll = tonumber(maxRoll)
@@ -70,5 +71,10 @@ function BubbleLoot_G.eventFunctions.OnSystemMsg(self, event, text)
             --BubbleLoot_G.rollerCollection:Save(name, tonumber(roll))
             --BubbleLoot_G:Draw()
         end
+		
+		if(minRoll == 1 and maxRoll == 10000 and name == UnitName("player")) then
+			BubbleLoot_G.calculation.getTheWinner(tonumber(roll))
+		end
+		
     end
 end

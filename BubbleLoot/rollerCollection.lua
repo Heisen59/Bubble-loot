@@ -2,6 +2,7 @@
 -- Populate `BubbleLoot_G.rollerCollection`.
 
 local cfg = BubbleLoot_G.configuration
+local tau = BubbleLoot_G.configuration.tau
 
 -- Array of player rolls.
 ---@type Roller[]
@@ -32,31 +33,50 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 
     if not self.isSorted then
         table.sort(self.values, function(lhs, rhs)
-            return lhs.roll > rhs.roll
+            --return lhs.need < rhs.need
+			return lhs.score < rhs.score
         end)
 
         orderChanged = true
         self.isSorted = true
     end
 
+	local threshold = 9
+	
+	-- set the threshold
+	for index, roller in ipairs(self.values) do
+		if(roller.need<threshold)then
+			threshold = roller.need
+		end
+	end
+
+	local i = 1
     for index, roller in ipairs(self.values) do
-        -- unit
-        local unitText = nil
-        if orderChanged or roller.unitChanged then
-            unitText = roller:MakeUnitText()
-            roller.unitChanged = false
-        end
-        -- roll
-        local needText = nil
-        if orderChanged or roller.rollChanged then
-            needText = roller:MakeNeedText()
-            roller.rollChanged = false
-        end
-		-- score
-		
-        -- write
-        BubbleLoot_G.gui:WriteRow(index, unitText, needText)
-        currentRow = index
+		if(roller.need<threshold+1)then
+			-- unit
+			local unitText = nil
+			if orderChanged or roller.unitChanged then
+				unitText = roller:MakeUnitText()
+				roller.unitChanged = false
+			end
+			-- roll
+			local needText = nil
+			if orderChanged or roller.rollChanged then
+				needText = roller:MakeNeedText()
+				roller.rollChanged = false
+			end
+			-- score
+			local scoreText = nil
+			if orderChanged or roller.rollChanged then
+				scoreText = roller:MakeScoreText()
+				roller.scoreTextChanged = false
+			end
+			
+			-- write
+			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText)
+			currentRow = i
+			i = i+1		
+		end
     end
 
     -- Hide unused rows.
@@ -76,6 +96,53 @@ function BubbleLoot_G.rollerCollection.FindRoller(self, name)
     return nil
 end
 
+-- return +1 rollers collection
+function BubbleLoot_G.rollerCollection.IsMsRoller(self)
+
+	for _, roller in ipairs(self.values) do
+		if roller.need == 1 then return true end
+	end
+	
+	return false
+	
+end
+
+function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
+
+	local chance_sum = 0
+	
+	-- first, compute brut chance
+	for _, roller in ipairs(self.values) do
+		if(roller.need == 1) then
+			roller.chance =	2^(roller.score/tau)	
+			chance_sum = chance_sum + roller.chance
+		else
+			roller.chance = 0
+		end
+	end
+	
+	-- then normalized this chance to 10000 and compute cumulative chances
+	local last_roller_chance = 0
+	for _, roller in ipairs(self.values) do
+		roller.chance =	roller.chance*10000/chance_sum
+		roller.cumulative_chance = roller.chance+last_roller_chance
+		last_roller_chance=roller.cumulative_chance
+	end		
+	
+end
+
+function BubbleLoot_G.rollerCollection.getTheWinner(self, value)
+	for _, roller in ipairs(self.values) do
+		if roller.cumulative_chance>value then 
+			return roller.name 
+		end
+	end
+	
+	return "no winner"
+
+end
+
+
 -- Update `roller` (if exists) or create a new one.
 function BubbleLoot_G.rollerCollection.Save(self, name, need)
     local roller = self:FindRoller(name)
@@ -93,6 +160,12 @@ end
 -- Fill test values.
 function BubbleLoot_G.rollerCollection.Fill(self)
     for _, val in pairs(cfg.testFill) do
+        self:Save(unpack(val))
+    end
+end
+
+function BubbleLoot_G.rollerCollection.FillOS(self)
+    for _, val in pairs(cfg.testFillOS) do
         self:Save(unpack(val))
     end
 end

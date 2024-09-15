@@ -3,7 +3,7 @@
 ## Notes: Lightweight addon for recording /rolls to simplify items distribution.
 ## Author: RomainLGD
 ## Version: 1.0.0
-## SavedVariablesPerCharacter: RaidRollsShown
+## SavedVariablesPerCharacter: BubbleLootShown, PlayersData
 
 main.lua
 configuration.lua
@@ -14,3 +14,5 @@ eventFrames.lua
 roller.lua
 rollerCollection.lua
 playerInfo.lua
+storage.lua
+Calculation.lua

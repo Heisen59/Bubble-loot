@@ -62,6 +62,9 @@ local function Test(args)
     -- No need to be part of a group for this to work.
     elseif subCommand == "solo" then
         BubbleLoot_G.eventFrames.RegisterSoloChatEvents()
+	elseif subCommand == "OS" then
+		BubbleLoot_G.rollerCollection:FillOS()
+        BubbleLoot_G:Draw()
 	else
 	end
 	--[[
@@ -79,6 +82,79 @@ local function Test(args)
         end
     end--]]
 end
+
+-- No need to be part of a group for this to work.
+local function addItemToPlayer(args)
+    -- Parameter check.
+    if not args then
+        printError(cfg.texts.ADDLOOTTOPLAYER_PARAMETER_ERROR)
+        return
+    end
+	
+	local playerName, itemName = args:match("^(%S+)%s(.+)$")
+	
+	print(itemName)
+	
+	if playerName and itemName then
+		BubbleLoot_G.storage.AddPlayerData(playerName,  itemName )
+		print("Added item '" .. itemName .. "' to character '" .. playerName .. "'")
+	else
+		print("Usage: /bl add <characterName> <itemName>")
+	end
+
+end
+
+
+local function getPlayerData(playerName)
+    -- Parameter check.
+    if not playerName then
+        printError(cfg.texts.GETPLAYERDATA_PARAMETER_ERROR)
+        return
+    end
+		
+	if playerName then
+		BubbleLoot_G.storage.GetPlayerData(playerName)
+	else
+		print("Usage: /bl get <characterName>")
+	end
+
+end
+
+
+local function getItem(itemName)
+	-- Parameter check.
+    if not itemName then
+        printError("Usage: /bl itemInfo <ItemName>")
+        return
+    end
+	
+	if itemName then
+		BubbleLoot_G.calculation.GetItem(itemName)
+	else
+		printError("Usage: /bl itemInfo <ItemName>")
+	end
+	
+	
+end
+
+local function getPlayerScore(playerName)
+	-- Parameter check.
+    if not playerName then
+        printError("Usage: /bl playerScore <playerName>")
+        return
+    end
+	
+	if playerName then
+		local score = BubbleLoot_G.calculation.GetPlayerScore(playerName)
+		print(score)
+	else
+		printError("Usage: /bl playerScore <playerName>")
+	end
+	
+	
+end
+
+
 
 -- Slash commands.
 SLASH_BUBBLELOOT1 = '/bubbleloot'
@@ -102,6 +178,14 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
         Resize(args)
     elseif command == "test" then
         Test(args)
+	elseif command == "add" then
+		addItemToPlayer(args)
+	elseif command == "get" then
+		getPlayerData(args)
+	elseif command == "itemInfo" then
+		getItem(args)
+	elseif command == "playerScore" then
+		getPlayerScore(args)
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

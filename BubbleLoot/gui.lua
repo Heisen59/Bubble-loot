@@ -3,7 +3,7 @@
 
 local cfg = BubbleLoot_G.configuration
 
--- Collection of { unit, need } to be used to show data rows.
+-- Collection of { unit, need , score} to be used to show data rows.
 BubbleLoot_G.gui.rowPool = {}
 
 -- From "AARRGGBB" to { r, g, b, a } for values between 0 and 1.
@@ -84,25 +84,29 @@ end
 -- Return i-th row (create if necessary). Zero gives headers.
 function BubbleLoot_G.gui.GetRow(self, i)
     if i == 0 then
-        return { unit = self.unitHeader, need = self.needHeader }
+        return { unit = self.unitHeader, need = self.needHeader, score = self.scoreHeader }
     end
 
     local row = self.rowPool[i]
     if row then
         row.unit:Show()
         row.need:Show()
+		row.score:Show()
     else
         local unit = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-        local need = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+        local need = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")		
+        local score = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 
         local parents = self:GetRow(i - 1)
         unit:SetPoint("TOPLEFT", parents.unit, "BOTTOMLEFT")
-        need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")
+        need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")		
+        score:SetPoint("TOPLEFT", parents.score, "BOTTOMLEFT")
 
         unit:SetHeight(cfg.size.ROW_HEIGHT)
-        need:SetHeight(cfg.size.ROW_HEIGHT)
+        need:SetHeight(cfg.size.ROW_HEIGHT)		
+        score:SetHeight(cfg.size.ROW_HEIGHT)
 
-        row = { unit = unit, need = need }
+        row = { unit = unit, need = need, score = score }
         tinsert(self.rowPool, row)
     end
 
@@ -110,13 +114,16 @@ function BubbleLoot_G.gui.GetRow(self, i)
 end
 
 -- Write character name and their need to the given row index. Skip `nil`.
-function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText)
+function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText)
     local row = self:GetRow(i)
     if unitText ~= nil then
         row.unit:SetText(unitText)
     end
     if needText ~= nil then		
 		row.need:SetText(needText)
+    end
+	if scoreText ~= nil then		
+		row.score:SetText(scoreText)
     end
 end
 
@@ -126,6 +133,7 @@ function BubbleLoot_G.gui.HideTailRows(self, fromIndex)
         local row = self:GetRow(fromIndex)
         row.unit:Hide()
         row.need:Hide()
+		row.score:Hide()
         fromIndex = fromIndex + 1
     end
 end

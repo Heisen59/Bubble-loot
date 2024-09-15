@@ -45,8 +45,8 @@ end
 
 --
 function methods.MakeNeedText(self)
-	print(self.need)
-    if self.need == 0 then
+	--print(self.need)
+    if self.need == 9 then
         return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
 	elseif self.need == 1 then
 		return self.ColorTextIfMulti("+1", self.repeated)
@@ -56,6 +56,12 @@ function methods.MakeNeedText(self)
 		return self.ColorTextIfMulti("Other", self.repeated)
 	end
 end
+
+function methods.MakeScoreText(self)
+	--return round2(BubbleLoot_G.calculation.GetPlayerScore(self.name),2)
+	return round2(self.score,2)
+end
+
 
 function methods.ColorTextIfMulti(text, multi)
 	if(multi) then
@@ -95,6 +101,9 @@ function BubbleLoot_G.roller.New(name, need, playerInfo)
         need = need,
         repeated = false,
         needChanged = true,
+		score = BubbleLoot_G.calculation.GetPlayerScore(name),
+		chance = 0,
+		cumulative_chance = 0,
     }
     -- Add methods.
     for funcName, func in pairs(methods) do

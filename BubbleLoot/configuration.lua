@@ -36,6 +36,23 @@ BubbleLoot_G.configuration.colors = {
     SYSTEMMSG = systemMessageColor,
 }
 
+BubbleLoot_G.configuration.index = 
+{
+	ATTENDANCE  	= 1,
+	BENCH 			= 2,
+	NON_ATTENDANCE  = 3,
+
+}
+
+BubbleLoot_G.configuration.constant = 
+{
+	ATTENDANCE_VALUE  		= 0.6,
+	BENCH_VALUE 			= 0.6,
+	NON_ATTENDANCE_VALUE  	= 1,
+}
+
+BubbleLoot_G.configuration.tau = 3
+
 -- Texts
 BubbleLoot_G.configuration.texts = {
     -- GENERAL.
@@ -58,6 +75,8 @@ BubbleLoot_G.configuration.texts = {
     RESIZE_SIZE_ERROR = "cannot resize below 100%.",
     RESIZE_PARAMETER_ERROR = "resize accepts either no argument or a number above 100.",
     TEST_PARAMETER_ERROR = "test accepts either 'fill', 'solo', 'plugins' or a plugin name.",
+	ADDLOOTTOPLAYER_PARAMETER_ERROR = "Usage: /bl add <characterName> <itemName>",
+	GETPLAYERDATA_PARAMETER_ERROR = "Usage: /bl get <characterName>",
     SLASH_PARAMETER_ERROR = "unknown command. Run '/bl' for available commands.",
 
     -- HELP LINES.
@@ -75,8 +94,23 @@ BubbleLoot_G.configuration.texts = {
 
 -- Pairs of name and roll.
 BubbleLoot_G.configuration.testFill = {
-    { "player1", 20 },
-    { "player2", 0 },
-    { "player3", 4 },
-    { "player3", 99 }, -- repeated
+    { "player1", 1 },
+    { "player2", 9 }, -- Pass
+    { "player3", 1 },
+    { "player3", 2 }, -- repeated
+	{ "player4", 1 },
+    { "player5", 1 },
+    { "player6", 2 },
+    { "player7", 1 }, 
+}
+
+BubbleLoot_G.configuration.testFillOS = {
+    { "player1", 2 },
+    { "player2", 2 },
+    { "player3", 2 },
+    { "player3", 2 }, -- repeated
+	{ "player4", 2 },
+    { "player5", 2 },
+    { "player6", 2 },
+    { "player7", 9 }, 
 }

@@ -20,6 +20,10 @@ BubbleLoot_G.playerInfo = {}
 -- Container for plugin namespaces.
 ---@type Plugin[]
 BubbleLoot_G.plugins = {}
+--Data storage
+BubbleLoot_G.storage = {}
+--Items calculation
+BubbleLoot_G.calculation = {}
 
 ---
 ---@class Plugin Mandatory plugin interface.
@@ -73,6 +77,11 @@ function BubbleLoot_G.Initialize(self)
         -- As if GROUP_JOINED was triggered.
         self.eventFunctions.OnGroupJoined(self)
     end
+	
+	--Storage data initialize
+	if PlayersData == nil then -- Initialize when first loaded.
+        PlayersData = {};
+    end
 
     -- Plugins might have sth to say.
     self:Draw()
@@ -118,4 +127,9 @@ function BubbleLoot_G.Draw(self)
     end--]]
 
     self.gui:SetHeight(cfg.size.EMPTY_HEIGHT + cfg.size.ROW_HEIGHT * currentRow)
+end
+
+
+function round2(num, numDecimalPlaces)
+  return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
