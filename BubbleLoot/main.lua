@@ -34,6 +34,10 @@ BubbleLoot_G.calculation = {}
 
 local cfg = BubbleLoot_G.configuration
 
+
+--- toggles
+--Bubbleloot_G.attributionMode = false
+
 ---@enum GroupTypeEnum addon user group status
 BubbleLoot_G.GroupType = {
     NOGROUP = "NOGROUP",
@@ -125,6 +129,7 @@ function BubbleLoot_G.Draw(self)
         addRows, relativePoint = plugin:Draw(relativePoint)
         currentRow = currentRow + addRows
     end--]]
+
 
     self.gui:SetHeight(cfg.size.EMPTY_HEIGHT + cfg.size.ROW_HEIGHT * currentRow)
 end

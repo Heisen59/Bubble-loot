@@ -34,7 +34,7 @@ function BubbleLoot_G.rollerCollection.Draw(self)
     if not self.isSorted then
         table.sort(self.values, function(lhs, rhs)
             --return lhs.need < rhs.need
-			return lhs.score < rhs.score
+			return lhs.score > rhs.score
         end)
 
         orderChanged = true
@@ -69,11 +69,16 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 			local scoreText = nil
 			if orderChanged or roller.rollChanged then
 				scoreText = roller:MakeScoreText()
-				roller.scoreTextChanged = false
+				--roller.scoreTextChanged = false
 			end
-			
+			-- chance
+			local chanceText = nil
+			if orderChanged or roller.rollChanged then
+				chanceText = roller:MakeChanceText()
+				--roller.chanceTextChanged = false
+			end			
 			-- write
-			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText)
+			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText, chanceText)
 			currentRow = i
 			i = i+1		
 		end
@@ -113,6 +118,9 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 	
 	-- first, compute brut chance
 	for _, roller in ipairs(self.values) do
+		--print(roller.name)
+		--print(roller.need)
+		--print(roller.score)
 		if(roller.need == 1) then
 			roller.chance =	2^(roller.score/tau)	
 			chance_sum = chance_sum + roller.chance

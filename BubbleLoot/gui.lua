@@ -59,22 +59,31 @@ function BubbleLoot_G.gui.Initialize(self)
     self.unitHeader = unitHeader
     -- NEED
     local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -55, -5)
+    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, -5)
     needHeader:SetHeight(cfg.size.ROW_HEIGHT)
     needHeader:SetJustifyH("LEFT")
     needHeader:SetJustifyV("TOP")
     needHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     needHeader:SetText(cfg.texts.NEED_HEADER)
     self.needHeader = needHeader
-	    -- SCORE
+	-- SCORE
     local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, -5)
     scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
     scoreHeader:SetJustifyH("LEFT")
     scoreHeader:SetJustifyV("TOP")
     scoreHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     scoreHeader:SetText(cfg.texts.SCORE_HEADER)
     self.scoreHeader = scoreHeader
+	-- CHANCE
+    local chanceHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    chanceHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    chanceHeader:SetJustifyH("LEFT")
+    chanceHeader:SetJustifyV("TOP")
+    chanceHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    chanceHeader:SetText(cfg.texts.CHANCE_HEADER)
+    self.chanceHeader = chanceHeader
 
     return unitHeader -- relativePoint
 end
@@ -84,7 +93,7 @@ end
 -- Return i-th row (create if necessary). Zero gives headers.
 function BubbleLoot_G.gui.GetRow(self, i)
     if i == 0 then
-        return { unit = self.unitHeader, need = self.needHeader, score = self.scoreHeader }
+        return { unit = self.unitHeader, need = self.needHeader, score = self.scoreHeader, chance = self.chanceHeader }
     end
 
     local row = self.rowPool[i]
@@ -92,21 +101,25 @@ function BubbleLoot_G.gui.GetRow(self, i)
         row.unit:Show()
         row.need:Show()
 		row.score:Show()
+		row.chance:Show()
     else
         local unit = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
         local need = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")		
         local score = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+		local chance = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 
         local parents = self:GetRow(i - 1)
         unit:SetPoint("TOPLEFT", parents.unit, "BOTTOMLEFT")
         need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")		
         score:SetPoint("TOPLEFT", parents.score, "BOTTOMLEFT")
+		chance:SetPoint("TOPLEFT", parents.chance, "BOTTOMLEFT")
 
         unit:SetHeight(cfg.size.ROW_HEIGHT)
         need:SetHeight(cfg.size.ROW_HEIGHT)		
         score:SetHeight(cfg.size.ROW_HEIGHT)
+		chance:SetHeight(cfg.size.ROW_HEIGHT)
 
-        row = { unit = unit, need = need, score = score }
+        row = { unit = unit, need = need, score = score, chance = chance }
         tinsert(self.rowPool, row)
     end
 
@@ -114,7 +127,7 @@ function BubbleLoot_G.gui.GetRow(self, i)
 end
 
 -- Write character name and their need to the given row index. Skip `nil`.
-function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText)
+function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanceText)
     local row = self:GetRow(i)
     if unitText ~= nil then
         row.unit:SetText(unitText)
@@ -125,6 +138,9 @@ function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText)
 	if scoreText ~= nil then		
 		row.score:SetText(scoreText)
     end
+	if chanceText ~= nil then		
+		row.chance:SetText(chanceText)
+    end
 end
 
 -- Hide all rows with index equal or greater than the parameter.
@@ -134,6 +150,7 @@ function BubbleLoot_G.gui.HideTailRows(self, fromIndex)
         row.unit:Hide()
         row.need:Hide()
 		row.score:Hide()
+		row.chance:Hide()
         fromIndex = fromIndex + 1
     end
 end
@@ -150,4 +167,68 @@ end
 
 function BubbleLoot_G.gui.SetHeight(self, height)
     self.mainFrame:SetHeight(height)
+end
+
+
+-- Function to create the raid members list when right-clicking an item
+function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
+	--print("test A")
+	--print(source)
+	--print(bag)
+	--print(slot)
+	--print(lootslot)
+	--print(IsAltKeyDown())
+    -- Check if the player is in a raid and holding Alt
+    if IsAltKeyDown() and IsInRaid() then
+        -- Get the item name based on the source (bag or loot window)
+        local itemName
+        if source == "bag" then
+            local itemLink = C_Container and C_Container.GetContainerItemLink(bag, slot) or GetContainerItemLink(bag, slot)
+            if itemLink then
+                itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
+            end
+        elseif source == "loot" then
+            local itemLink = GetLootSlotLink(lootSlot)
+            if itemLink then
+                itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
+            end
+        end
+		
+        -- Create the dropdown menu
+        local dropdownMenu = CreateFrame("Frame", "MyAddonRaidMenu", UIParent, "UIDropDownMenuTemplate")
+
+        -- Initialize the dropdown menu
+        UIDropDownMenu_Initialize(dropdownMenu, function(self, level, menuList)
+            if not level then return end
+            
+            -- Loop through all raid members
+            for i = 1, GetNumGroupMembers() do
+                local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+                if name then
+                    -- Create a menu item for each raid member
+                    local info = UIDropDownMenu_CreateInfo()
+                    info.text = name
+                    info.func = function()
+									if itemName then
+										BubbleLoot_G.storage.AddPlayerData(name, itemName)
+										if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
+											-- Send the message to the RAID_WARNING channel
+											SendChatMessage(name.." has win "..itemName, "RAID_WARNING")
+										else 
+											SendChatMessage(name.." has win "..itemName, "RAID")
+											-- print(name.." has win "..itemName)
+											-- print("You must be a raid leader or assistant to send a raid warning.")
+										end										
+									else
+										print("ShowRaidMemberMenu : can't get the item name")
+									end
+								end
+                    UIDropDownMenu_AddButton(info)
+                end
+            end
+        end)
+
+        -- Show the dropdown menu near the cursor
+        ToggleDropDownMenu(1, nil, dropdownMenu, "cursor", 3, 3)
+    end
 end

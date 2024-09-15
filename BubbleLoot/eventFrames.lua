@@ -66,3 +66,19 @@ function BubbleLoot_G.eventFrames.RegisterSoloChatEvents()
     passing_EventFrame:RegisterEvent("CHAT_MSG_WHISPER")
     rolling_EventFrame:RegisterEvent("CHAT_MSG_SYSTEM")
 end
+
+
+
+
+
+--[[
+-- Register event when the player logs in, to set up the hooks
+--addonLoaded_EventFrame:RegisterEvent("ADDON_LOADED")
+addonLoaded_EventFrame:SetScript("OnEvent", function(self, event)
+    if event == "ADDON_LOADED" then
+		print("I'm in SetScript ADDON_LOADED")
+        HookBagItemRightClick() -- Set up the hook for bag items after login
+        LootFrame:HookScript("OnShow", HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
+    end
+end)
+]]--
