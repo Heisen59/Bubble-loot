@@ -179,7 +179,7 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 	--print(lootslot)
 	--print(IsAltKeyDown())
     -- Check if the player is in a raid and holding Alt
-	local test = true
+	local test = false
     if IsAltKeyDown() and (IsInRaid() or test) then
         -- Get the item name based on the source (bag or loot window)
         local itemName
@@ -232,10 +232,10 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 			
 					-- Loop through all raid members
 					local N = GetNumGroupMembers()
-					N = 5
+					--N = 5
 					for i = 1, N do
-						--local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-						local name = "TEST"..i
+						local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+						--local name = "TEST"..i
 						if name then
 							-- Create a menu item for each raid member
 							local info = UIDropDownMenu_CreateInfo()
