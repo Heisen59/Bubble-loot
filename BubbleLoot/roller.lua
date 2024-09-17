@@ -63,7 +63,6 @@ function methods.MakeScoreText(self)
 end
 
 function methods.MakeChanceText(self)
-	--BubbleLoot_G.rollerCollection:LootChanceRoller()
 	return round2(self.chance/100,0)
 end
 

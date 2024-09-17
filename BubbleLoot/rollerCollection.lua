@@ -163,6 +163,7 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need)
         table.insert(self.values, roller)
     end
     self.isSorted = false
+	self:LootChanceRoller()
 end
 
 
