@@ -115,3 +115,62 @@ BubbleLoot_G.configuration.testFillOS = {
     { "player6", 2 },
     { "player7", 9 }, 
 }
+
+BubbleLoot_G.configuration.tokenLocation = 
+{
+"INVTYPE_HEAD",
+"INVTYPE_SHOULDER",
+"INVTYPE_CHEST",
+"INVTYPE_HAND",
+"INVTYPE_WRIST",
+"INVTYPE_WAIST",
+"INVTYPE_LEGS",
+"INVTYPE_FEET",
+}
+
+BubbleLoot_G.configuration.tokens = 
+{ 
+{-- head
+"Chaperon incandescent",
+"Heaume en écailles en fusion",
+"Heaume du noyau incendié"
+},
+{--Shoulders
+"Protège-épaules incandescents",
+"Épaulières en écailles en fusion", 
+"Protège-épaules du noyau incendié"
+},
+{--Chest
+"Robe incandescente",
+"Plastron en écailles en fusion",
+"Plastron du noyau incendié"
+},
+{--Gloves
+"Gants incandescents",
+"Gants en écailles en fusion",
+"Gants du noyau incendié"
+},
+{--Wrist
+"Manchettes incandescentes",
+"Manchettes en écailles en fusion",
+"Manchettes du noyau incendié"
+},
+{--Waist
+"Ceinture incandescente",
+"Ceinture en écailles en fusion",
+"Ceinture du noyau incendié"
+},
+{--Legs
+"Jambières incandescentes",
+"Jambières en écailles en fusion",
+"Jambières du noyau incendié"
+},
+{--Boots
+"Bottes incandescentes",
+"Bottes incandescentes",
+"Bottes du noyau incendié"
+},
+}
+
+
+

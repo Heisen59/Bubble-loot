@@ -16,6 +16,8 @@ end
 
 function BubbleLoot_G.calculation.GetPlayerScore(playerName)
 
+--print("GetPlayerScore function")
+
 local score = 0
 --Check if player exist in database
 if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score end
@@ -24,7 +26,9 @@ if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score e
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 	if(lootList) then
 		for index, value in ipairs(lootList) do
-			local itemName = GetItemInfo(value[1])
+			--local itemName = GetItemInfo(value[1])
+			--print(value[1])
+			local itemName = value[1]
 			if(itemName) then
 				score = score +  BubbleLoot_G.calculation.GetItemScore(itemName)
 			end
@@ -45,8 +49,7 @@ function BubbleLoot_G.calculation.GetItemScore(item)
 
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
-
-	 if itemEquipLoc and itemName then
+	
 		local slotMod = {
             ["INVTYPE_HEAD"] = 1,
             ["INVTYPE_NECK"] = 0.5625,
@@ -76,9 +79,26 @@ function BubbleLoot_G.calculation.GetItemScore(item)
             ["INVTYPE_BAG"] = 0,
             ["INVTYPE_QUIVER"] = 0,
         }
-		return slotMod[itemEquipLoc]
-	 else
-		return 0
+
+	 if itemEquipLoc and itemName then
+		local slotModValue = slotMod[itemEquipLoc]
+		if slotModValue then
+			return slotModValue
+		else -- check if token
+			slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(itemName)]
+			if slotModValue then
+				return slotModValue
+			else
+				return 0
+			end
+		end
+	 else		
+		slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(item)]
+		if slotModValue then
+			return slotModValue
+		else
+			return 0
+		end
 	end
 
 end
@@ -89,11 +109,12 @@ function BubbleLoot_G.calculation.GetItem(item)
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
 
+	--print(GetItemInfo(item))
+	--print(BubbleLoot_G.calculation.GetItemScore(item))
+	
 	
 -- Check if the item was found
-    if itemEquipLoc and itemName then
-	        -- Use WoW's global table to translate the equip location code to a human-readable string
-        local equipLocations = {
+local equipLocations = {
             ["INVTYPE_HEAD"] = "Head",
             ["INVTYPE_NECK"] = "Neck",
             ["INVTYPE_SHOULDER"] = "Shoulder",
@@ -121,7 +142,12 @@ function BubbleLoot_G.calculation.GetItem(item)
             ["INVTYPE_TABARD"] = "Tabard",
             ["INVTYPE_BAG"] = "Bag",
             ["INVTYPE_QUIVER"] = "Quiver",
-        }
+         }
+
+
+    if itemEquipLoc and itemName then
+	        -- Use WoW's global table to translate the equip location code to a human-readable string
+        
 		
 		        -- Get the human-readable equip location
         local equipLocString = equipLocations[itemEquipLoc]
@@ -129,12 +155,51 @@ function BubbleLoot_G.calculation.GetItem(item)
         if equipLocString then
             DEFAULT_CHAT_FRAME:AddMessage(itemName .." (ilvl "..itemLevel..")" .." can be equipped in the " .. equipLocString .. " slot.")
         else
-            DEFAULT_CHAT_FRAME:AddMessage("Equip location for " .. itemName .. " is unknown.")
+			equipLocString = equipLocations[BubbleLoot_G.calculation.SearchToken(itemName)]
+			if equipLocString then
+				DEFAULT_CHAT_FRAME:AddMessage(itemName .." (ilvl "..itemLevel..")" .." can be equipped in the " .. equipLocString .. " slot.")
+			else			
+				DEFAULT_CHAT_FRAME:AddMessage("Equip location for " .. itemName .. " is unknown.")
+			end
         end
 	else
 	-- If the item wasn't found, inform the player
-	DEFAULT_CHAT_FRAME:AddMessage("Item '" .. item .. "' not found.")
+	print("GetItem function : point A")
+	--print(item)
+	itemEquipLoc = BubbleLoot_G.calculation.SearchToken(item)
+	--print(itemEquipLoc)
+	local equipLocString = equipLocations[itemEquipLoc]
+	--print(equipLocString)
+		if equipLocString then
+			DEFAULT_CHAT_FRAME:AddMessage(item .." can be equipped in the " .. equipLocString .. " slot.")
+		else	
+			DEFAULT_CHAT_FRAME:AddMessage("Item '" .. item .. "' not found.")
+		end
     end
+end
+
+
+function BubbleLoot_G.calculation.SearchToken(itemName)
+	
+	--print(itemName)
+	--print("function SearchToken")
+	--print(tokenList[1][1])
+	--local itemEquipLocIndex = nil
+	for tokenType, subListToken in ipairs(cfg.tokens) do
+	--print(subListToken)
+		for _, tokenName in ipairs(subListToken)do
+			--print(tokenType)
+			if tokenName == itemName then
+					--print(tokenType)
+					--print(cfg.tokenLocation[tokenType])
+					return cfg.tokenLocation[tokenType]			
+			end
+		end		
+	end
+	
+	return "Not Found"
+
+
 end
 
 

@@ -73,13 +73,20 @@ end
 -- Function to retrieve and print Player data
 function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
     
+	--print(PlayersData)
+	
 	if verbose == nil then
 		if PlayersData[playerName] then
 			print("Player: " .. playerName)
 			print("Items: ")
 			for index, value in ipairs(PlayersData[playerName].items) do
-				local itemName = GetItemInfo(value[1])
-				print(itemName)
+				print(value[1])
+				--[[if string.find(value[1].tostring(), "[") == nil then
+					local itemName = GetItemInfo(value[1])
+					print(itemName)
+				else
+					print(value[1])
+				end--]]
 			end
 			--print("Items: " .. table.concat(PlayersData[playerName].items, ", "))
 			--print("Last updated at: " .. PlayersData[playerName].time)

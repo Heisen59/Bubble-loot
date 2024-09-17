@@ -128,6 +128,7 @@ local function getItem(itemName)
         return
     end
 	
+		--printError(itemName)
 	if itemName then
 		BubbleLoot_G.calculation.GetItem(itemName)
 	else
