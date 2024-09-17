@@ -250,7 +250,10 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 													SendChatMessage(name.." has win "..itemName, "RAID")
 													-- print(name.." has win "..itemName)
 													-- print("You must be a raid leader or assistant to send a raid warning.")
-												end										
+												end
+												if source == "loot" and lootSlot then
+												GiveLootToPlayer(lootSlot, name) -- Send the loot to the selected player
+												end
 											else
 												print("ShowRaidMemberMenu : can't get the item name")
 											end
@@ -280,7 +283,10 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 														SendChatMessage(name.." has win "..itemName, "RAID")
 														-- print(name.." has win "..itemName)
 														-- print("You must be a raid leader or assistant to send a raid warning.")
-													end										
+													end
+													if source == "loot" and lootSlot then
+														GiveLootToPlayer(lootSlot, name) -- Send the loot to the selected player
+													end
 												else
 													print("ShowRaidMemberMenu : can't get the item name")
 												end
