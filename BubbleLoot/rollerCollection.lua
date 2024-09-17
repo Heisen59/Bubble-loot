@@ -165,6 +165,22 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need)
     self.isSorted = false
 end
 
+
+function BubbleLoot_G.rollerCollection.getMS_Rollers(self)
+
+	local listOfMS_Rollers = {}
+
+	for _, roller in ipairs(self.values) do
+		if roller.need == 1 then
+			table.insert(listOfMS_Rollers, roller.name)
+		end
+	end
+
+	return listOfMS_Rollers
+	
+end
+
+
 -- Fill test values.
 function BubbleLoot_G.rollerCollection.Fill(self)
     for _, val in pairs(cfg.testFill) do
