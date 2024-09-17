@@ -204,6 +204,14 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
             
 			
 			if level == 1 then
+			
+				-- Add the "Bubble Loot" title at the top
+                local info = UIDropDownMenu_CreateInfo()
+                info.text = "Bubble Loot"
+                info.isTitle = true -- This marks it as a title
+                info.notCheckable = true -- This makes sure the title cannot be checked
+                UIDropDownMenu_AddButton(info, level)
+			
                 -- Add a main menu entry called "All Raid"
                 local info = UIDropDownMenu_CreateInfo()
                 info.text = "All Raid"
