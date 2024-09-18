@@ -156,6 +156,7 @@ local icon = LibStub("LibDBIcon-1.0")
 
 -- Saved Variables for the Minimap icon
 MyAddonDB = MyAddonDB or {}
+MyAddonDB.minimap = MyAddonDB.minimap or { hide = false, minimapPos = 220 }
 
 -- Create the LDB data object for the minimap button
 local MyAddonLDB = LDB:NewDataObject("MyAddonMinimapIcon", {
@@ -187,7 +188,7 @@ function ShowMinimapContextMenu()
             -- Add "Option 1"
             local info = UIDropDownMenu_CreateInfo()
             info.text = "Add a participation to all players in raid"
-            info.func = function() print("Option not implemented yet") end
+            info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
             UIDropDownMenu_AddButton(info, level)
 
             -- Add "Option 2"
@@ -209,7 +210,9 @@ MyAddon:RegisterEvent("PLAYER_LOGIN")
 MyAddon:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
         -- Minimap icon settings
-        icon:Register("MyAddonMinimapIcon", MyAddonLDB, MyAddonDB.minimap or {})
+        if not MyAddonDB.minimap.hide then
+            icon:Register("MyAddonMinimapIcon", MyAddonLDB, MyAddonDB.minimap)
+        end
     end
 end)
 

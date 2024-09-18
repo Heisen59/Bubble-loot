@@ -50,6 +50,8 @@ function BubbleLoot_G.storage.AddPlayerParticipation(playerName, index)
         }
     end
 	
+	print(index)
+	print(PlayersData[playerName].participation)
 	PlayersData[playerName].participation[index] = PlayersData[playerName].participation[index] + 1
 
 end
@@ -68,7 +70,15 @@ function BubbleLoot_G.storage.ModifyIndexPlayerParticipation(playerName, index, 
 
 end
 
-
+--Add all raiders a participation
+function BubbleLoot_G.storage.AddRaidParticipation()
+	-- Loop through all raid members
+	local N = GetNumGroupMembers()
+	for i = 1, N do
+		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+		BubbleLoot_G.storage.AddPlayerParticipation(name, cfg.index.ATTENDANCE)
+	end
+end
 
 -- Function to retrieve and print Player data
 function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
