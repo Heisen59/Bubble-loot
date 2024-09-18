@@ -170,6 +170,22 @@ function BubbleLoot_G.gui.SetHeight(self, height)
 end
 
 
+
+-- Function to give loot to the selected player
+local function GiveLootToPlayer(lootSlot, playerName)
+    -- Find the raid index for the player
+    for i = 1, GetNumGroupMembers() do
+        local name = GetRaidRosterInfo(i)
+        if name == playerName then
+            -- Assign the loot to the player
+            GiveMasterLoot(lootSlot, i)
+            --print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
+            return
+        end
+    end
+    print("Player " .. playerName .. " not found in raid.")
+end
+
 -- Function to create the raid members list when right-clicking an item
 function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 	--print("test A")
