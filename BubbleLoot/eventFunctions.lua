@@ -49,8 +49,13 @@ function BubbleLoot_G.eventFunctions.OnLoad(self, event, addOnName)
     if addOnName == cfg.ADDON_NAME then
 		--bprint("I'm in SetScript ADDON_LOADED")
         BubbleLoot_G:Initialize()
+		
+		-- items Hooks
 		HookBagItemRightClick() -- Set up the hook for bag items after login
         LootFrame:HookScript("OnShow", HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
+		
+		-- attendance frame
+		BubbleLoot_G.gui.createAttendanceFrame()
     end
 end
 

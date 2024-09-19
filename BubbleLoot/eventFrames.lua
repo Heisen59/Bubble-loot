@@ -69,7 +69,90 @@ end
 
 
 
+--[[
+MINIMAP
+]]--
+-- Initialize the addon
+local MyMinimap = CreateFrame("Frame")
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+local icon = LibStub("LibDBIcon-1.0")
 
+-- Saved Variables for the Minimap icon
+MyDB = MyDB or {}
+MyDB.minimap = MyDB.minimap or { hide = false, minimapPos = 220 }
+
+-- Create the LDB data object for the minimap button
+local MyMinimapLDB = LDB:NewDataObject("MyMinimapIcon", {
+    type = "data source",
+    text = "Bubble Loot",
+    --icon = "Interface\\Icons\\INV_Misc_Bag_08",  -- You can choose any icon
+	icon = "Interface\\AddOns\\BubbleLoot\\Textures\\MinimapIcon",
+    OnClick = function(self, button)
+        if button == "LeftButton" then
+            -- Show the context menu on left click
+            ShowMinimapContextMenu()
+        end
+    end,
+    OnTooltipShow = function(tooltip)
+        tooltip:AddLine("Bubble Loot")
+        tooltip:AddLine("Left-click to open options menu.")
+    end,
+})
+
+
+-- Function to display the context menu for the minimap button
+function ShowMinimapContextMenu()
+    -- Create a dropdown menu frame
+    local dropdownMenu = CreateFrame("Frame", "MyAddonMinimapMenu", UIParent, "UIDropDownMenuTemplate")
+
+    -- Initialize the dropdown menu with options
+    UIDropDownMenu_Initialize(dropdownMenu, function(self, level)
+        if not level then return end
+
+        if level == 1 then
+            -- Add "Option 1"
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = "Add a participation to all players in raid"
+            info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
+            UIDropDownMenu_AddButton(info, level)
+
+            -- Add "Option 2"
+			info = UIDropDownMenu_CreateInfo()
+            info.text = "Modify participation of a specific player"
+            info.func = function()				
+				BubbleLoot_G.gui.OpenInputWindow()
+				end
+            UIDropDownMenu_AddButton(info, level)
+			
+        end
+    end)
+
+
+    -- Show the dropdown menu at the cursor position
+    ToggleDropDownMenu(1, nil, dropdownMenu, "cursor", 0, 0)
+	
+
+
+	
+	
+
+	
+end
+
+
+
+
+
+-- Register event when the player logs in to set up the minimap icon
+MyMinimap:RegisterEvent("PLAYER_LOGIN")
+MyMinimap:SetScript("OnEvent", function(self, event)
+    if event == "PLAYER_LOGIN" then
+        -- Minimap icon settings
+        if not MyDB.minimap.hide then
+            icon:Register("MyMinimapIcon", MyMinimapLDB, MyDB.minimap)
+        end
+    end
+end)
 
 --[[
 -- Register event when the player logs in, to set up the hooks

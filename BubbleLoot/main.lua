@@ -3,6 +3,8 @@
 
 -- Global locals (this addon's global namespace).
 BubbleLoot_G = {}
+--Data storage
+BubbleLoot_G.storage = {}
 -- `eventFunctions.lua` namespace.
 BubbleLoot_G.eventFunctions = {}
 -- `eventFrames.lua` namespace.
@@ -20,8 +22,6 @@ BubbleLoot_G.playerInfo = {}
 -- Container for plugin namespaces.
 ---@type Plugin[]
 BubbleLoot_G.plugins = {}
---Data storage
-BubbleLoot_G.storage = {}
 --Items calculation
 BubbleLoot_G.calculation = {}
 
@@ -64,6 +64,11 @@ end
 
 -- Initialize self, plugins, saved variables
 function BubbleLoot_G.Initialize(self)
+	--Storage data initialize
+	if PlayersData == nil then -- Initialize when first loaded.
+        PlayersData = {};
+    end
+
     local relativePoint = self.gui:Initialize()
     -- Plugins initialize.
     for _, plugin in ipairs(self.plugins) do
@@ -82,11 +87,6 @@ function BubbleLoot_G.Initialize(self)
         self.eventFunctions.OnGroupJoined(self)
     end
 	
-	--Storage data initialize
-	if PlayersData == nil then -- Initialize when first loaded.
-        PlayersData = {};
-    end
-
     -- Plugins might have sth to say.
     self:Draw()
 end
@@ -146,74 +146,6 @@ end
 
 
 
---[[
-MINIMAP
-]]--
--- Initialize the addon
-local MyAddon = CreateFrame("Frame")
-local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
-local icon = LibStub("LibDBIcon-1.0")
 
--- Saved Variables for the Minimap icon
-MyAddonDB = MyAddonDB or {}
-MyAddonDB.minimap = MyAddonDB.minimap or { hide = false, minimapPos = 220 }
-
--- Create the LDB data object for the minimap button
-local MyAddonLDB = LDB:NewDataObject("MyAddonMinimapIcon", {
-    type = "data source",
-    text = "Bubble Loot",
-    icon = "Interface\\Icons\\INV_Misc_Bag_08",  -- You can choose any icon
-    OnClick = function(self, button)
-        if button == "LeftButton" then
-            -- Show the context menu on left click
-            ShowMinimapContextMenu()
-        end
-    end,
-    OnTooltipShow = function(tooltip)
-        tooltip:AddLine("Bubble Loot")
-        tooltip:AddLine("Left-click to open options menu.")
-    end,
-})
-
--- Function to display the context menu for the minimap button
-function ShowMinimapContextMenu()
-    -- Create a dropdown menu frame
-    local dropdownMenu = CreateFrame("Frame", "MyAddonMinimapMenu", UIParent, "UIDropDownMenuTemplate")
-
-    -- Initialize the dropdown menu with options
-    UIDropDownMenu_Initialize(dropdownMenu, function(self, level)
-        if not level then return end
-
-        if level == 1 then
-            -- Add "Option 1"
-            local info = UIDropDownMenu_CreateInfo()
-            info.text = "Add a participation to all players in raid"
-            info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
-            UIDropDownMenu_AddButton(info, level)
-
-            -- Add "Option 2"
-			--[[
-            info = UIDropDownMenu_CreateInfo()
-            info.text = "Option 2"
-            info.func = function() print("Place holder") end
-            UIDropDownMenu_AddButton(info, level)
-			--]]
-        end
-    end)
-
-    -- Show the dropdown menu at the cursor position
-    ToggleDropDownMenu(1, nil, dropdownMenu, "cursor", 0, 0)
-end
-
--- Register event when the player logs in to set up the minimap icon
-MyAddon:RegisterEvent("PLAYER_LOGIN")
-MyAddon:SetScript("OnEvent", function(self, event)
-    if event == "PLAYER_LOGIN" then
-        -- Minimap icon settings
-        if not MyAddonDB.minimap.hide then
-            icon:Register("MyAddonMinimapIcon", MyAddonLDB, MyAddonDB.minimap)
-        end
-    end
-end)
 
 
