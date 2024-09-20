@@ -120,7 +120,7 @@ function ShowMinimapContextMenu()
 			info = UIDropDownMenu_CreateInfo()
             info.text = "Modify participation of a specific player"
             info.func = function()				
-				BubbleLoot_G.gui.OpenInputWindow()
+				BubbleLoot_G.gui.OpenParticipationWindow()
 				end
             UIDropDownMenu_AddButton(info, level)
 			

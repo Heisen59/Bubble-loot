@@ -13,6 +13,7 @@ Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 main.lua
 configuration.lua
 gui.lua
+participationGUI.lua
 slashCommands.lua
 eventFunctions.lua
 eventFrames.lua
