@@ -9,30 +9,12 @@ player loots mgr windows
 -- Store references to UI elements for easy updating later
 local PlayerslootsFrame = {}
 
-local test = nil
-
--- Function to update the displayed player values
-local function UpdateLootsList(playerName)
-
-	print("UpdateLootsList")
-	
-	if PlayerslootsFrame[playerName] ~= nil then
-		-- Hide the frame
-		PlayerslootsFrame[playerName]:Hide()
-		-- Remove the frame from its parent and delete it
-		PlayerslootsFrame[playerName]:SetParent(nil)
-		PlayerslootsFrame[playerName] = nil
-	end
-	
-	BubbleLoot_G.gui.createLootsMgrFrame(playerName)
-		
-end
-
 -- Function to handle dropdown selection for Loots and Bonus/Malus
 local function OnClickRemove(self, arg1, arg2)
     print(arg2 .. ": removed")
 	BubbleLoot_G.storage.DeletePlayerSpecificLoot(arg1, arg2)
-	UpdateLootsList(arg1)	
+	--UpdateLootsList(arg1)	
+	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
 end
 
 local function OnClickB(self, arg1)
@@ -66,10 +48,20 @@ local LastFrameLevelUsed = 0
 -- Create the list of players
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName)
 
+local point, relativeTo, relativePoint, xOffset, yOffset
+if PlayerslootsFrame[playerName] ~= nil then
+	point, relativeTo, relativePoint, xOffset, yOffset = PlayerslootsFrame[playerName]:GetPoint()
+	
+	-- Hide the frame
+	PlayerslootsFrame[playerName]:Hide()
+	-- Remove the frame from its parent and delete it
+	PlayerslootsFrame[playerName]:SetParent(nil)
+	PlayerslootsFrame[playerName] = nil		
+	
+end
 
 
-
-local lootsRows = PlayerslootsRows[playerName]
+--local lootsRows = PlayerslootsRows[playerName]
 
 
 
@@ -77,7 +69,7 @@ local lootsRows = PlayerslootsRows[playerName]
 -- Create the main frame for the player list (initially hidden)
 local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
 lootsMgrFrame:SetSize(800, 500)
-lootsMgrFrame:SetPoint("CENTER")
+lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 0, yOffset or 0)
 lootsMgrFrame:SetMovable(true)  -- Make the frame movable
 lootsMgrFrame:EnableMouse(true) -- Enable mouse interaction for moving
 lootsMgrFrame:RegisterForDrag("LeftButton") -- Register left-button dragging
@@ -180,7 +172,7 @@ end
 end
 
 function BubbleLoot_G.gui.OpenPlayerLootWindow(playerName)
-	BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+	BubbleLoot_G.gui.createLootsMgrFrame(playerName, 0, 0)
 	
 
 	

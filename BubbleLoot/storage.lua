@@ -118,7 +118,7 @@ function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootName)
 	
 	for index, lootData in ipairs(PlayersData[playerName].items) do
 		if lootName == lootData[1] then
-			print(index)
+			--print(index)
 			table.remove(PlayersData[playerName].items,index)
 			return
 		end
