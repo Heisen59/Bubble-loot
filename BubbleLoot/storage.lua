@@ -10,14 +10,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, item)
     -- Get current date and time
     local currentTime = date("%Y-%m-%d %H:%M:%S")
     
-    -- Store the data in the table if it doesn't exist already
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0},
-        }
-    end
-
+	CreateNewPlayerEntry(playerName)
+	
     -- Add items to the player's item list
     --for _, item in ipairs(items) do
 		dataItem = {item, currentTime}
@@ -28,44 +22,21 @@ end
 -- Function to modify player participation
 function BubbleLoot_G.storage.ModifyPlayerParticipation(playerName, participation)
     
-    -- Store the data in the table if it doesn't exist already
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0},
-        }
-    end
-
+	CreateNewPlayerEntry(playerName)
     PlayersData[playerName].participation = participation
 
 end
 
 function BubbleLoot_G.storage.AddPlayerParticipation(playerName, index)
 
-    -- Store the data in the table if it doesn't exist already
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0}
-        }
-    end
-	
-	print(index)
-	print(PlayersData[playerName].participation)
+	CreateNewPlayerEntry(playerName)
 	PlayersData[playerName].participation[index] = PlayersData[playerName].participation[index] + 1
 
 end
 
 function BubbleLoot_G.storage.ModifyIndexPlayerParticipation(playerName, index, value)
 
-    -- Store the data in the table if it doesn't exist already
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0}
-        }
-    end
-	
+	CreateNewPlayerEntry(playerName)	
 	PlayersData[playerName].participation[index] = value
 
 end
@@ -84,6 +55,7 @@ end
 function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
     
 	--print(PlayersData)
+	CreateNewPlayerEntry(playerName)
 	
 	if verbose == nil then
 		if PlayersData[playerName] then
@@ -105,6 +77,8 @@ function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
 		end
 	end
 	
+	
+	
 	if not PlayersData[playerName] then
         PlayersData[playerName] = {
             items = {},
@@ -121,12 +95,7 @@ end
 
 function BubbleLoot_G.storage.GetPlayerParticipation(playerName)
     -- Store the data in the table if it doesn't exist already
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0}
-        }
-    end
+    CreateNewPlayerEntry(playerName)
 
 	return PlayersData[playerName].participation
 
@@ -141,5 +110,34 @@ function BubbleLoot_G.storage.GetPlayerLootList(playerName)
 		return nil	        
     end
 
+end
+
+
+-- function delet loot to player in database
+function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootName)
+	
+	for index, lootData in ipairs(PlayersData[playerName].items) do
+		if lootName == lootData[1] then
+			print(index)
+			table.remove(PlayersData[playerName].items,index)
+			return
+		end
+	end
+	
+	print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
+
+
+end
+
+
+-- function to create a new entry if it doesn't exist
+local function CreateNewPlayerEntry(playerName)
+    if not PlayersData[playerName] then
+        PlayersData[playerName] = {
+            items = {},
+			BonusMalus = {},
+            participation = {0,0,0}
+        }
+    end	
 end
 

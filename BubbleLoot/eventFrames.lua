@@ -118,7 +118,7 @@ function ShowMinimapContextMenu()
 
             -- Add "Option 2"
 			info = UIDropDownMenu_CreateInfo()
-            info.text = "Modify participation of a specific player"
+            info.text = "Modify a specific player's data"
             info.func = function()				
 				BubbleLoot_G.gui.OpenParticipationWindow()
 				end

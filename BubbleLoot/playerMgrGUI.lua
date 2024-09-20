@@ -3,7 +3,7 @@
 
 --[[
 
-Attendance windows
+player mgr windows
 
 --]]
 
@@ -39,27 +39,63 @@ local function DecrementPlayer(playerName, index)
     UpdatePlayerList()
 end
 
+-- Function to handle dropdown selection for Loots and Bonus/Malus
+local function OnClickLoots(self, arg1)
+    print(arg1 .. ": Loots clicked")
+	BubbleLoot_G.gui.OpenPlayerLootWindow(arg1)
+end
+
+local function OnClickBonusMalus(self, arg1)
+    print(arg1 .. ": Bonus/Malus clicked")
+end
+
+-- Function to create the dropdown menu for the player name
+local function CreateDropdownMenu(playerName)
+    local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
+    local menuList = {
+		{
+            text = playerName,  -- Player's name as the header
+            isTitle = true,  -- This makes the text non-clickable and acts as a title
+            notCheckable = true,  -- Don't show a checkbox
+        },
+        {
+            text = "Loots",
+            func = OnClickLoots,
+            arg1 = playerName
+        },
+        {
+            text = "Bonus/Malus",
+            func = OnClickBonusMalus,
+            arg1 = playerName
+        }
+    }
+    
+    EasyMenu(menuList, dropdown, "cursor", 0 , 0, "MENU")
+end
+
+
+
 -- Create the main frame for the player list (initially hidden)
-local frame = CreateFrame("Frame", "PlayerListFrame", UIParent, "BasicFrameTemplateWithInset")
-frame:SetSize(400, 500)
-frame:SetPoint("CENTER")
-frame:SetMovable(true)  -- Make the frame movable
-frame:EnableMouse(true) -- Enable mouse interaction for moving
-frame:RegisterForDrag("LeftButton") -- Register left-button dragging
-frame:SetScript("OnDragStart", frame.StartMoving) -- Start moving on drag
-frame:SetScript("OnDragStop", frame.StopMovingOrSizing) -- Stop moving on drag end
-frame:Hide()  -- Start hidden until the toggle button is clicked
+local playerMgrFrame = CreateFrame("Frame", "PlayerListFrame", UIParent, "BasicFrameTemplateWithInset")
+playerMgrFrame:SetSize(400, 500)
+playerMgrFrame:SetPoint("CENTER")
+playerMgrFrame:SetMovable(true)  -- Make the frame movable
+playerMgrFrame:EnableMouse(true) -- Enable mouse interaction for moving
+playerMgrFrame:RegisterForDrag("LeftButton") -- Register left-button dragging
+playerMgrFrame:SetScript("OnDragStart", playerMgrFrame.StartMoving) -- Start moving on drag
+playerMgrFrame:SetScript("OnDragStop", playerMgrFrame.StopMovingOrSizing) -- Stop moving on drag end
+playerMgrFrame:Hide()  -- Start hidden until the toggle button is clicked
 
 -- Title of the frame
-frame.title = frame:CreateFontString(nil, "OVERLAY")
-frame.title:SetFontObject("GameFontHighlight")
-frame.title:SetPoint("CENTER", frame.TitleBg, "CENTER", 0, 0)
-frame.title:SetText("Participation Manager")
+playerMgrFrame.title = playerMgrFrame:CreateFontString(nil, "OVERLAY")
+playerMgrFrame.title:SetFontObject("GameFontHighlight")
+playerMgrFrame.title:SetPoint("CENTER", playerMgrFrame.TitleBg, "CENTER", 0, 0)
+playerMgrFrame.title:SetText("Participation Manager")
 
 -- Create a header frame to hold the non-scrollable header
-local headerFrame = CreateFrame("Frame", nil, frame)
+local headerFrame = CreateFrame("Frame", nil, playerMgrFrame)
 headerFrame:SetSize(400, 30)  -- Set a fixed height for the header
-headerFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -30)
+headerFrame:SetPoint("TOPLEFT", playerMgrFrame, "TOPLEFT", 10, -30)
 
 -- Create header elements with precise positioning
 local headerRow = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -82,9 +118,9 @@ dataHeader3:SetText("Absence")
 dataHeader3:SetJustifyH("CENTER")
 
 -- Create the scroll frame inside the main frame
-local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
+local scrollFrame = CreateFrame("ScrollFrame", nil, playerMgrFrame, "UIPanelScrollFrameTemplate")
 scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -5)
-scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 10)
+scrollFrame:SetPoint("BOTTOMRIGHT", playerMgrFrame, "BOTTOMRIGHT", -30, 10)
 
 -- Create the content frame that will hold all player rows
 local contentFrame = CreateFrame("Frame", nil, scrollFrame)
@@ -104,6 +140,10 @@ for playerName, playerData in pairs(PlayersData) do
     nameLabel:SetText(playerName)
 	nameLabel:SetWidth(100)  -- Set a fixed width for alignment
     nameLabel:SetJustifyH("LEFT")  -- Align text to the left
+    -- Add mouse click handler to show dropdown
+    nameLabel:SetScript("OnMouseDown", function()
+        CreateDropdownMenu(playerName)
+    end)
 
     -- Loop to create value labels and +/- buttons for each of the three numbers
     for i = 1, 3 do
@@ -140,11 +180,8 @@ UpdatePlayerList()
 
 end
 
-
-
-
 function BubbleLoot_G.gui.OpenParticipationWindow()
-	frame:Show()
+	playerMgrFrame:Show()
 end
 
 
