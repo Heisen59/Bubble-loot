@@ -110,13 +110,21 @@ function ShowMinimapContextMenu()
         if not level then return end
 
         if level == 1 then
-            -- Add "Option 1"
+			-- Add toggle main loot window
+			info = UIDropDownMenu_CreateInfo()
+            info.text = "Show/hide the main loot window"
+            info.func = function()				
+				BubbleLoot_G.gui:ToggleVisibility()
+				end
+            UIDropDownMenu_AddButton(info, level)
+		
+            -- Add a participation to all raiders
             local info = UIDropDownMenu_CreateInfo()
             info.text = "Add a participation to all players in raid"
             info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
             UIDropDownMenu_AddButton(info, level)
 
-            -- Add "Option 2"
+            -- Add Modify a player's data
 			info = UIDropDownMenu_CreateInfo()
             info.text = "Modify a specific player's data"
             info.func = function()				
@@ -124,18 +132,14 @@ function ShowMinimapContextMenu()
 				end
             UIDropDownMenu_AddButton(info, level)
 			
+
+			
         end
     end)
 
 
     -- Show the dropdown menu at the cursor position
     ToggleDropDownMenu(1, nil, dropdownMenu, "cursor", 0, 0)
-	
-
-
-	
-	
-
 	
 end
 

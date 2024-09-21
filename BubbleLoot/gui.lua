@@ -161,6 +161,11 @@ function BubbleLoot_G.gui.SetVisibility(self, bool)
     self.mainFrame:SetShown(bool)
 end
 
+function BubbleLoot_G.gui.ToggleVisibility(self)
+	BubbleLootShown = not BubbleLootShown
+	self.mainFrame:SetShown(BubbleLootShown)
+end
+
 function BubbleLoot_G.gui.SetWidth(self, width)
     self.mainFrame:SetWidth(width)
 end
