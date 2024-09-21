@@ -14,13 +14,17 @@ local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 
 end
 
-function BubbleLoot_G.calculation.GetPlayerScore(playerName)
+function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
+
+lootscore = lootscore or false;
 
 --print("GetPlayerScore function")
 
 local score = 0
 --Check if player exist in database
 if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score end
+
+
 
 -- First, get loot score
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
@@ -30,10 +34,13 @@ local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 			--print(value[1])
 			local itemName = value[1]
 			if(itemName) then
-				score = score +  BubbleLoot_G.calculation.GetItemScore(itemName)
+				local SlotModFromDB = value[3]
+				score = score +  BubbleLoot_G.calculation.GetItemScore(playerName,itemName, SlotModFromDB)
 			end
 		end
 	end
+
+if lootscore then return score end
 
 -- Second, modify this loot score according to attendance
 local participation = BubbleLoot_G.storage.GetPlayerParticipation(playerName)
@@ -41,11 +48,27 @@ local participation = BubbleLoot_G.storage.GetPlayerParticipation(playerName)
 		score = score - cfg.constant.ATTENDANCE_VALUE*participation[cfg.index.ATTENDANCE] - cfg.constant.BENCH_VALUE*participation[cfg.index.BENCH] + cfg.constant.NON_ATTENDANCE_VALUE*participation[cfg.index.NON_ATTENDANCE]
 	end
 	
+-- Third : bonus/malus
+-- TO DO 
+	
 return score
 
 end
 
-function BubbleLoot_G.calculation.GetItemScore(item)
+function BubbleLoot_G.calculation.GetItemScore(playerName, itemName, SlotModFromDB)
+	
+	local ItemSlotMod = SlotModFromDB
+
+	if ItemSlotMod == nil then
+		ItemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(itemName)
+		print("From GetItemInfo "..ItemSlotMod)
+	end
+	
+
+	return ItemSlotMod
+end
+
+function BubbleLoot_G.calculation.GetItemSlotMode(item)
 
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
@@ -79,6 +102,7 @@ function BubbleLoot_G.calculation.GetItemScore(item)
             ["INVTYPE_BAG"] = 0,
             ["INVTYPE_QUIVER"] = 0,
         }
+		
 
 	 if itemEquipLoc and itemName then
 		local slotModValue = slotMod[itemEquipLoc]
@@ -109,9 +133,6 @@ function BubbleLoot_G.calculation.GetItem(item)
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
 
-	--print(GetItemInfo(item))
-	--print(BubbleLoot_G.calculation.GetItemScore(item))
-	
 	
 -- Check if the item was found
 local equipLocations = {

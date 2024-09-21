@@ -3,18 +3,32 @@
 local cfg = BubbleLoot_G.configuration
 
 
+-- function to create a new entry if it doesn't exist
+local function CreateNewPlayerEntry(playerName)
+    if not PlayersData[playerName] then
+        PlayersData[playerName] = {
+            items = {},
+			BonusMalus = {},
+            participation = {0,0,0}
+        }
+    end	
+end
+
+
 
 
 -- Function to add player item data
 function BubbleLoot_G.storage.AddPlayerData(playerName, item)
     -- Get current date and time
     local currentTime = date("%Y-%m-%d %H:%M:%S")
-    
+    local itemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(item)
+	
 	CreateNewPlayerEntry(playerName)
 	
     -- Add items to the player's item list
     --for _, item in ipairs(items) do
-		dataItem = {item, currentTime}
+		
+		dataItem = {item, currentTime, itemSlotMod}
         table.insert(PlayersData[playerName].items, dataItem)
     --end
 end
@@ -130,14 +144,4 @@ function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootName)
 end
 
 
--- function to create a new entry if it doesn't exist
-local function CreateNewPlayerEntry(playerName)
-    if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-			BonusMalus = {},
-            participation = {0,0,0}
-        }
-    end	
-end
 

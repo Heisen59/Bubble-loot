@@ -109,9 +109,22 @@ headerFrame:SetSize(800, 30)  -- Set a fixed height for the header
 headerFrame:SetPoint("TOPLEFT", lootsMgrFrame, "TOPLEFT", 10, -30)
 
 -- Create header elements with precise positioning
+local playerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName)
+local itemPlayerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName, true)
+
 local headerRow = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 headerRow:SetPoint("LEFT", headerFrame, "LEFT", 20, 0)
 headerRow:SetText(playerName)
+
+local dataHeader1 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+dataHeader1:SetPoint("LEFT", headerRow, "RIGHT", 50, 0)
+dataHeader1:SetText("Score : "..playerScore)
+dataHeader1:SetJustifyH("CENTER")
+
+local dataHeader2 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+dataHeader2:SetPoint("LEFT", dataHeader1, "RIGHT", 50, 0)
+dataHeader2:SetText("Items score : "..itemPlayerScore)
+dataHeader2:SetJustifyH("CENTER")
 
 -- Create the scroll frame inside the main frame
 local scrollFrame = CreateFrame("ScrollFrame", nil, lootsMgrFrame, "UIPanelScrollFrameTemplate")
