@@ -36,13 +36,16 @@ BubbleLoot_G.configuration.colors = {
     SYSTEMMSG = systemMessageColor,
 }
 
+
 BubbleLoot_G.configuration.index = 
 {
 	ATTENDANCE  	= 1,
 	BENCH 			= 2,
 	NON_ATTENDANCE  = 3,
-
 }
+
+BubbleLoot_G.configuration.SHOWN			= 1
+BubbleLoot_G.configuration.NUMBER_OF_RAID 	= 2
 
 BubbleLoot_G.configuration.constant = 
 {

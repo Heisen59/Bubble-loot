@@ -34,7 +34,6 @@ BubbleLoot_G.calculation = {}
 
 local cfg = BubbleLoot_G.configuration
 
-
 --- toggles
 --Bubbleloot_G.attributionMode = false
 
@@ -59,7 +58,7 @@ end
 
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
-    BubbleLoot_G.gui:SetVisibility(not BubbleLootShown)
+    BubbleLoot_G.gui:SetVisibility(not BubbleLootData[cfg.SHOWN])
 end
 
 -- Initialize self, plugins, saved variables
@@ -76,10 +75,16 @@ function BubbleLoot_G.Initialize(self)
     end
 
     -- Load saved variables.
-    if BubbleLootShown == nil then -- Initialize when first loaded.
-        BubbleLootShown = true;
+	BubbleLootData = BubbleLootData or {}
+	
+    if BubbleLootData[cfg.SHOWN] == nil then -- Initialize when first loaded.
+        BubbleLootData[cfg.SHOWN] = true;
     end
-    self.gui:SetVisibility(BubbleLootShown)
+    self.gui:SetVisibility(BubbleLootData[cfg.SHOWN])
+	
+	if BubbleLootData[cfg.NUMBER_OF_RAID] == nil then -- Initialize when first loaded.
+		BubbleLootData[cfg.NUMBER_OF_RAID] = 0;
+    end
 
     -- Starting in a group?
     if IsInGroup() then
@@ -141,9 +146,24 @@ end
 
 
 
+--[[
+
+Getter and setter
+
+]]--
+
+function BubbleLoot_G.getNumberOfRaid()
+	return BubbleLootData[cfg.NUMBER_OF_RAID]
+end
 
 
+function BubbleLoot_G.increaseNumberOfRaid()
+	BubbleLootData[cfg.NUMBER_OF_RAID] = BubbleLootData[cfg.NUMBER_OF_RAID] + 1
+end
 
+function BubbleLoot_G.setNumberOfRaid(num)
+	BubbleLootData[cfg.NUMBER_OF_RAID] = num
+end
 
 
 

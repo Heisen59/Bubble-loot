@@ -57,11 +57,20 @@ end
 
 --Add all raiders a participation
 function BubbleLoot_G.storage.AddRaidParticipation()
-	-- Loop through all raid members
-	local N = GetNumGroupMembers()
-	for i = 1, N do
-		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-		BubbleLoot_G.storage.AddPlayerParticipation(name, cfg.index.ATTENDANCE)
+	-- Increase the raid counter
+	if(IsInRaid()) then
+		BubbleLoot_G.increaseNumberOfRaid()
+		-- Loop through all raid members
+		local N = GetNumGroupMembers()
+		for i = 1, N do
+			local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+			BubbleLoot_G.storage.AddPlayerParticipation(name, cfg.index.ATTENDANCE)
+		end
+		
+		print("Participation of all raid member increased")
+		print(BubbleLoot_G.getNumberOfRaid().." number of raids so far !")
+	else
+		print("Function available in raid only !")	
 	end
 end
 
@@ -144,4 +153,11 @@ function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootName)
 end
 
 
+
+
+
+--[[
+
+
+--]]
 
