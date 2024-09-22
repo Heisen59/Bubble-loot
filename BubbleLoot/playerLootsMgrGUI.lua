@@ -9,6 +9,22 @@ player loots mgr windows
 -- Store references to UI elements for easy updating later
 local PlayerslootsFrame = {}
 
+-- helping function
+local function HexToRGB(hex)
+    local r = tonumber(hex:sub(1, 2), 16) / 255
+    local g = tonumber(hex:sub(3, 4), 16) / 255
+    local b = tonumber(hex:sub(5, 6), 16) / 255
+    return r, g, b
+end
+
+local function getRGBItemLink(itemLink)
+	local colorCode = itemLink:match("|c(%x%x%x%x%x%x%x%x)")
+	local r, g, b
+		if colorCode then
+			return HexToRGB(colorCode:sub(3))  -- We skip the first two characters (ff) which represent the alpha
+		end
+end
+
 -- Function to handle dropdown selection for Loots and Bonus/Malus
 local function OnClickRemove(self, arg1, arg2)
     print(arg2 .. ": removed")
@@ -22,11 +38,12 @@ local function OnClickB(self, arg1)
 end
 
 -- Function to create the dropdown menu for the player name
-local function CreateLootDropdownMenu(playerName, lootName)
+local function CreateLootDropdownMenu(playerName, lootName, lootId)
+	--print("CreateLootDropdownMenu")
     local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
     local menuList = {
 		{
-            text = lootName,  -- Player's name as the header
+            text = lootName,  -- loot's name as the header
             isTitle = true,  -- This makes the text non-clickable and acts as a title
             notCheckable = true,  -- Don't show a checkbox
         },
@@ -34,7 +51,7 @@ local function CreateLootDropdownMenu(playerName, lootName)
             text = "Remove",
             func = OnClickRemove,
             arg1 = playerName, 
-			arg2 = lootName
+			arg2 = lootId
         },
 
     }
@@ -44,8 +61,142 @@ end
 
 
 local LastFrameLevelUsed = 0
+local NumberOfPlayerFrame = 0
 
 -- Create the list of players
+
+function BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+
+    -- Clear previous frame if it exists
+    if PlayerslootsFrame[playerName] ~= nil then
+        PlayerslootsFrame[playerName]:Hide()
+        PlayerslootsFrame[playerName] = nil        
+    end
+	
+	NumberOfPlayerFrame = NumberOfPlayerFrame +1
+	
+    -- Create the main frame for the player list
+    local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
+    lootsMgrFrame:SetSize(800, 500)
+    lootsMgrFrame:SetPoint("CENTER")
+    lootsMgrFrame:SetMovable(true)
+    lootsMgrFrame:EnableMouse(true)
+    lootsMgrFrame:RegisterForDrag("LeftButton")
+    lootsMgrFrame:SetScript("OnDragStart", lootsMgrFrame.StartMoving)
+    lootsMgrFrame:SetScript("OnDragStop", lootsMgrFrame.StopMovingOrSizing)
+    lootsMgrFrame:SetFrameStrata("HIGH")
+    lootsMgrFrame:Hide()
+	
+	
+	--local alreadyPutOnTop = false
+	lootsMgrFrame:SetScript("OnDragStart", function(self)
+		self:StartMoving()
+			if LastFrameLevelUsed ==0 then LastFrameLevelUsed = self:GetFrameLevel() end
+		
+		--if not alreadyPutOnTop then
+			LastFrameLevelUsed = LastFrameLevelUsed + 4
+			self:SetFrameLevel(LastFrameLevelUsed) -- Bring the frame to the top of its current strata		
+			--alreadyPutOnTop = true
+		--end
+	end)
+
+    -- Title of the frame
+    lootsMgrFrame.title = lootsMgrFrame:CreateFontString(nil, "OVERLAY")
+    lootsMgrFrame.title:SetFontObject("GameFontHighlight")
+    lootsMgrFrame.title:SetPoint("CENTER", lootsMgrFrame.TitleBg, "CENTER", 0, 0)
+    lootsMgrFrame.title:SetText("Loots Manager")
+	
+    -- Create a header frame to hold the non-scrollable header
+    local headerFrame = CreateFrame("Frame", nil, lootsMgrFrame)
+    headerFrame:SetSize(800, 30)
+    headerFrame:SetPoint("TOPLEFT", lootsMgrFrame, "TOPLEFT", 10, -30)
+
+    -- Header elements
+    local playerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName)
+    local itemPlayerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName, true)
+
+    local headerRow = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    headerRow:SetPoint("LEFT", headerFrame, "LEFT", 20, 0)
+    headerRow:SetText(playerName)
+
+    local dataHeader1 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    dataHeader1:SetPoint("LEFT", headerRow, "RIGHT", 50, 0)
+    dataHeader1:SetText("Score : " .. playerScore)
+
+    local dataHeader2 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    dataHeader2:SetPoint("LEFT", dataHeader1, "RIGHT", 50, 0)
+    dataHeader2:SetText("Items score : " .. itemPlayerScore)
+
+    -- Create the scroll frame
+    local scrollFrame = CreateFrame("ScrollFrame", nil, lootsMgrFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -5)
+    scrollFrame:SetPoint("BOTTOMRIGHT", lootsMgrFrame, "BOTTOMRIGHT", -30, 10)
+
+    -- Content frame for items
+    local contentFrame = CreateFrame("Frame", nil, scrollFrame)
+    contentFrame:SetSize(800, 1500)
+    scrollFrame:SetScrollChild(contentFrame)
+
+    -- Create item rows
+    local rowIndex = 0
+    for lootId, lootData in pairs(PlayersData[playerName].items) do
+        local itemLink = lootData[1]
+        local lootDropDate = lootData[2]
+		local itemName = itemLink:match("%[(.+)%]")
+		itemName = "["..itemName.."]"
+		
+        rowIndex = rowIndex + 1
+        
+        -- Create the item label
+        local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
+        itemLabel:SetText(itemName)
+		itemLabel:SetTextColor(getRGBItemLink(itemLink))
+        itemLabel:SetWidth(400)
+        itemLabel:SetJustifyH("LEFT")
+
+        -- Set mouse click handler for the item label
+		itemLabel:EnableMouse(true)
+        itemLabel:SetScript("OnMouseUp", function(self, button)
+            if button == "RightButton" then
+				--print("Frame clicked : "..button)
+                CreateLootDropdownMenu(playerName, itemLink, lootId)
+            end
+        end)
+		itemLabel:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+			GameTooltip:SetHyperlink(itemLink)
+			GameTooltip:Show()
+		end)
+		itemLabel:SetScript("OnLeave", function(self)
+			GameTooltip:Hide()
+		end)
+
+        -- Create a value label
+        local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
+        valueLabel:SetText(lootDropDate)
+        valueLabel:SetJustifyH("CENTER")
+    end
+
+    -- Show the loot manager frame
+    lootsMgrFrame:Show()
+    PlayerslootsFrame[playerName] = lootsMgrFrame
+
+    -- Close button functionality
+    local CloseButton = lootsMgrFrame.CloseButton
+    CloseButton:SetScript("OnClick", function(self)
+        lootsMgrFrame:Hide()
+        lootsMgrFrame:SetParent(nil)
+        lootsMgrFrame = nil
+		NumberOfPlayerFrame = NumberOfPlayerFrame-1
+		if NumberOfPlayerFrame == 0 then LastFrameLevelUsed = 0 end
+    end)
+end
+
+--[[
+
+
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName)
 
 local point, relativeTo, relativePoint, xOffset, yOffset
@@ -138,22 +289,29 @@ scrollFrame:SetScrollChild(contentFrame)
 
 -- Dynamically create player rows inside the content frame
 local rowIndex = 0
-for index, lootData in ipairs(PlayersData[playerName].items) do
-	local itemName = lootData[1]
+for lootId, lootData in pairs(PlayersData[playerName].items) do
+	local itemLink = lootData[1]
 	local lootDropDate = lootData[2]
+	
+	--print(itemLink)
+	
     rowIndex = rowIndex + 1
 -- Player name label
     local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20 )
-    itemLabel:SetText(itemName)
+    itemLabel:SetText(itemLink)
 	itemLabel:SetWidth(400)  -- Set a fixed width for alignment
     itemLabel:SetJustifyH("LEFT")  -- Align text to the left
     -- Add mouse click handler to show dropdown
-    itemLabel:SetScript("OnMouseDown", function()
-        CreateLootDropdownMenu(playerName, itemName)
+	itemLabel:EnableMouse(true)
+    itemLabel:SetScript("OnMouseUp", function(self, button)
+		print("SetScript OnMouseUp")
+		if button == "RightButton" then
+			CreateLootDropdownMenu(playerName, itemLink, lootId)
+		end
     end)
 
-    -- Loop to create value labels and +/- buttons for each of the three numbers
+    -- Loop to create value labels 
     for i = 1, 1 do
         -- Value label
         local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -183,6 +341,11 @@ end
 	end)
 
 end
+
+
+--]]
+
+
 
 function BubbleLoot_G.gui.OpenPlayerLootWindow(playerName)
 	BubbleLoot_G.gui.createLootsMgrFrame(playerName, 0, 0)

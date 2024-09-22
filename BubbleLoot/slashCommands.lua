@@ -93,13 +93,20 @@ local function addItemToPlayer(args)
 	
 	local playerName, itemName = args:match("^(%S+)%s(.+)$")
 	
-	print(itemName)
+	--print(itemName)
 	
-	if playerName and itemName then
-		BubbleLoot_G.storage.AddPlayerData(playerName,  itemName )
-		print("Added item '" .. itemName .. "' to character '" .. playerName .. "'")
+	
+	local item, itemLink,_,_,_,_,_,_,_  = GetItemInfo(itemName)
+		
+	if playerName and itemLink then
+		BubbleLoot_G.storage.AddPlayerData(playerName,  itemLink )
+		print("Added item '" .. item .. "' to character '" .. playerName .. "'")
 	else
-		print("Usage: /bl add <characterName> <itemName>")
+		if playerName and itemName then
+			print("function addItemToPlayer can't get the itemlink from name : itemName "..itemName)
+		else
+			print("Usage: /bl add <characterName> <itemName>")
+		end
 	end
 
 end
@@ -120,23 +127,6 @@ local function getPlayerData(playerName)
 
 end
 
-
-local function getItem(itemName)
-	-- Parameter check.
-    if not itemName then
-        printError("Usage: /bl itemInfo <ItemName>")
-        return
-    end
-	
-		--printError(itemName)
-	if itemName then
-		BubbleLoot_G.calculation.GetItem(itemName)
-	else
-		printError("Usage: /bl itemInfo <ItemName>")
-	end
-	
-	
-end
 
 local function getPlayerScore(playerName)
 	-- Parameter check.
@@ -183,8 +173,6 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		addItemToPlayer(args)
 	elseif command == "get" then
 		getPlayerData(args)
-	elseif command == "itemInfo" then
-		getItem(args)
 	elseif command == "playerScore" then
 		getPlayerScore(args)
     else

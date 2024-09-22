@@ -46,6 +46,7 @@ BubbleLoot_G.configuration.index =
 
 BubbleLoot_G.configuration.SHOWN			= 1
 BubbleLoot_G.configuration.NUMBER_OF_RAID 	= 2
+BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
 
 BubbleLoot_G.configuration.constant = 
 {
@@ -79,7 +80,7 @@ BubbleLoot_G.configuration.texts = {
     RESIZE_SIZE_ERROR = "cannot resize below 100%.",
     RESIZE_PARAMETER_ERROR = "resize accepts either no argument or a number above 100.",
     TEST_PARAMETER_ERROR = "test accepts either 'fill', 'solo', 'plugins' or a plugin name.",
-	ADDLOOTTOPLAYER_PARAMETER_ERROR = "Usage: /bl add <characterName> <itemName>",
+	ADDLOOTTOPLAYER_PARAMETER_ERROR = "Usage: /bl add <characterName> <itemName or itemId> ",
 	GETPLAYERDATA_PARAMETER_ERROR = "Usage: /bl get <characterName>",
     SLASH_PARAMETER_ERROR = "unknown command. Run '/bl' for available commands.",
 
@@ -132,42 +133,49 @@ BubbleLoot_G.configuration.tokenLocation =
 }
 
 BubbleLoot_G.configuration.tokens = 
-{ 
+{["INVTYPE_HEAD"] = 
 {-- head
 "Chaperon incandescent",
 "Heaume en écailles en fusion",
 "Heaume du noyau incendié"
 },
+["INVTYPE_SHOULDER"] = 
 {--Shoulders
 "Protège-épaules incandescents",
 "Épaulières en écailles en fusion", 
 "Protège-épaules du noyau incendié"
 },
+["INVTYPE_CHEST"] = 
 {--Chest
 "Robe incandescente",
 "Plastron en écailles en fusion",
 "Plastron du noyau incendié"
 },
+["INVTYPE_HAND"] = 
 {--Gloves
 "Gants incandescents",
 "Gants en écailles en fusion",
 "Gants du noyau incendié"
 },
+["INVTYPE_WRIST"] = 
 {--Wrist
 "Manchettes incandescentes",
 "Manchettes en écailles en fusion",
 "Manchettes du noyau incendié"
 },
+["INVTYPE_WAIST"] = 
 {--Waist
 "Ceinture incandescente",
 "Ceinture en écailles en fusion",
 "Ceinture du noyau incendié"
 },
+["INVTYPE_LEGS"] = 
 {--Legs
 "Jambières incandescentes",
 "Jambières en écailles en fusion",
 "Jambières du noyau incendié"
 },
+["INVTYPE_FEET"] = 
 {--Boots
 "Bottes incandescentes",
 "Bottes incandescentes",

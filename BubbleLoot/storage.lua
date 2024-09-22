@@ -18,19 +18,33 @@ end
 
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, item)
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
     -- Get current date and time
     local currentTime = date("%Y-%m-%d %H:%M:%S")
-    local itemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(item)
+     
+	local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
+
+	instanceName = instanceName or "None"
 	
-	CreateNewPlayerEntry(playerName)
+	if itemLink and playerName then	
 	
-    -- Add items to the player's item list
-    --for _, item in ipairs(items) do
+		local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+		-- if needed, create a new player entry
+		CreateNewPlayerEntry(playerName)
 		
-		dataItem = {item, currentTime, itemSlotMod}
-        table.insert(PlayersData[playerName].items, dataItem)
-    --end
+		if not PlayersData[playerName].items then
+		 print("items sublist not initialized")
+		end
+	
+		local dataItem = {itemLink, currentTime, instanceName}
+        --table.insert(PlayersData[playerName].items, dataItem)
+		PlayersData[playerName].items[itemId] = dataItem
+  
+	else
+		print("function AddPlayerData : error")	
+	end
+	
+	
 end
 
 -- Function to modify player participation
@@ -84,7 +98,7 @@ function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
 		if PlayersData[playerName] then
 			print("Player: " .. playerName)
 			print("Items: ")
-			for index, value in ipairs(PlayersData[playerName].items) do
+			for index, value in pairs(PlayersData[playerName].items) do
 				print(value[1])
 				--[[if string.find(value[1].tostring(), "[") == nil then
 					local itemName = GetItemInfo(value[1])
@@ -103,10 +117,7 @@ function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
 	
 	
 	if not PlayersData[playerName] then
-        PlayersData[playerName] = {
-            items = {},
-            participation = {0,0,0}
-        }
+        CreateNewPlayerEntry(playerName)
 		--print("GetPlayerData : player doesn't exist")
 		return false
 	else
@@ -137,17 +148,24 @@ end
 
 
 -- function delet loot to player in database
-function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootName)
+function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootID)
+		
+	if(PlayersData[playerName].items[lootID]) then
+		PlayersData[playerName].items[lootID] = nil
+	else
+		print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
+	end
 	
-	for index, lootData in ipairs(PlayersData[playerName].items) do
+	--[[
+	for index, lootData in pairs(PlayersData[playerName].items) do
 		if lootName == lootData[1] then
 			--print(index)
 			table.remove(PlayersData[playerName].items,index)
 			return
 		end
 	end
-	
-	print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
+	]]--
+	--print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
 
 
 end

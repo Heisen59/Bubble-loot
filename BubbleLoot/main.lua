@@ -85,6 +85,11 @@ function BubbleLoot_G.Initialize(self)
 	if BubbleLootData[cfg.NUMBER_OF_RAID] == nil then -- Initialize when first loaded.
 		BubbleLootData[cfg.NUMBER_OF_RAID] = 0;
     end
+	
+	-- check if major a database modification need a restructuration
+	while BubbleLootData[cfg.DATA_STRUCTURE] ~= "v1.2" do
+		PlayersData = MigrationToNewDataBase(PlayersData)				
+	end
 
     -- Starting in a group?
     if IsInGroup() then
@@ -163,6 +168,74 @@ end
 
 function BubbleLoot_G.setNumberOfRaid(num)
 	BubbleLootData[cfg.NUMBER_OF_RAID] = num
+end
+
+
+
+
+
+--[[
+
+	Database migration
+
+]]--
+
+function MigrationToNewDataBase(PlayersDataBase)
+-- old not numbered database to v1.2
+if BubbleLootData[cfg.DATA_STRUCTURE] == nil then
+
+	local localPlayersDataBase = {}
+
+	for playerName, playerData in pairs(PlayersDataBase) do
+		--print("player "..playerName)
+		-- initialized player in localdatabase
+		localPlayersDataBase[playerName] = {
+			items = {},
+			BonusMalus = {},
+			participation = {0,0,0}
+		}
+		
+		-- do work on Items
+		for itemIndex, itemData  in ipairs(playerData.items) do
+			-- old data structure : {itemName Or link, currentTime, SlotMod}
+			-- new data structure : [itemId] = {itemLink, currentTime, instanceName}
+			
+			local oldItemNameOrLink = itemData[1]
+			local oldCurrentTime = itemData[2]
+			
+			--print("item "..oldItemNameOrLink)
+			
+			local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(oldItemNameOrLink)
+			
+			if itemLink then
+				local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+				if(itemId) then
+					localPlayersDataBase[playerName].items[itemId] = {itemLink, oldCurrentTime, ""}
+				else
+					print("Migration to v1.2, can't extract itemId from item link")
+				end
+			else
+				print("Item "..oldItemNameOrLink.." for player "..playerName.." can't be imported in new database structure. Reason : can't get item info from item name (item not in cache)")
+			end
+			
+		end
+		
+		-- do work on participation and malus
+		localPlayersDataBase[playerName].participation = PlayersDataBase[playerName].participation
+		localPlayersDataBase[playerName].BonusMalus = PlayersDataBase[playerName].BonusMalus	
+	end
+
+	print("Migration to players database v1.2 successfull")
+	BubbleLootData[cfg.DATA_STRUCTURE] = "v1.2"
+	return localPlayersDataBase
+end
+
+
+
+
+print("Data base up to date or case not yet implemented, shouldn't enter here")
+return PlayersDataBase
+
 end
 
 

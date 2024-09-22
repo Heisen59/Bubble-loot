@@ -41,7 +41,7 @@ end
 
 -- Function to handle dropdown selection for Loots and Bonus/Malus
 local function OnClickLoots(self, arg1)
-    print(arg1 .. ": Loots clicked")
+    --print(arg1 .. ": Loots clicked")
 	BubbleLoot_G.gui.OpenPlayerLootWindow(arg1)
 end
 

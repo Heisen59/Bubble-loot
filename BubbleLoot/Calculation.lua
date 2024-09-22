@@ -8,7 +8,7 @@ function BubbleLoot_G.calculation.GetPlayerItemList(playerName)
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 
  for index, value in ipairs(lootList) do
-        print("Item " .. index .. ": " .. value)
+        print(value[1].." at "..value[2].." in "..value[3])
     end
 
 
@@ -29,14 +29,8 @@ if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score e
 -- First, get loot score
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 	if(lootList) then
-		for index, value in ipairs(lootList) do
-			--local itemName = GetItemInfo(value[1])
-			--print(value[1])
-			local itemName = value[1]
-			if(itemName) then
-				local SlotModFromDB = value[3]
-				score = score +  BubbleLoot_G.calculation.GetItemScore(playerName,itemName, SlotModFromDB)
-			end
+		for itemId, _ in ipairs(lootList) do
+			score = score +  BubbleLoot_G.calculation.GetItemScore(itemId)
 		end
 	end
 
@@ -55,23 +49,17 @@ return score
 
 end
 
-function BubbleLoot_G.calculation.GetItemScore(playerName, itemName, SlotModFromDB)
+function BubbleLoot_G.calculation.GetItemScore(itemId)
 	
-	local ItemSlotMod = SlotModFromDB
-
-	if ItemSlotMod == nil then
-		ItemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(itemName)
-		print("From GetItemInfo "..ItemSlotMod)
-	end
-	
+	local ItemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 
 	return ItemSlotMod
 end
 
-function BubbleLoot_G.calculation.GetItemSlotMode(item)
+function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 
 -- First, try to get item info using the item name
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(itemId)
 	
 		local slotMod = {
             ["INVTYPE_HEAD"] = 1,
@@ -109,111 +97,39 @@ function BubbleLoot_G.calculation.GetItemSlotMode(item)
 		if slotModValue then
 			return slotModValue
 		else -- check if token
-			slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(itemName)]
+			slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(itemId)]
 			if slotModValue then
 				return slotModValue
 			else
 				return 0
 			end
 		end
-	 else		
+	 else	
+print("GetItemSlotMode function : should never enter here since working with item ID")
+	 --[[
 		slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(item)]
 		if slotModValue then
 			return slotModValue
 		else
 			return 0
 		end
+		--]]
 	end
 
 end
 
--- Function to get item equip location and ilevel
-function BubbleLoot_G.calculation.GetItem(item)
-		--print(item)
--- First, try to get item info using the item name
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(item)
 
+
+function BubbleLoot_G.calculation.SearchToken(itemID)
 	
--- Check if the item was found
-local equipLocations = {
-            ["INVTYPE_HEAD"] = "Head",
-            ["INVTYPE_NECK"] = "Neck",
-            ["INVTYPE_SHOULDER"] = "Shoulder",
-            ["INVTYPE_BODY"] = "Shirt",
-            ["INVTYPE_CHEST"] = "Chest",
-            ["INVTYPE_ROBE"] = "Chest (Robe)",
-            ["INVTYPE_WAIST"] = "Waist",
-            ["INVTYPE_LEGS"] = "Legs",
-            ["INVTYPE_FEET"] = "Feet",
-            ["INVTYPE_WRIST"] = "Wrist",
-            ["INVTYPE_HAND"] = "Hands",
-            ["INVTYPE_FINGER"] = "Finger",
-            ["INVTYPE_TRINKET"] = "Trinket",
-            ["INVTYPE_CLOAK"] = "Back",
-            ["INVTYPE_WEAPON"] = "One-Hand Weapon",
-            ["INVTYPE_SHIELD"] = "Off-Hand Shield",
-            ["INVTYPE_2HWEAPON"] = "Two-Hand Weapon",
-            ["INVTYPE_WEAPONMAINHAND"] = "Main Hand Weapon",
-            ["INVTYPE_WEAPONOFFHAND"] = "Off-Hand Weapon",
-            ["INVTYPE_HOLDABLE"] = "Held in Off-Hand",
-            ["INVTYPE_RANGED"] = "Ranged Weapon",
-            ["INVTYPE_THROWN"] = "Thrown Weapon",
-            ["INVTYPE_RANGEDRIGHT"] = "Ranged Weapon",
-            ["INVTYPE_RELIC"] = "Relic",
-            ["INVTYPE_TABARD"] = "Tabard",
-            ["INVTYPE_BAG"] = "Bag",
-            ["INVTYPE_QUIVER"] = "Quiver",
-         }
-
-
-    if itemEquipLoc and itemName then
-	        -- Use WoW's global table to translate the equip location code to a human-readable string
-        
-		
-		        -- Get the human-readable equip location
-        local equipLocString = equipLocations[itemEquipLoc]
-		-- If a location was found, print it to the chat
-        if equipLocString then
-            DEFAULT_CHAT_FRAME:AddMessage(itemName .." (ilvl "..itemLevel..")" .." can be equipped in the " .. equipLocString .. " slot.")
-        else
-			equipLocString = equipLocations[BubbleLoot_G.calculation.SearchToken(itemName)]
-			if equipLocString then
-				DEFAULT_CHAT_FRAME:AddMessage(itemName .." (ilvl "..itemLevel..")" .." can be equipped in the " .. equipLocString .. " slot.")
-			else			
-				DEFAULT_CHAT_FRAME:AddMessage("Equip location for " .. itemName .. " is unknown.")
-			end
-        end
-	else
-	-- If the item wasn't found, inform the player
-	print("GetItem function : point A")
-	--print(item)
-	itemEquipLoc = BubbleLoot_G.calculation.SearchToken(item)
-	--print(itemEquipLoc)
-	local equipLocString = equipLocations[itemEquipLoc]
-	--print(equipLocString)
-		if equipLocString then
-			DEFAULT_CHAT_FRAME:AddMessage(item .." can be equipped in the " .. equipLocString .. " slot.")
-		else	
-			DEFAULT_CHAT_FRAME:AddMessage("Item '" .. item .. "' not found.")
-		end
-    end
-end
-
-
-function BubbleLoot_G.calculation.SearchToken(itemName)
-	
-	--print(itemName)
-	--print("function SearchToken")
-	--print(tokenList[1][1])
-	--local itemEquipLocIndex = nil
 	for tokenType, subListToken in ipairs(cfg.tokens) do
 	--print(subListToken)
-		for _, tokenName in ipairs(subListToken)do
+		for _, tokenID in ipairs(subListToken)do
 			--print(tokenType)
-			if tokenName == itemName then
+			if itemID == tokenID then
 					--print(tokenType)
 					--print(cfg.tokenLocation[tokenType])
-					return cfg.tokenLocation[tokenType]			
+					return tokenType		
 			end
 		end		
 	end

@@ -204,18 +204,20 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
     if IsAltKeyDown() and (IsInRaid() or test) then
         -- Get the item name based on the source (bag or loot window)
         local itemName
+		local itemID
+		local itemLink 
         if source == "bag" then
-            local itemLink = C_Container and C_Container.GetContainerItemLink(bag, slot) or GetContainerItemLink(bag, slot)
-            if itemLink then
-                itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
-            end
+            itemLink = C_Container and C_Container.GetContainerItemLink(bag, slot) or GetContainerItemLink(bag, slot)
         elseif source == "loot" then
-            local itemLink = GetLootSlotLink(lootSlot)
-            if itemLink then
-                itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
-            end
+            itemLink = GetLootSlotLink(lootSlot)
         end
+	
+		if itemLink then
+			itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
+			itemID = tonumber(string.match(itemLink, "item:(%d+):"))
+		end
 		
+				
         -- Create the dropdown menu
         local dropdownMenu = CreateFrame("Frame", "MyAddonRaidMenu", UIParent, "UIDropDownMenuTemplate")
 
@@ -254,28 +256,28 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 					local N = GetNumGroupMembers()
 					--N = 5
 					for i = 1, N do
-						local name, rank, subgroup, plevel, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-						--local name = "TEST"..i
-						if name then
+						local playerName, rank, subgroup, plevel, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+						--local playerName = "TEST"..i
+						if playerName then
 							-- Create a menu item for each raid member
 							local info = UIDropDownMenu_CreateInfo()
-							info.text = name
+							info.text = playerName
 							info.func = function()
-											if itemName then
-												BubbleLoot_G.storage.AddPlayerData(name, itemName)
+											if itemLink then
+												BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 												if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 													-- Send the message to the RAID_WARNING channel
-													SendChatMessage(name.." has win "..itemName, "RAID_WARNING")
+													SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
 												else 
-													SendChatMessage(name.." has win "..itemName, "RAID")
-													-- print(name.." has win "..itemName)
+													SendChatMessage(playerName.." has win "..itemName, "RAID")
+													-- print(playerName.." has win "..itemName)
 													-- print("You must be a raid leader or assistant to send a raid warning.")
 												end
 												if source == "loot" and lootSlot then
-												GiveLootToPlayer(lootSlot, name) -- Send the loot to the selected player
+												GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
 												end
 											else
-												print("ShowRaidMemberMenu : can't get the item name")
+												print("ShowRaidMemberMenu : can't get the item link")
 											end
 										end
 							UIDropDownMenu_AddButton(info, level)
@@ -287,28 +289,27 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 					if MS_Rollers then
 						local N = table.getn(MS_Rollers)
 						for i = 1, N do
-							--local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-							local name = MS_Rollers[i]
-							if name then
+							local playerName = MS_Rollers[i]
+							if playerName then
 								-- Create a menu item for each raid member
 								local info = UIDropDownMenu_CreateInfo()
-								info.text = name
+								info.text = playerName
 								info.func = function()
-												if itemName then
-													BubbleLoot_G.storage.AddPlayerData(name, itemName)
+												if itemLink then
+													BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 													if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 														-- Send the message to the RAID_WARNING channel
-														SendChatMessage(name.." has win "..itemName, "RAID_WARNING")
+														SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
 													else 
-														SendChatMessage(name.." has win "..itemName, "RAID")
-														-- print(name.." has win "..itemName)
+														SendChatMessage(playerName.." has win "..itemName, "RAID")
+														-- print(playerName.." has win "..itemName)
 														-- print("You must be a raid leader or assistant to send a raid warning.")
 													end
 													if source == "loot" and lootSlot then
-														GiveLootToPlayer(lootSlot, name) -- Send the loot to the selected player
+														GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
 													end
 												else
-													print("ShowRaidMemberMenu : can't get the item name")
+													print("ShowRaidMemberMenu : can't get the item link")
 												end
 											end
 								UIDropDownMenu_AddButton(info, level)
