@@ -57,6 +57,12 @@ BubbleLoot_G.configuration.constant =
 
 BubbleLoot_G.configuration.tau = 3
 
+-- Cancel table
+BubbleLoot_G.configuration.cancelIndex = 
+{
+	LAST_DELETED_LOOT_PLAYER_LIST = 1
+}
+
 -- Texts
 BubbleLoot_G.configuration.texts = {
     -- GENERAL.

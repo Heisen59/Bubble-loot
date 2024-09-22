@@ -148,9 +148,11 @@ end
 
 
 -- function delet loot to player in database
-function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootID)
+function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootID)		
+			
 		
 	if(PlayersData[playerName].items[lootID]) then
+		BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[lootID])
 		PlayersData[playerName].items[lootID] = nil
 	else
 		print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
@@ -172,10 +174,70 @@ end
 
 
 
+function BubbleLoot_G.storage.getAllPlayersFromDB()
 
+	local PlayerList = {}
+
+	for playerName, value in pairs(PlayersData) do
+		--print(playerName)
+		table.insert(PlayerList, playerName)
+	end
+
+	table.sort(PlayerList)
+
+	return PlayerList
+
+end
+
+function BubbleLoot_G.storage.playerGiveLootToPlayer(donor, recipient, lootId)
+
+
+	if(PlayersData[donor].items[lootId]) then
+		local itemData = PlayersData[donor].items[lootId]
+		PlayersData[recipient].items[lootId] = itemData
+		PlayersData[donor].items[lootId] = nil
+		print(donor.." gave " .. lootId .. " to " .. recipient)
+	else
+		print(donor.." doesn't have the required item "..lootId)
+		return false
+	end
+
+end
 
 --[[
 
+	Cancel Data
 
 --]]
+
+function BubbleLoot_G.storage.getLastDeletedItemForPlayer(playerName)
+	
+	if CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] then
+		return CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
+	else
+		CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] = {}
+		return nil
+	end
+	
+end
+
+function BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
+
+	-- restore in PlayersData
+	local itemData = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
+	local itemId = tonumber(string.match(itemData[1], "item:(%d+):"))	
+	PlayersData[playerName].items[itemId] = itemData
+	
+	-- remove from CancelData
+	table.remove(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName], 1)
+	
+	
+
+end
+
+function BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, itemData)
+
+	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  itemData)
+
+end
 

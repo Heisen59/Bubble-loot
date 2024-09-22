@@ -27,21 +27,17 @@ end
 
 -- Function to handle dropdown selection for Loots and Bonus/Malus
 local function OnClickRemove(self, arg1, arg2)
-    print(arg2 .. ": removed")
+    --print(arg2 .. ": removed")
 	BubbleLoot_G.storage.DeletePlayerSpecificLoot(arg1, arg2)
 	--UpdateLootsList(arg1)	
 	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
-end
-
-local function OnClickB(self, arg1)
-    print(arg1 .. ": B clicked")
 end
 
 -- Function to create the dropdown menu for the player name
 local function CreateLootDropdownMenu(playerName, lootName, lootId)
 	--print("CreateLootDropdownMenu")
     local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
-    local menuList = {
+    local menuItems  = {
 		{
             text = lootName,  -- loot's name as the header
             isTitle = true,  -- This makes the text non-clickable and acts as a title
@@ -53,10 +49,28 @@ local function CreateLootDropdownMenu(playerName, lootName, lootId)
             arg1 = playerName, 
 			arg2 = lootId
         },
-
+		{
+			text = "Give to player",
+			hasArrow = true,
+			menuList = {}
+		}
     }
+	
+	-- Populate the player list for the "Give to player" option
+	local allPlayersListFromDB = BubbleLoot_G.storage.getAllPlayersFromDB()
+	
+	for _, RecevingPlayer in ipairs(allPlayersListFromDB) do
+		table.insert(menuItems[3].menuList, {
+			text = RecevingPlayer,
+			func = function() 
+					BubbleLoot_G.storage.playerGiveLootToPlayer(playerName, RecevingPlayer, lootId)
+					BubbleLoot_G.gui.createLootsMgrFrame(RecevingPlayer)
+					BubbleLoot_G.gui.createLootsMgrFrame(playerName)										
+				end
+		})
+	end
     
-    EasyMenu(menuList, dropdown, "cursor", 0 , 0, "MENU")
+    EasyMenu(menuItems, dropdown, "cursor", 0 , 0, "MENU")
 end
 
 
@@ -82,10 +96,15 @@ end
 	
 	NumberOfPlayerFrame = NumberOfPlayerFrame +1
 	
+	-- Last deleted item
+	local LastDeletedItemData = BubbleLoot_G.storage.getLastDeletedItemForPlayer(playerName)
+	
+	
+	
     -- Create the main frame for the player list
     local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
     lootsMgrFrame:SetSize(800, 500)
-	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 0, yOffset or 0)
+	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 20*NumberOfPlayerFrame, yOffset or -20*NumberOfPlayerFrame)
     lootsMgrFrame:SetMovable(true)
     lootsMgrFrame:EnableMouse(true)
     lootsMgrFrame:RegisterForDrag("LeftButton")
@@ -93,7 +112,8 @@ end
     lootsMgrFrame:SetScript("OnDragStop", lootsMgrFrame.StopMovingOrSizing)
     lootsMgrFrame:SetFrameStrata("HIGH")
     lootsMgrFrame:Hide()
-	
+	LastFrameLevelUsed = LastFrameLevelUsed + 4 
+	lootsMgrFrame:SetFrameLevel(LastFrameLevelUsed)
 	
 	--local alreadyPutOnTop = false
 	lootsMgrFrame:SetScript("OnDragStart", function(self)
@@ -133,7 +153,28 @@ end
     local dataHeader2 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     dataHeader2:SetPoint("LEFT", dataHeader1, "RIGHT", 50, 0)
     dataHeader2:SetText("Items score : " .. itemPlayerScore)
-
+	
+	if LastDeletedItemData then
+	
+		local CancelButtonHeader3 = CreateFrame("Button", "CancelButton", headerFrame, "UIPanelButtonTemplate")
+		CancelButtonHeader3:SetSize(200, 30)
+		CancelButtonHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 30, 0)
+		CancelButtonHeader3:SetText("Cancel last deleted item")
+		CancelButtonHeader3:EnableMouse(true)
+		CancelButtonHeader3:Show()
+		CancelButtonHeader3:SetScript("OnClick", function(self)
+			BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
+			BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+		end)
+		
+		local CancelItemLinkHeader4 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 30, 0)
+		CancelItemLinkHeader4:SetText(LastDeletedItemData[1])
+		CancelItemLinkHeader4:Show()
+	
+	end
+	
+	
     -- Create the scroll frame
     local scrollFrame = CreateFrame("ScrollFrame", nil, lootsMgrFrame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -5)

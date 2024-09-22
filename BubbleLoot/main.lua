@@ -75,9 +75,12 @@ function BubbleLoot_G.Initialize(self)
     end
 
     -- Load saved variables.
+	CancelData = CancelData or {}
+	CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] or {}
+	
 	BubbleLootData = BubbleLootData or {}
 	
-    if BubbleLootData[cfg.SHOWN] == nil then -- Initialize when first loaded.
+	if BubbleLootData[cfg.SHOWN] == nil then -- Initialize when first loaded.
         BubbleLootData[cfg.SHOWN] = true;
     end
     self.gui:SetVisibility(BubbleLootData[cfg.SHOWN])
