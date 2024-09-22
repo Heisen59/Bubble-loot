@@ -141,51 +141,51 @@ BubbleLoot_G.configuration.tokenLocation =
 BubbleLoot_G.configuration.tokens = 
 {["INVTYPE_HEAD"] = 
 {-- head
-"Chaperon incandescent",
-"Heaume en écailles en fusion",
-"Heaume du noyau incendié"
+227532,--"Chaperon incandescent",
+227755,-- "Heaume en écailles en fusion",
+227764,-- "Heaume du noyau incendié"
 },
 ["INVTYPE_SHOULDER"] = 
 {--Shoulders
-"Protège-épaules incandescents",
-"Épaulières en écailles en fusion", 
-"Protège-épaules du noyau incendié"
+227537,-- "Protège-épaules incandescents",
+227752,-- "Épaulières en écailles en fusion", 
+227762,-- "Protège-épaules du noyau incendié"
 },
 ["INVTYPE_CHEST"] = 
 {--Chest
-"Robe incandescente",
-"Plastron en écailles en fusion",
-"Plastron du noyau incendié"
+227535,-- "Robe incandescente",
+227758,-- "Plastron en écailles en fusion",
+227766,-- "Plastron du noyau incendié"
 },
 ["INVTYPE_HAND"] = 
 {--Gloves
-"Gants incandescents",
-"Gants en écailles en fusion",
-"Gants du noyau incendié"
+227533,-- "Gants incandescents",
+227756,-- "Gants en écailles en fusion",
+227759,-- "Gants du noyau incendié"
 },
 ["INVTYPE_WRIST"] = 
 {--Wrist
-"Manchettes incandescentes",
-"Manchettes en écailles en fusion",
-"Manchettes du noyau incendié"
+227531,-- "Manchettes incandescentes",
+227750,-- "Manchettes en écailles en fusion",
+227760,-- "Manchettes du noyau incendié"
 },
 ["INVTYPE_WAIST"] = 
 {--Waist
-"Ceinture incandescente",
-"Ceinture en écailles en fusion",
-"Ceinture du noyau incendié"
+227530,-- "Ceinture incandescente",
+227751,-- "Ceinture en écailles en fusion",
+227761,-- "Ceinture du noyau incendié"
 },
 ["INVTYPE_LEGS"] = 
 {--Legs
-"Jambières incandescentes",
-"Jambières en écailles en fusion",
-"Jambières du noyau incendié"
+227534,-- "Jambières incandescentes",
+227754,-- "Jambières en écailles en fusion",
+227763,-- "Jambières du noyau incendié"
 },
 ["INVTYPE_FEET"] = 
 {--Boots
-"Bottes incandescentes",
-"Bottes incandescentes",
-"Bottes du noyau incendié"
+227536,-- "Bottes incandescentes",
+227536,-- "Bottes incandescentes",
+227765,-- "Bottes du noyau incendié"
 },
 }
 

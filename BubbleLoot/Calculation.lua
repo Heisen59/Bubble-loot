@@ -7,7 +7,7 @@ function BubbleLoot_G.calculation.GetPlayerItemList(playerName)
 
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 
- for index, value in ipairs(lootList) do
+ for index, value in pairs(lootList) do
         print(value[1].." at "..value[2].." in "..value[3])
     end
 
@@ -29,7 +29,7 @@ if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score e
 -- First, get loot score
 local lootList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
 	if(lootList) then
-		for itemId, _ in ipairs(lootList) do
+		for itemId, _ in pairs(lootList) do
 			score = score +  BubbleLoot_G.calculation.GetItemScore(itemId)
 		end
 	end
