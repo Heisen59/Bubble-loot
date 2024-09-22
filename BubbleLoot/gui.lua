@@ -262,7 +262,7 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 							-- Create a menu item for each raid member
 							local info = UIDropDownMenu_CreateInfo()
 							info.text = playerName
-							info.func = function()
+							info.func = function()											
 											if itemLink then
 												BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 												if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
@@ -294,8 +294,8 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 								-- Create a menu item for each raid member
 								local info = UIDropDownMenu_CreateInfo()
 								info.text = playerName
-								info.func = function()
-												if itemLink then
+								info.func = function()												
+												if itemLink then													
 													BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 													if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 														-- Send the message to the RAID_WARNING channel

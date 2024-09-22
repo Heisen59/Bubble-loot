@@ -19,7 +19,8 @@ end
 
 -- Function to add player item data
 function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
-    -- Get current date and time
+    --print("I'm in AddPlayerData")
+	-- Get current date and time
     local currentTime = date("%Y-%m-%d %H:%M:%S")
      
 	local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
@@ -39,6 +40,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 		local dataItem = {itemLink, currentTime, instanceName}
         --table.insert(PlayersData[playerName].items, dataItem)
 		PlayersData[playerName].items[itemId] = dataItem
+		
+		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
   
 	else
 		print("function AddPlayerData : error")	

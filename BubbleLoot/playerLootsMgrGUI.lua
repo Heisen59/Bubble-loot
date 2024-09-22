@@ -79,7 +79,12 @@ local NumberOfPlayerFrame = 0
 
 -- Create the list of players
 
-function BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+function BubbleLoot_G.gui.createLootsMgrFrame(playerName, refresh)
+
+-- refresh only if already exist
+if refresh==true and PlayerslootsFrame[playerName]==nil then
+	return
+end
 
     -- Clear previous frame if it exists
 local point, relativeTo, relativePoint, xOffset, yOffset
@@ -239,6 +244,10 @@ end
         lootsMgrFrame = nil
 		NumberOfPlayerFrame = NumberOfPlayerFrame-1
 		if NumberOfPlayerFrame == 0 then LastFrameLevelUsed = 0 end
+		
+		-- Remove the frame from its parent and delete it
+		PlayerslootsFrame[playerName] = nil	
+		
     end)
 end
 
