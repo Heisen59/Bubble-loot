@@ -180,7 +180,7 @@ end
 local function GiveLootToPlayer(lootSlot, playerName)
     -- Find the raid index for the player
     for i = 1, GetNumGroupMembers() do
-        local name = GetRaidRosterInfo(i)
+        local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
         if name == playerName then
             -- Assign the loot to the player
             GiveMasterLoot(lootSlot, i)
