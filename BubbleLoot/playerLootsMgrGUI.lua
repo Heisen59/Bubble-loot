@@ -68,17 +68,24 @@ local NumberOfPlayerFrame = 0
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName)
 
     -- Clear previous frame if it exists
-    if PlayerslootsFrame[playerName] ~= nil then
-        PlayerslootsFrame[playerName]:Hide()
-        PlayerslootsFrame[playerName] = nil        
-    end
+local point, relativeTo, relativePoint, xOffset, yOffset
+if PlayerslootsFrame[playerName] ~= nil then
+	point, relativeTo, relativePoint, xOffset, yOffset = PlayerslootsFrame[playerName]:GetPoint()
+	
+	-- Hide the frame
+	PlayerslootsFrame[playerName]:Hide()
+	-- Remove the frame from its parent and delete it
+	PlayerslootsFrame[playerName]:SetParent(nil)
+	PlayerslootsFrame[playerName] = nil		
+	
+end
 	
 	NumberOfPlayerFrame = NumberOfPlayerFrame +1
 	
     -- Create the main frame for the player list
     local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
     lootsMgrFrame:SetSize(800, 500)
-    lootsMgrFrame:SetPoint("CENTER")
+	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 0, yOffset or 0)
     lootsMgrFrame:SetMovable(true)
     lootsMgrFrame:EnableMouse(true)
     lootsMgrFrame:RegisterForDrag("LeftButton")
