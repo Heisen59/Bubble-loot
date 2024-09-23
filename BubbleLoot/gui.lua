@@ -212,6 +212,55 @@ local function GiveLootToPlayer(lootSlot, playerName)
     print("Player " .. playerName .. " not found in raid.")
 end
 
+
+-- countdown function
+local function SendCountdownToRaidChat(itemLink)
+    if IsInRaid() or true then  -- Ensure you're in a raid
+        local countdown = { "5", "4", "3", "2", "1" }
+        local delay = 10  -- Start delay at 0 seconds
+		local channel = "GUILD" --"RAID"
+
+		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
+		SendChatMessage("Distribution de "..itemLink, "RAID_WARNING")
+		SendChatMessage("Choisissez +1/+2/pass pour "..itemLink.." et /rand si +2. Vous avez "..(delay+5).."s !", channel)
+	
+        -- Loop through the countdown table
+        for i, number in ipairs(countdown) do
+            C_Timer.After(delay, function()
+                SendChatMessage(number, channel)
+            end)
+            delay = delay + 1  -- Increment delay for each number
+        end
+
+        -- Send "GO!" at the end of the countdown
+        C_Timer.After(delay, function()
+            SendChatMessage("Time's up!", channel)
+        end)
+    else
+        print("You are not in a raid group.")
+    end
+end
+
+
+-- Function to attempt trading the item with the selected player
+local function AttemptTradeWithPlayer(playerName, bag, slot)
+	
+    -- Check if the player is close enough to trade
+    if CheckInteractDistance(playerName, 2) then
+		
+	
+        -- Open trade window
+        InitiateTrade(playerName)
+        
+		-- Pick up the item and place it in the trade window
+		C_Container.PickupContainerItem(bag, slot)
+		--ClickTradeButton(1) -- Put it in the first trade slot
+        
+    else
+        print(playerName .. " is too far away to trade.")
+    end
+end
+
 -- Function to create the raid members list when right-clicking an item
 function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 	--print("test A")
@@ -221,7 +270,7 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 	--print(lootslot)
 	--print(IsAltKeyDown())
     -- Check if the player is in a raid and holding Alt
-	local test = false
+	local test = true
     if IsAltKeyDown() and (IsInRaid() or test) then
         -- Get the item name based on the source (bag or loot window)
         local itemName
@@ -256,8 +305,19 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
                 info.notCheckable = true -- This makes sure the title cannot be checked
                 UIDropDownMenu_AddButton(info, level)
 			
-                -- Add a main menu entry called "All Raid"
+				-- Add a main menu entry called "All Raid"
                 local info = UIDropDownMenu_CreateInfo()
+                info.text = "Raid offer"
+                info.hasArrow = false -- This tells the menu item to create a submenu
+                info.notCheckable = false
+				info.func = function()
+								BubbleLoot_G.rollerCollection:Clear()
+								BubbleLoot_G:Draw()
+								SendCountdownToRaidChat(itemLink)
+							end
+                UIDropDownMenu_AddButton(info, level)
+                -- Add a main menu entry called "All Raid"
+                info = UIDropDownMenu_CreateInfo()
                 info.text = "All Raid"
                 info.hasArrow = true -- This tells the menu item to create a submenu
                 info.notCheckable = true
@@ -295,8 +355,12 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 													-- print("You must be a raid leader or assistant to send a raid warning.")
 												end
 												if source == "loot" and lootSlot then
-												GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
+													GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
 												end
+												if source == "bag" and bag and slot then
+													AttemptTradeWithPlayer(playerName, bag, slot)
+												end
+												
 											else
 												print("ShowRaidMemberMenu : can't get the item link")
 											end
@@ -328,6 +392,9 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 													end
 													if source == "loot" and lootSlot then
 														GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
+													end
+													if source == "bag" and bag and slot then
+														AttemptTradeWithPlayer(playerName, bag, slot)
 													end
 												else
 													print("ShowRaidMemberMenu : can't get the item link")
