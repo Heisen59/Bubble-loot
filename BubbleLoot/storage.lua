@@ -11,6 +11,8 @@ local function CreateNewPlayerEntry(playerName)
 			BonusMalus = {},
             participation = {0,0,0}
         }
+		
+		BubbleLoot_G.gui.RefreshParticipationWindow()
     end	
 end
 

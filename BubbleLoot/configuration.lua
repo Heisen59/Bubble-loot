@@ -10,7 +10,7 @@ BubbleLoot_G.configuration.ADDON_NAME = "BubbleLoot"
 BubbleLoot_G.configuration.size = {
     EMPTY_HEIGHT = 30, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
-    FRAME_WIDTH = 300, -- Default value.
+    FRAME_WIDTH = 350, -- Default value.
 }
 
 local systemMessageColor = "FFFFFF00"
@@ -72,6 +72,7 @@ BubbleLoot_G.configuration.texts = {
     NEED_HEADER = "Need",
 	SCORE_HEADER = "Score",
 	CHANCE_HEADER = "Chance",
+	ROLL_HEADER = "Roll",
 	UNIT_LOOT_SCORE_HEADER = "Loot Score",
     PASS = "pass",
 

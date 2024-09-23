@@ -25,9 +25,34 @@ local methods = {}
 
 -- Update need and set connected flags.
 function methods.UpdateNeed(self, need)
-    self.repeated = true
+
+	if need == nil then
+		need = self.need
+	end
+
+    --self.repeated = true
     self.need = need
     self.needChanged = true
+end
+
+-- Update need and set connected flags.
+function methods.UpdateRoll(self, roll)
+	
+	if roll == nil then
+		if self.roll == nil then
+			roll = 0
+		else
+			roll = self.roll
+		end
+	end
+
+	if roll>0 and self.roll ~= roll and self.roll >0 then	
+		-- print("I'm in UpdateRoll")
+		self.repeated = true
+	end
+	
+    self.roll = roll
+    self.rollChanged = true
 end
 
 -- Update raid subgroup or group state.
@@ -49,11 +74,26 @@ function methods.MakeNeedText(self)
     if self.need == 9 then
         return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
 	elseif self.need == 1 then
-		return self.ColorTextIfMulti("+1", self.repeated)
+		return self.ColorTextIfMulti("+1", self.needChanged)
 	elseif self.need == 2 then
-		return self.ColorTextIfMulti("+2", self.repeated)
+		return self.ColorTextIfMulti("+2", self.needChanged)
 	else
-		return self.ColorTextIfMulti("Other", self.repeated)
+		return self.ColorTextIfMulti("Other", self.needChanged)
+	end
+end
+
+
+function methods.MakeRollText(self)
+	-- print(self.need)
+	-- print(self.roll)
+    if self.need == 9 then
+        return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
+	else
+		if self.repeated then
+			return self.ColorTextIfMulti(tostring(self.roll), self.repeated)
+		else
+			return tostring(self.roll)
+		end
 	end
 end
 
@@ -105,9 +145,12 @@ function BubbleLoot_G.roller.New(name, need, playerInfo)
         need = need,
         repeated = false,
         needChanged = true,
+		needRepeated = false,
 		score = BubbleLoot_G.calculation.GetPlayerScore(name),
 		chance = 0,
 		cumulative_chance = 0,
+		roll = 0,
+		rollChanged = true,
     }
     -- Add methods.
     for funcName, func in pairs(methods) do

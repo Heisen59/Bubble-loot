@@ -61,6 +61,8 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(itemId)
 	
+	-- print(itemName)
+	
 		local slotMod = {
             ["INVTYPE_HEAD"] = 1,
             ["INVTYPE_NECK"] = 0.5625,
@@ -101,11 +103,16 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 			if slotModValue then
 				return slotModValue
 			else
+				print("GetItemSlotMode function : "..itemName.." doesn't have any slot mod")			
 				return 0
 			end
 		end
 	 else	
-print("GetItemSlotMode function : should never enter here since working with item ID")
+		if itemName then 
+			print("GetItemSlotMode function : "..itemName.." doesn't have any itemEquipLoc")			
+		else
+			print("GetItemSlotMode function : should never enter here since working with item ID")
+		end		
 	 --[[
 		slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(item)]
 		if slotModValue then
@@ -115,6 +122,8 @@ print("GetItemSlotMode function : should never enter here since working with ite
 		end
 		--]]
 	end
+	
+	return 0
 
 end
 

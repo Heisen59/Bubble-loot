@@ -117,22 +117,54 @@ dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 35, 0)
 dataHeader3:SetText("Absence")
 dataHeader3:SetJustifyH("CENTER")
 
+
+scrollFrame = nil
+contentFrame = nil
+
+-- Create the list of players
+function BubbleLoot_G.gui.createAttendanceFrame(refresh)
+
+if refresh == true and contentFrame~= nil and scrollFrame~= nil then
+
+	UpdatePlayerList()
+
+	contentFrame:Hide()
+	contentFrame:SetParent(nil)
+	contentFrame = nil
+	
+	scrollFrame:Hide()
+	scrollFrame:SetParent(nil)
+	scrollFrame = nil
+
+	--return
+end
+
 -- Create the scroll frame inside the main frame
-local scrollFrame = CreateFrame("ScrollFrame", nil, playerMgrFrame, "UIPanelScrollFrameTemplate")
+scrollFrame = CreateFrame("ScrollFrame", nil, playerMgrFrame, "UIPanelScrollFrameTemplate")
 scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -5)
 scrollFrame:SetPoint("BOTTOMRIGHT", playerMgrFrame, "BOTTOMRIGHT", -30, 10)
 
 -- Create the content frame that will hold all player rows
-local contentFrame = CreateFrame("Frame", nil, scrollFrame)
+contentFrame = CreateFrame("Frame", nil, scrollFrame)
 contentFrame:SetSize(400, 1500)  -- Adjust height to fit a large number of players
 scrollFrame:SetScrollChild(contentFrame)
 
--- Create the list of players
-function BubbleLoot_G.gui.createAttendanceFrame()
+
+-- sort PlayersData
+			
+local SortPlayersData = {}
+for k in pairs(PlayersData) do
+    table.insert(SortPlayersData, k)
+end
+
+table.sort(SortPlayersData)
 
 -- Dynamically create player rows inside the content frame
 local rowIndex = 0
-for playerName, playerData in pairs(PlayersData) do
+for _, playerName in pairs(SortPlayersData) do
+
+	playerData = PlayersData[playerName]
+
     rowIndex = rowIndex + 1
 -- Player name label
     local nameLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -176,9 +208,15 @@ for playerName, playerData in pairs(PlayersData) do
 end
 
 -- Update the player list on load
-UpdatePlayerList()
+--UpdatePlayerList()
 
 end
+
+
+function BubbleLoot_G.gui.RefreshParticipationWindow()
+	BubbleLoot_G.gui.createAttendanceFrame(true)
+end
+
 
 function BubbleLoot_G.gui.OpenParticipationWindow()
 	playerMgrFrame:Show()

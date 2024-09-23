@@ -31,16 +31,6 @@ function BubbleLoot_G.rollerCollection.Draw(self)
     local currentRow = 0
     local orderChanged = false
 
-    if not self.isSorted then
-        table.sort(self.values, function(lhs, rhs)
-            --return lhs.need < rhs.need
-			return lhs.score < rhs.score
-        end)
-
-        orderChanged = true
-        self.isSorted = true
-    end
-
 	local threshold = 9
 	
 	-- set the threshold
@@ -49,6 +39,24 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 			threshold = roller.need
 		end
 	end
+	
+	
+	if not self.isSorted then
+		if threshold == 1 then
+			table.sort(self.values, function(lhs, rhs)
+				--return lhs.need < rhs.need
+				return lhs.score < rhs.score
+			end)
+		else
+			table.sort(self.values, function(lhs, rhs)
+				--return lhs.need < rhs.need
+				return lhs.roll < rhs.roll
+			end)
+		end
+        orderChanged = true
+        self.isSorted = true
+    end
+	
 
 	local i = 1
     for index, roller in ipairs(self.values) do
@@ -59,26 +67,33 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 				unitText = roller:MakeUnitText()
 				roller.unitChanged = false
 			end
-			-- roll
+			-- need
 			local needText = nil
-			if orderChanged or roller.rollChanged then
+			if orderChanged or roller.needChanged then
 				needText = roller:MakeNeedText()
-				roller.rollChanged = false
+				roller.needChanged = false
 			end
 			-- score
 			local scoreText = nil
-			if orderChanged or roller.rollChanged then
+			if orderChanged then
 				scoreText = roller:MakeScoreText()
 				--roller.scoreTextChanged = false
 			end
 			-- chance
 			local chanceText = nil
-			if orderChanged or roller.rollChanged then
+			if orderChanged then
 				chanceText = roller:MakeChanceText()
 				--roller.chanceTextChanged = false
-			end			
+			end		
+			-- roll
+			local rollText = nil
+			if orderChanged or roller.rollChanged then
+				rollText = roller:MakeRollText()
+				roller.rollChanged = false
+			end
+			
 			-- write
-			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText, chanceText)
+			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText, chanceText, rollText)
 			currentRow = i
 			i = i+1		
 		end
@@ -152,18 +167,27 @@ end
 
 
 -- Update `roller` (if exists) or create a new one.
-function BubbleLoot_G.rollerCollection.Save(self, name, need)
-    local roller = self:FindRoller(name)
+function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
+
+	local roller = self:FindRoller(name)
+    
     if roller ~= nil then
         roller:UpdateNeed(need)
+		roller:UpdateRoll(roll)
+		
+		self.isSorted = false
+		self:LootChanceRoller()
+		
     else
-        local groupType = BubbleLoot_G:GetGroupType()
-        local playerInfo = BubbleLoot_G.playerInfo:Get(name, groupType)
-        roller = BubbleLoot_G.roller.New(name, need, playerInfo)
-        table.insert(self.values, roller)
+		if need ~= nil then
+			local groupType = BubbleLoot_G:GetGroupType()
+			local playerInfo = BubbleLoot_G.playerInfo:Get(name, groupType)
+			roller = BubbleLoot_G.roller.New(name, need, playerInfo)
+			table.insert(self.values, roller)
+			self.isSorted = false
+			self:LootChanceRoller()
+		end
     end
-    self.isSorted = false
-	self:LootChanceRoller()
 end
 
 

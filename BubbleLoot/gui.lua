@@ -59,7 +59,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.unitHeader = unitHeader
     -- NEED
     local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, -5)
+    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -150, -5)
     needHeader:SetHeight(cfg.size.ROW_HEIGHT)
     needHeader:SetJustifyH("LEFT")
     needHeader:SetJustifyV("TOP")
@@ -68,7 +68,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.needHeader = needHeader
 	-- SCORE
     local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, -5)
+    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, -5)
     scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
     scoreHeader:SetJustifyH("LEFT")
     scoreHeader:SetJustifyV("TOP")
@@ -77,13 +77,22 @@ function BubbleLoot_G.gui.Initialize(self)
     self.scoreHeader = scoreHeader
 	-- CHANCE
     local chanceHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, -5)
     chanceHeader:SetHeight(cfg.size.ROW_HEIGHT)
     chanceHeader:SetJustifyH("LEFT")
     chanceHeader:SetJustifyV("TOP")
     chanceHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     chanceHeader:SetText(cfg.texts.CHANCE_HEADER)
     self.chanceHeader = chanceHeader
+    -- ROLL
+    local rollHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    rollHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    rollHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    rollHeader:SetJustifyH("LEFT")
+    rollHeader:SetJustifyV("TOP")
+    rollHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    rollHeader:SetText(cfg.texts.ROLL_HEADER)
+    self.rollHeader = rollHeader
 
     return unitHeader -- relativePoint
 end
@@ -93,7 +102,7 @@ end
 -- Return i-th row (create if necessary). Zero gives headers.
 function BubbleLoot_G.gui.GetRow(self, i)
     if i == 0 then
-        return { unit = self.unitHeader, need = self.needHeader, score = self.scoreHeader, chance = self.chanceHeader }
+        return { unit = self.unitHeader, need = self.needHeader, score = self.scoreHeader, chance = self.chanceHeader, roll = self.rollHeader }
     end
 
     local row = self.rowPool[i]
@@ -102,24 +111,28 @@ function BubbleLoot_G.gui.GetRow(self, i)
         row.need:Show()
 		row.score:Show()
 		row.chance:Show()
+		row.roll:Show()
     else
         local unit = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
         local need = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")		
         local score = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 		local chance = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+		local roll = self.mainFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 
         local parents = self:GetRow(i - 1)
         unit:SetPoint("TOPLEFT", parents.unit, "BOTTOMLEFT")
         need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")		
         score:SetPoint("TOPLEFT", parents.score, "BOTTOMLEFT")
 		chance:SetPoint("TOPLEFT", parents.chance, "BOTTOMLEFT")
+		roll:SetPoint("TOPLEFT", parents.roll, "BOTTOMLEFT")
 
         unit:SetHeight(cfg.size.ROW_HEIGHT)
         need:SetHeight(cfg.size.ROW_HEIGHT)		
         score:SetHeight(cfg.size.ROW_HEIGHT)
 		chance:SetHeight(cfg.size.ROW_HEIGHT)
+		roll:SetHeight(cfg.size.ROW_HEIGHT)
 
-        row = { unit = unit, need = need, score = score, chance = chance }
+        row = { unit = unit, need = need, score = score, chance = chance, roll = roll }
         tinsert(self.rowPool, row)
     end
 
@@ -127,7 +140,7 @@ function BubbleLoot_G.gui.GetRow(self, i)
 end
 
 -- Write character name and their need to the given row index. Skip `nil`.
-function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanceText)
+function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanceText, rollText)
     local row = self:GetRow(i)
     if unitText ~= nil then
         row.unit:SetText(unitText)
@@ -141,6 +154,9 @@ function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanc
 	if chanceText ~= nil then		
 		row.chance:SetText(chanceText)
     end
+	if rollText ~= nil then		
+		row.roll:SetText(rollText)
+    end
 end
 
 -- Hide all rows with index equal or greater than the parameter.
@@ -151,6 +167,7 @@ function BubbleLoot_G.gui.HideTailRows(self, fromIndex)
         row.need:Hide()
 		row.score:Hide()
 		row.chance:Hide()
+		row.roll:Hide()
         fromIndex = fromIndex + 1
     end
 end

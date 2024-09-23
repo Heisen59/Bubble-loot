@@ -116,8 +116,9 @@ function BubbleLoot_G.eventFunctions.OnSystemMsg(self, event, text)
         minRoll = tonumber(minRoll)
         maxRoll = tonumber(maxRoll)
         if (minRoll == 1 and maxRoll == 100) then
-            --BubbleLoot_G.rollerCollection:Save(name, tonumber(roll))
-            --BubbleLoot_G:Draw()
+			--print("test On sysMsg")
+            BubbleLoot_G.rollerCollection:Save(name,nil, tonumber(roll))
+            BubbleLoot_G:Draw()
         end
 		
 		if(minRoll == 1 and maxRoll == 10000 and name == UnitName("player")) then
