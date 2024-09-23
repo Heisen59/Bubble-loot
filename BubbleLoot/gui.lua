@@ -28,7 +28,11 @@ function BubbleLoot_G.gui.Initialize(self)
     mainFrame:EnableMouse(true)
     mainFrame:SetScript("OnMouseDown", function(self_mainFrame, event)
         if event == "LeftButton" then
-            self_mainFrame:StartMoving();
+			if IsAltKeyDown() then
+				RandomRoll(1, 10000)
+			else
+				self_mainFrame:StartMoving();
+			end
         elseif event == "RightButton" then
             BubbleLoot_G.rollerCollection:Clear()
             BubbleLoot_G:Draw()
