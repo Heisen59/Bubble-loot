@@ -10,7 +10,7 @@ BubbleLoot_G.configuration.ADDON_NAME = "BubbleLoot"
 BubbleLoot_G.configuration.size = {
     EMPTY_HEIGHT = 30, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
-    FRAME_WIDTH = 350, -- Default value.
+    FRAME_WIDTH = 400, -- Default value.
 }
 
 local systemMessageColor = "FFFFFF00"
@@ -68,7 +68,7 @@ BubbleLoot_G.configuration.texts = {
     -- GENERAL.
 
     LIST_CMDS = "Commands: show, hide, toggle, help, reset, resize, test.",
-    UNIT_HEADER = "Player (class)[subgroup]",
+    UNIT_HEADER = "Player (class) [+1]",
     NEED_HEADER = "Need",
 	SCORE_HEADER = "Score",
 	CHANCE_HEADER = "Chance",

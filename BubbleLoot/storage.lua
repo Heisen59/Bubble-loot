@@ -44,12 +44,40 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 		PlayersData[playerName].items[itemId] = dataItem
 		
 		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
+		
+		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, 1, 1)
+		
   
 	else
 		print("function AddPlayerData : error")	
 	end
 	
 	
+end
+
+
+function BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, lootType, value)
+
+	-- first initialized if needed
+	RaidLootData[playerName] = RaidLootData[playerName] or {0,0}
+	RaidLootData[playerName][lootType] = RaidLootData[playerName][lootType] + value
+	if RaidLootData[playerName][lootType]<0 then RaidLootData[playerName][lootType] = 0 end
+
+end
+
+function BubbleLoot_G.storage.GetNumberOfRaidLoot(playerName, lootType)
+
+	RaidLootData[playerName] = RaidLootData[playerName] or {0,0}
+	return RaidLootData[playerName][lootType]
+	
+end
+
+function BubbleLoot_G.storage.ResetNumberOfRaidLoot()
+
+	for index, _ in pairs(RaidLootData) do
+		RaidLootData[index] = {0,0}
+	end
+
 end
 
 -- Function to modify player participation
@@ -86,9 +114,12 @@ function BubbleLoot_G.storage.AddRaidParticipation()
 			BubbleLoot_G.storage.AddPlayerParticipation(name, cfg.index.ATTENDANCE)
 		end
 		
+		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
+		
 		print("Participation of all raid member increased")
 		print(BubbleLoot_G.getNumberOfRaid().." number of raids so far !")
 	else
+		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		print("Function available in raid only !")	
 	end
 end
@@ -202,6 +233,10 @@ function BubbleLoot_G.storage.playerGiveLootToPlayer(donor, recipient, lootId)
 		PlayersData[recipient].items[lootId] = itemData
 		PlayersData[donor].items[lootId] = nil
 		print(donor.." gave " .. lootId .. " to " .. recipient)
+		
+		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(donor, 1, -1)
+		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(recipient, 1, 1)
+		
 	else
 		print(donor.." doesn't have the required item "..lootId)
 		return false

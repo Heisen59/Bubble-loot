@@ -93,6 +93,9 @@ function BubbleLoot_G.Initialize(self)
 	while BubbleLootData[cfg.DATA_STRUCTURE] ~= "v1.2" do
 		PlayersData = MigrationToNewDataBase(PlayersData)				
 	end
+	
+	-- keep track of who loot during the raid (+1/+2/other)
+	RaidLootData = RaidLootData or {}
 
     -- Starting in a group?
     if IsInGroup() then
