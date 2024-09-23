@@ -140,9 +140,11 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 			roller.chance =	tau^(-roller.score)	
 			chance_sum = chance_sum + roller.chance
 		else
-			roller.chance = 0
+			roller.chance = -1
 		end
 	end
+	
+	if chance_sum == 0 then return end
 	
 	-- then normalized this chance to 10000 and compute cumulative chances
 	local last_roller_chance = 0
