@@ -168,7 +168,12 @@ function BubbleLoot_G.calculation.getTheWinner(roll)
 -- third, return the winner
 	local winner = BubbleLoot_G.rollerCollection:getTheWinner(roll-1)
 
-	print("the winner is "..winner)
+	--print("the winner is "..winner)
+	if IsInRaid() then
+		SendChatMessage("Ze Winner est "..winner, "RAID_WARNING")
+	else
+		print("the winner is "..winner)
+	end
 
 
 end

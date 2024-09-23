@@ -140,7 +140,7 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 			roller.chance =	tau^(-roller.score)	
 			chance_sum = chance_sum + roller.chance
 		else
-			roller.chance = -1
+			roller.chance = 0
 		end
 	end
 	

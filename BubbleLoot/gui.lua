@@ -215,10 +215,10 @@ end
 
 -- countdown function
 local function SendCountdownToRaidChat(itemLink)
-    if IsInRaid() or true then  -- Ensure you're in a raid
+    if IsInRaid() then  -- Ensure you're in a raid
         local countdown = { "5", "4", "3", "2", "1" }
         local delay = 10  -- Start delay at 0 seconds
-		local channel = "GUILD" --"RAID"
+		local channel = "RAID" --"RAID"
 
 		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
 		SendChatMessage("Distribution de "..itemLink, "RAID_WARNING")
