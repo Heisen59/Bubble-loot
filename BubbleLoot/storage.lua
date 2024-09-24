@@ -118,6 +118,10 @@ function BubbleLoot_G.storage.AddRaidParticipation()
 		
 		print("Participation of all raid member increased")
 		print(BubbleLoot_G.getNumberOfRaid().." number of raids so far !")
+		
+		-- refresh participation mgr windows
+		BubbleLoot_G.gui.RefreshParticipationWindow()
+		
 	else
 		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		print("Function available in raid only !")	
