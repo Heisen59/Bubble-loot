@@ -85,8 +85,12 @@ function BubbleLoot_G.Initialize(self)
     end
     self.gui:SetVisibility(BubbleLootData[cfg.SHOWN])
 	
-	if BubbleLootData[cfg.NUMBER_OF_RAID] == nil then -- Initialize when first loaded.
-		BubbleLootData[cfg.NUMBER_OF_RAID] = 0;
+	
+	-- RaidData
+	RaidData = RaidData or {}
+	
+	if RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] == nil then -- Initialize when first loaded.
+		RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = 0;
     end
 	
 	-- check if major a database modification need a restructuration
@@ -164,16 +168,16 @@ Getter and setter
 ]]--
 
 function BubbleLoot_G.getNumberOfRaid()
-	return BubbleLootData[cfg.NUMBER_OF_RAID]
+	return RaidData[cfg.raidData.NUMBER_OF_RAID_DONE]
 end
 
 
 function BubbleLoot_G.increaseNumberOfRaid()
-	BubbleLootData[cfg.NUMBER_OF_RAID] = BubbleLootData[cfg.NUMBER_OF_RAID] + 1
+	RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] + 1
 end
 
 function BubbleLoot_G.setNumberOfRaid(num)
-	BubbleLootData[cfg.NUMBER_OF_RAID] = num
+	RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = num
 end
 
 

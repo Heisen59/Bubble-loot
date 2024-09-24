@@ -3,15 +3,17 @@
 ## Notes: Lightweight addon for recording /rolls to simplify items distribution.
 ## Author: RomainLGD
 ## Version: 1.0.0
-## SavedVariables: BubbleLootData, PlayersData, CancelData, RaidLootData
+## SavedVariables: BubbleLootData, PlayersData, CancelData, RaidLootData, RaidData
 
-
+Libs\LibDeflate\LibDeflate.lua
+Libs\LibSerialize\LibSerialize.lua
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 main.lua
 configuration.lua
+sync.lua
 gui.lua
 playerMgrGUI.lua
 playerLootsMgrGUI.lua

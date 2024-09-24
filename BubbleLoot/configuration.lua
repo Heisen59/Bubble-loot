@@ -5,6 +5,7 @@ local GroupType = BubbleLoot_G.GroupType
 
 --
 BubbleLoot_G.configuration.ADDON_NAME = "BubbleLoot"
+BubbleLoot_G.configuration.PREFIX = "BubbleLootSync"
 
 --
 BubbleLoot_G.configuration.size = {
@@ -45,8 +46,13 @@ BubbleLoot_G.configuration.index =
 }
 
 BubbleLoot_G.configuration.SHOWN			= 1
-BubbleLoot_G.configuration.NUMBER_OF_RAID 	= 2
+BubbleLoot_G.configuration.NOT_USED 	= 2
 BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
+
+BubbleLoot_G.configuration.raidData =
+{
+	NUMBER_OF_RAID_DONE = 1
+}
 
 BubbleLoot_G.configuration.constant = 
 {
