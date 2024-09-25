@@ -3,6 +3,35 @@
 
 local cfg = BubbleLoot_G.configuration
 
+--[[
+
+Compatibility option
+
+]]--
+
+local GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID
+if C_Container then
+	GetContainerNumSlots = C_Container.GetContainerNumSlots
+	GetContainerItemLink = C_Container.GetContainerItemLink
+	GetContainerItemCooldown = C_Container.GetContainerItemCooldown
+	GetItemCooldown = C_Container.GetItemCooldown
+	PickupContainerItem = C_Container.PickupContainerItem
+	ContainerIDToInventoryID = C_Container.ContainerIDToInventoryID
+	GetContainerItemInfo = function(bag, slot)
+		local info = C_Container.GetContainerItemInfo(bag, slot)
+		if info then
+			return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
+		else
+			return
+		end
+	end
+else
+	GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID =
+	_G.GetContainerNumSlots, _G.GetContainerItemLink, _G.GetContainerItemCooldown, _G.GetContainerItemInfo, _G.GetItemCooldown, _G.PickupContainerItem, _G.ContainerIDToInventoryID
+end
+
+
+
 -- Collection of { unit, need , score} to be used to show data rows.
 BubbleLoot_G.gui.rowPool = {}
 
@@ -253,7 +282,7 @@ local function AttemptTradeWithPlayer(playerName, bag, slot)
         InitiateTrade(playerName)
         
 		-- Pick up the item and place it in the trade window
-		C_Container.PickupContainerItem(bag, slot)
+		PickupContainerItem(bag, slot)  
 		--ClickTradeButton(1) -- Put it in the first trade slot
         
     else
@@ -271,13 +300,13 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 	--print(IsAltKeyDown())
     -- Check if the player is in a raid and holding Alt
 	local test = true
-    if IsAltKeyDown() and (IsInRaid() or test) then
+    if IsInRaid() or test then
         -- Get the item name based on the source (bag or loot window)
         local itemName
 		local itemID
 		local itemLink 
         if source == "bag" then
-            itemLink = C_Container and C_Container.GetContainerItemLink(bag, slot) or GetContainerItemLink(bag, slot)
+            itemLink = GetContainerItemLink(bag, slot) 
         elseif source == "loot" then
             itemLink = GetLootSlotLink(lootSlot)
         end
@@ -285,6 +314,8 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 		if itemLink then
 			itemName = itemLink:match("%[(.+)%]") -- Extracts the item name from the link
 			itemID = tonumber(string.match(itemLink, "item:(%d+):"))
+		else
+			return
 		end
 		
 				
@@ -300,14 +331,14 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 			
 				-- Add the "Bubble Loot" title at the top
                 local info = UIDropDownMenu_CreateInfo()
-                info.text = "Bubble Loot"
+                info.text = itemLink
                 info.isTitle = true -- This marks it as a title
                 info.notCheckable = true -- This makes sure the title cannot be checked
                 UIDropDownMenu_AddButton(info, level)
 			
 				-- Add a main menu entry called "All Raid"
                 local info = UIDropDownMenu_CreateInfo()
-                info.text = "Raid offer"
+                info.text = "Proposer au raid"
                 info.hasArrow = false -- This tells the menu item to create a submenu
                 info.notCheckable = false
 				info.func = function()

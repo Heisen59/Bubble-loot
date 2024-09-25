@@ -9,6 +9,11 @@ local addonLoaded_EventFrame = CreateFrame("Frame")
 addonLoaded_EventFrame:RegisterEvent("ADDON_LOADED")
 addonLoaded_EventFrame:SetScript("OnEvent", BubbleLoot_G.eventFunctions.OnLoad)
 
+-- At each bag update
+--local addonBagUpdate_EventFrame = CreateFrame("Frame")
+--addonBagUpdate_EventFrame:RegisterEvent("BAG_UPDATE_DELAYED")
+--addonBagUpdate_EventFrame:SetScript("OnEvent", BubbleLoot_G.eventFunctions.OnBagUpdate)
+
 -- The current player joins a group.
 local groupJoin_EventFrame = CreateFrame("Frame")
 groupJoin_EventFrame:RegisterEvent("GROUP_JOINED")
@@ -158,14 +163,4 @@ MyMinimap:SetScript("OnEvent", function(self, event)
     end
 end)
 
---[[
--- Register event when the player logs in, to set up the hooks
---addonLoaded_EventFrame:RegisterEvent("ADDON_LOADED")
-addonLoaded_EventFrame:SetScript("OnEvent", function(self, event)
-    if event == "ADDON_LOADED" then
-		print("I'm in SetScript ADDON_LOADED")
-        HookBagItemRightClick() -- Set up the hook for bag items after login
-        LootFrame:HookScript("OnShow", HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
-    end
-end)
-]]--
+
