@@ -11,49 +11,49 @@ Compatibility option
 
 ]]--
 
-local GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID
-if C_Container then
-	GetContainerNumSlots = C_Container.GetContainerNumSlots
-	GetContainerItemLink = C_Container.GetContainerItemLink
-	GetContainerItemCooldown = C_Container.GetContainerItemCooldown
-	GetItemCooldown = C_Container.GetItemCooldown
-	PickupContainerItem = C_Container.PickupContainerItem
-	ContainerIDToInventoryID = C_Container.ContainerIDToInventoryID
-	GetContainerItemInfo = function(bag, slot)
-		local info = C_Container.GetContainerItemInfo(bag, slot)
-		if info then
-			return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
-		else
-			return
-		end
-	end
-else
-	GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID =
-	_G.GetContainerNumSlots, _G.GetContainerItemLink, _G.GetContainerItemCooldown, _G.GetContainerItemInfo, _G.GetItemCooldown, _G.PickupContainerItem, _G.ContainerIDToInventoryID
+
+
+-- Function to handle the Alt+Right-Click behavior
+
+local function OnBagnonBagClick(self, button)
+	if button == "RightButton" and IsAltKeyDown() then -- 
+		local bag = self:GetBag()
+		local slot = self:GetID()
+		BubbleLoot_G.gui.ShowItemRaidMemberMenu("bag", bag, slot, nil)
+    end
 end
-
-
-
-
 
 -- Hook into bag slot right-click event
 function HookBagItemRightClick()
-    for bag = 0, 4 do -- Loop over the 5 bags (0 = backpack, 1-4 = regular bags)
-        local numSlots = GetContainerNumSlots(bag)
-        for slot = 1, numSlots do
-            local itemButton = _G["ContainerFrame"..(bag + 1).."Item"..slot]
 
-            if itemButton then
-                -- Hook into the original OnClick script of each item button in the bag
-                itemButton:HookScript("OnMouseDown", function(self, button)
-                    if button == "RightButton" and IsAltKeyDown() then -- 
-                        -- Call the function to show the raid member menu
-                        BubbleLoot_G.gui.ShowRaidMemberMenu("bag", bag, numSlots-slot+1, nil)
-                    end
-                end)
-            end
-        end
-    end
+	if not Bagnon then
+		for bag = 0, 4 do -- Loop over the 5 bags (0 = backpack, 1-4 = regular bags)
+			local numSlots = GetContainerNumSlots(bag)
+			for slot = 1, numSlots do
+				local itemButton = _G["ContainerFrame"..(bag + 1).."Item"..slot]
+
+				if itemButton then
+					-- Hook into the original OnClick script of each item button in the bag
+					itemButton:HookScript("OnMouseDown", function(self, button)
+						if button == "RightButton" and IsAltKeyDown() then -- 
+							-- Call the function to show the raid member menu
+							BubbleLoot_G.gui.ShowItemRaidMemberMenu("bag", bag, numSlots-slot+1, nil)
+						end
+					end)
+				end
+			end
+		end
+	else
+		-- Hook when Bagnon creates new item buttons
+		hooksecurefunc(Bagnon.ItemSlot, "Update", function(itemButton)
+        -- We can't use HookScript, so we handle clicks manually
+        itemButton:EnableMouse(true)
+        itemButton:SetScript("OnMouseDown", function(self, button)
+            OnBagnonBagClick(self, button)
+        end)
+    end)
+	end	
+	
 end
 
 -- Hook into loot window right-click event
@@ -66,7 +66,7 @@ function HookLootItemRightClick()
             lootButton:HookScript("OnMouseDown", function(self, button)
                 if button == "RightButton" and IsAltKeyDown() then --button == "RightButton" and
                     -- Call the function to show the raid member menu
-                    BubbleLoot_G.gui.ShowRaidMemberMenu("loot", nil, nil, slot)
+                    BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, slot)
                 end
             end)
         end
@@ -80,9 +80,10 @@ function BubbleLoot_G.eventFunctions.OnLoad(self, event, addOnName)
 		--bprint("I'm in SetScript ADDON_LOADED")
         BubbleLoot_G:Initialize()
 		
+		print("BubbleLoot_G.eventFunctions.OnLoad")
 		-- items Hooks
 		C_Timer.After(3,function()
-							print("delayed function")
+							print("Bubble loot : delayed function")
 							HookBagItemRightClick()
 						end
 		) -- Set up the hook for bag items after login

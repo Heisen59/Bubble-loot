@@ -9,27 +9,6 @@ Compatibility option
 
 ]]--
 
-local GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID
-if C_Container then
-	GetContainerNumSlots = C_Container.GetContainerNumSlots
-	GetContainerItemLink = C_Container.GetContainerItemLink
-	GetContainerItemCooldown = C_Container.GetContainerItemCooldown
-	GetItemCooldown = C_Container.GetItemCooldown
-	PickupContainerItem = C_Container.PickupContainerItem
-	ContainerIDToInventoryID = C_Container.ContainerIDToInventoryID
-	GetContainerItemInfo = function(bag, slot)
-		local info = C_Container.GetContainerItemInfo(bag, slot)
-		if info then
-			return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
-		else
-			return
-		end
-	end
-else
-	GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID =
-	_G.GetContainerNumSlots, _G.GetContainerItemLink, _G.GetContainerItemCooldown, _G.GetContainerItemInfo, _G.GetItemCooldown, _G.PickupContainerItem, _G.ContainerIDToInventoryID
-end
-
 
 
 -- Collection of { unit, need , score} to be used to show data rows.
@@ -291,7 +270,7 @@ local function AttemptTradeWithPlayer(playerName, bag, slot)
 end
 
 -- Function to create the raid members list when right-clicking an item
-function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
+function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 	--print("test A")
 	--print(source)
 	--print(bag)
@@ -393,7 +372,7 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 												end
 												
 											else
-												print("ShowRaidMemberMenu : can't get the item link")
+												print("ShowItemRaidMemberMenu : can't get the item link")
 											end
 										end
 							UIDropDownMenu_AddButton(info, level)
@@ -428,7 +407,7 @@ function BubbleLoot_G.gui.ShowRaidMemberMenu(source, bag, slot, lootSlot)
 														AttemptTradeWithPlayer(playerName, bag, slot)
 													end
 												else
-													print("ShowRaidMemberMenu : can't get the item link")
+													print("ShowItemRaidMemberMenu : can't get the item link")
 												end
 											end
 								UIDropDownMenu_AddButton(info, level)

@@ -99,7 +99,9 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 		if slotModValue then
 			return slotModValue
 		else -- check if token
-			slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(itemId)]
+			itemEquipLoc = BubbleLoot_G.calculation.SearchToken(itemId)
+			-- print(itemEquipLoc)
+			slotModValue = slotMod[itemEquipLoc]
 			if slotModValue then
 				return slotModValue
 			else
@@ -131,10 +133,10 @@ end
 
 function BubbleLoot_G.calculation.SearchToken(itemID)
 	
-	for tokenType, subListToken in ipairs(cfg.tokens) do
-	--print(subListToken)
+	for tokenType, subListToken in pairs(cfg.tokens) do
+	-- print(subListToken)
 		for _, tokenID in ipairs(subListToken)do
-			--print(tokenType)
+			-- print(tokenType)
 			if itemID == tokenID then
 					--print(tokenType)
 					--print(cfg.tokenLocation[tokenType])

@@ -142,10 +142,16 @@ local function getPlayerScore(playerName)
 		printError("Usage: /bl playerScore <playerName>")
 	end
 	
-	
 end
 
-
+local function sendData()
+	
+	--Broadcast everything
+	BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData)
+	BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData)
+	BubbleLoot_G.sync.BroadcastDataTable("RaidLootData", RaidLootData)
+	
+end
 
 -- Slash commands.
 SLASH_BUBBLELOOT1 = '/bubbleloot'
@@ -175,6 +181,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		getPlayerData(args)
 	elseif command == "playerScore" then
 		getPlayerScore(args)
+	elseif command == "send" then
+		sendData()
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

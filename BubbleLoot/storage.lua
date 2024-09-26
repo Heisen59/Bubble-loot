@@ -13,6 +13,8 @@ local function CreateNewPlayerEntry(playerName)
         }
 		
 		BubbleLoot_G.gui.RefreshParticipationWindow()
+		
+		BubbleLoot_G.sync.SendEverything()
     end	
 end
 
@@ -46,6 +48,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
 		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
 		
 		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, 1, 1)
+		
+		BubbleLoot_G.sync.SendEverything()
 		
   
 	else
@@ -122,6 +126,8 @@ function BubbleLoot_G.storage.AddRaidParticipation()
 		-- refresh participation mgr windows
 		BubbleLoot_G.gui.RefreshParticipationWindow()
 		
+		BubbleLoot_G.sync.SendEverything()
+		
 	else
 		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		print("Function available in raid only !")	
@@ -194,6 +200,9 @@ function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootID)
 	if(PlayersData[playerName].items[lootID]) then
 		BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[lootID])
 		PlayersData[playerName].items[lootID] = nil
+		
+		BubbleLoot_G.sync.SendEverything()
+		
 	else
 		print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
 	end

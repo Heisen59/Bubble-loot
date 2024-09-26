@@ -24,6 +24,8 @@ BubbleLoot_G.playerInfo = {}
 BubbleLoot_G.plugins = {}
 --Items calculation
 BubbleLoot_G.calculation = {}
+--Syncing
+BubbleLoot_G.sync = {}
 
 ---
 ---@class Plugin Mandatory plugin interface.
@@ -89,8 +91,8 @@ function BubbleLoot_G.Initialize(self)
 	-- RaidData
 	RaidData = RaidData or {}
 	
-	if RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] == nil then -- Initialize when first loaded.
-		RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = 0;
+	if RaidData[cfg.NUMBER_OF_RAID_DONE] == nil then -- Initialize when first loaded.
+		RaidData[cfg.NUMBER_OF_RAID_DONE] = 0;
     end
 	
 	-- check if major a database modification need a restructuration
@@ -100,6 +102,11 @@ function BubbleLoot_G.Initialize(self)
 	
 	-- keep track of who loot during the raid (+1/+2/other)
 	RaidLootData = RaidLootData or {}
+	
+	-- Sync trust list
+	SyncTrustList = SyncTrustList or {}
+	SyncTrustList[cfg.TRUST_LIST] = SyncTrustList[cfg.TRUST_LIST] or {}
+	SyncTrustList[cfg.BLACK_LIST] = SyncTrustList[cfg.BLACK_LIST] or {}
 
     -- Starting in a group?
     if IsInGroup() then
@@ -168,16 +175,16 @@ Getter and setter
 ]]--
 
 function BubbleLoot_G.getNumberOfRaid()
-	return RaidData[cfg.raidData.NUMBER_OF_RAID_DONE]
+	return RaidData[cfg.NUMBER_OF_RAID_DONE]
 end
 
 
 function BubbleLoot_G.increaseNumberOfRaid()
-	RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] + 1
+	RaidData[cfg.NUMBER_OF_RAID_DONE] = RaidData[cfg.NUMBER_OF_RAID_DONE] + 1
 end
 
 function BubbleLoot_G.setNumberOfRaid(num)
-	RaidData[cfg.raidData.NUMBER_OF_RAID_DONE] = num
+	RaidData[cfg.NUMBER_OF_RAID_DONE] = num
 end
 
 
@@ -251,6 +258,44 @@ end
 
 
 
+
+
+--[[
+
+Librairy functions and compatibility options
+
+--]]
+
+local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0", true)
+EasyMenu = function(...)
+    if LibDD then
+        LibDD:EasyMenu(...)
+    else
+        _G.EasyMenu(...)
+    end
+end
+
+
+--GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID
+if C_Container then
+	GetContainerNumSlots = C_Container.GetContainerNumSlots
+	GetContainerItemLink = C_Container.GetContainerItemLink
+	GetContainerItemCooldown = C_Container.GetContainerItemCooldown
+	GetItemCooldown = C_Container.GetItemCooldown
+	PickupContainerItem = C_Container.PickupContainerItem
+	ContainerIDToInventoryID = C_Container.ContainerIDToInventoryID
+	GetContainerItemInfo = function(bag, slot)
+		local info = C_Container.GetContainerItemInfo(bag, slot)
+		if info then
+			return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
+		else
+			return
+		end
+	end
+else
+	GetContainerNumSlots, GetContainerItemLink, GetContainerItemCooldown, GetContainerItemInfo, GetItemCooldown, PickupContainerItem, ContainerIDToInventoryID =
+	_G.GetContainerNumSlots, _G.GetContainerItemLink, _G.GetContainerItemCooldown, _G.GetContainerItemInfo, _G.GetItemCooldown, _G.PickupContainerItem, _G.ContainerIDToInventoryID
+end
 
 
 --[[

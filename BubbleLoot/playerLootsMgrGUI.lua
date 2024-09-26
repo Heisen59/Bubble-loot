@@ -6,6 +6,8 @@
 player loots mgr windows
 
 --]]
+
+
 -- Store references to UI elements for easy updating later
 local PlayerslootsFrame = {}
 

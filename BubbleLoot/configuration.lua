@@ -49,10 +49,12 @@ BubbleLoot_G.configuration.SHOWN			= 1
 BubbleLoot_G.configuration.NOT_USED 	= 2
 BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
 
-BubbleLoot_G.configuration.raidData =
-{
-	NUMBER_OF_RAID_DONE = 1
-}
+--raidData index
+BubbleLoot_G.configuration.NUMBER_OF_RAID_DONE = 1
+
+-- Sync data index
+BubbleLoot_G.configuration.TRUST_LIST = 1
+BubbleLoot_G.configuration.BLACK_LIST = 2
 
 BubbleLoot_G.configuration.constant = 
 {
