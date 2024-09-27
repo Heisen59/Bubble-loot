@@ -79,13 +79,13 @@ end
 
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem)
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange)
 
-
+	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
-    print("I'm in AddPlayerData")
-	print(playerName)
-	print(itemLink)
+    -- print("I'm in AddPlayerData")
+	-- print(playerName)
+	-- print(itemLink)
 	
 	if DateRemoveItem == nil then
 	
@@ -152,13 +152,15 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		
 			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
 			
-			BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[itemId])
+			if not exchange then
+				BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[itemId])
+			end
 			
 			if	PlayersData[playerName].items[itemId][cfg.NUMBER] == 1 then
 			
 			
 				if GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][1]) < 3 then
-					local removedItemLootType = PlayersData[playerName].items[itemId][cfg.LOOTDATA][2]
+					local removedItemLootType = PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][2]
 					-- Increase numbers of loots		
 					BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
 				end
@@ -199,7 +201,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 	
 	
 			-- update LootMgrFrame
-		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
+		--BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
+		BubbleLoot_G.gui.createLootsMgrFrame(playerName)
 			-- Synchronisation functions
 		BubbleLoot_G.sync.SendEverything()
 end
@@ -354,30 +357,6 @@ function BubbleLoot_G.storage.getAllPlayersFromDB()
 
 end
 
-function BubbleLoot_G.storage.playerGiveLootToPlayer(donor, recipient, lootId)
-
-
-	if(PlayersData[donor].items[lootId]) then
-		local itemData = PlayersData[donor].items[lootId]
-		
-		-- BubbleLoot_G.storage.AddPlayerData(recipient, itemData[ITEMLINK], itemData[LOOT_ATTRIBUTION_TYPE])
-		-- NEED TO BE MODIFIED
-		print("playerGiveLootToPlayer : need modification")
-		--PlayersData[recipient].items[lootId] = itemData		
-		-- PlayersData[donor].items[lootId] = nil
-		-- UNTIL HERE
-		
-		-- print(donor.." gave " .. lootId .. " to " .. recipient)
-		
-		-- BubbleLoot_G.storage.ModifyNumberOfRaidLoot(donor, 1, -1)
-		-- BubbleLoot_G.storage.ModifyNumberOfRaidLoot(recipient, 1, 1)
-		
-	else
-		print(donor.." doesn't have the required item "..lootId)
-		return false
-	end
-
-end
 
 --[[
 
