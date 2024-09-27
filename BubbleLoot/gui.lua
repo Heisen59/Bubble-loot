@@ -205,20 +205,20 @@ end
 
 
 
--- Function to give loot to the selected player
-local function GiveLootToPlayer(lootSlot, playerName)
-    -- Find the raid index for the player
-    for i = 1, GetNumGroupMembers() do
-        local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-        if name == playerName then
-            -- Assign the loot to the player
-            GiveMasterLoot(lootSlot, i)
-            --print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
-            return
-        end
-    end
-    print("Player " .. playerName .. " not found in raid.")
-end
+	-- Function to give loot to the selected player
+	local function GiveLootToPlayer(lootSlot, playerName)
+		-- Find the raid index for the player
+		for i = 1, GetNumGroupMembers() do
+			local name = GetMasterLootCandidate(lootSlot, i)
+			if name == playerName then
+				-- Assign the loot to the player
+				GiveMasterLoot(lootSlot, i)
+				--print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
+				return
+			end
+		end
+		print("Player " .. playerName .. " not found in raid.")
+	end	
 
 
 -- countdown function
@@ -269,8 +269,36 @@ local function AttemptTradeWithPlayer(playerName, bag, slot)
     end
 end
 
+-- Main Attribution function
+local MainAttributionFunction = function(itemLink, itemName, playerName, source, lootSlot, bag, slot, LootAttribType)		
+	-- print("Je suis dans MainAttributionFunction with LootAttribType "..LootAttribType)
+	if itemLink then
+		BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType)
+		if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
+			-- Send the message to the RAID_WARNING channel
+			SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
+		else 
+			SendChatMessage(playerName.." has win "..itemName, "RAID")
+			-- print(playerName.." has win "..itemName)
+			-- print("You must be a raid leader or assistant to send a raid warning.")
+		end
+		if source == "loot" and lootSlot then
+			GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
+		end
+		if source == "bag" and bag and slot then
+			AttemptTradeWithPlayer(playerName, bag, slot)
+		end
+		
+	else
+		print("ShowItemRaidMemberMenu : can't get the item link")
+	end
+end
+
+
 -- Function to create the raid members list when right-clicking an item
 function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
+	local LootAttribType = 0 -- 1=> MS / 2=> OS / 3 => DEZ
+	
 	--print("test A")
 	--print(source)
 	--print(bag)
@@ -303,6 +331,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 
         -- Initialize the dropdown menu
         UIDropDownMenu_Initialize(dropdownMenu, function(self, level, menuList)
+			
             if not level then return end
             
 			
@@ -314,9 +343,9 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
                 info.isTitle = true -- This marks it as a title
                 info.notCheckable = true -- This makes sure the title cannot be checked
                 UIDropDownMenu_AddButton(info, level)
-			
-				-- Add a main menu entry called "All Raid"
-                local info = UIDropDownMenu_CreateInfo()
+								
+				-- Add a main menu entry called Proposer au raid
+                info = UIDropDownMenu_CreateInfo()
                 info.text = "Proposer au raid"
                 info.hasArrow = false -- This tells the menu item to create a submenu
                 info.notCheckable = false
@@ -326,22 +355,108 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 								SendCountdownToRaidChat(itemLink)
 							end
                 UIDropDownMenu_AddButton(info, level)
-                -- Add a main menu entry called "All Raid"
-                info = UIDropDownMenu_CreateInfo()
-                info.text = "All Raid"
+				
+								
+				-- Add main menu entry called +1
+				info = UIDropDownMenu_CreateInfo()
+                info.text = "+1"
                 info.hasArrow = true -- This tells the menu item to create a submenu
                 info.notCheckable = true
-                info.menuList = "ALL_RAID_SUBMENU" -- Assigns a name to the submenu
-                UIDropDownMenu_AddButton(info, level)
-				-- Add a main menu entry called "+1 only"
-                info = UIDropDownMenu_CreateInfo()
-                info.text = "Only +1"
-                info.hasArrow = true -- This tells the menu item to create a submenu
-                info.notCheckable = true
-                info.menuList = "MS_RAID_SUBMENU" -- Assigns a name to the submenu
+                info.menuList = "MS_SUBMENU" -- Assigns a name to the submenu
                 UIDropDownMenu_AddButton(info, level)
 				
-            elseif level == 2 then
+				-- Add main menu entry called +2
+				info = UIDropDownMenu_CreateInfo()
+                info.text = "+2"
+                info.hasArrow = true -- This tells the menu item to create a submenu
+                info.notCheckable = true
+                info.menuList = "OS_SUBMENU" -- Assigns a name to the submenu
+                UIDropDownMenu_AddButton(info, level)
+				
+				-- Add main menu entry called dez
+				--[[
+				info = UIDropDownMenu_CreateInfo()
+                info.text = "dez"
+                info.hasArrow = true -- This tells the menu item to create a submenu
+                info.notCheckable = true
+                info.menuList = "DEZ_SUBMENU" -- Assigns a name to the submenu
+                UIDropDownMenu_AddButton(info, level)
+				--]]
+				
+			elseif level == 2 then
+				if menuList == "MS_SUBMENU" then
+					LootAttribType = 1
+					
+					--Add Title +1
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = "+1"
+					info.isTitle = true -- This marks it as a title
+					info.notCheckable = true -- This makes sure the title cannot be checked
+					UIDropDownMenu_AddButton(info, level)
+					
+					
+					-- Add a main menu entry called "All Raid"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "All Raid"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "ALL_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+					-- Add a main menu entry called "+1 only"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "Only +1"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "MS_ONLY_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+				
+				elseif menuList == "OS_SUBMENU" then
+					LootAttribType = 2
+					
+					--Add Title +2					
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = "+2"
+					info.isTitle = true -- This marks it as a title
+					info.notCheckable = true -- This makes sure the title cannot be checked
+					UIDropDownMenu_AddButton(info, level)
+					
+					-- Add a main menu entry called "All Raid"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "All Raid"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "ALL_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+					-- Add a main menu entry called "+1 only"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "Only +2"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "MS_ONLY_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+				
+				--[[
+				elseif menuList == "DEZ_SUBMENU" then
+					LootAttribType = 3
+					print("LootAttribType "..LootAttribType)
+					-- Add a main menu entry called "All Raid"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "All Raid"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "ALL_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+					-- Add a main menu entry called "+1 only"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "Only +2"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "MS_ONLY_RAID_SUBMENU" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+					--]]
+				end
+				
+            elseif level == 3 then
 				if menuList == "ALL_RAID_SUBMENU" then
 					-- Loop through all raid members
 					local N = GetNumGroupMembers()
@@ -353,32 +468,11 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 							-- Create a menu item for each raid member
 							local info = UIDropDownMenu_CreateInfo()
 							info.text = playerName
-							info.func = function()											
-											if itemLink then
-												BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
-												if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
-													-- Send the message to the RAID_WARNING channel
-													SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
-												else 
-													SendChatMessage(playerName.." has win "..itemName, "RAID")
-													-- print(playerName.." has win "..itemName)
-													-- print("You must be a raid leader or assistant to send a raid warning.")
-												end
-												if source == "loot" and lootSlot then
-													GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
-												end
-												if source == "bag" and bag and slot then
-													AttemptTradeWithPlayer(playerName, bag, slot)
-												end
-												
-											else
-												print("ShowItemRaidMemberMenu : can't get the item link")
-											end
-										end
+							info.func = function()	MainAttributionFunction(itemLink, itemName, playerName, source, lootSlot, bag, slot, LootAttribType) end
 							UIDropDownMenu_AddButton(info, level)
 						end
 					end
-				elseif menuList == "MS_RAID_SUBMENU" then
+				elseif menuList == "MS_ONLY_RAID_SUBMENU" then
 					-- Loop through all raid members
 					local MS_Rollers = BubbleLoot_G.rollerCollection:getMS_Rollers()
 					if MS_Rollers then
@@ -389,27 +483,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 								-- Create a menu item for each raid member
 								local info = UIDropDownMenu_CreateInfo()
 								info.text = playerName
-								info.func = function()												
-												if itemLink then													
-													BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
-													if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
-														-- Send the message to the RAID_WARNING channel
-														SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
-													else 
-														SendChatMessage(playerName.." has win "..itemName, "RAID")
-														-- print(playerName.." has win "..itemName)
-														-- print("You must be a raid leader or assistant to send a raid warning.")
-													end
-													if source == "loot" and lootSlot then
-														GiveLootToPlayer(lootSlot, playerName) -- Send the loot to the selected player
-													end
-													if source == "bag" and bag and slot then
-														AttemptTradeWithPlayer(playerName, bag, slot)
-													end
-												else
-													print("ShowItemRaidMemberMenu : can't get the item link")
-												end
-											end
+								info.func = function() MainAttributionFunction(itemLink, itemName, playerName, source, lootSlot, bag, slot, LootAttribType)	end											
 								UIDropDownMenu_AddButton(info, level)
 							end
 						end

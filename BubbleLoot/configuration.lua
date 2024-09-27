@@ -56,6 +56,12 @@ BubbleLoot_G.configuration.NUMBER_OF_RAID_DONE = 1
 BubbleLoot_G.configuration.TRUST_LIST = 1
 BubbleLoot_G.configuration.BLACK_LIST = 2
 
+-- item data index
+BubbleLoot_G.configuration.ITEMLINK = 1
+BubbleLoot_G.configuration.LOOTDATA = 2
+BubbleLoot_G.configuration.INSTANCE_NAME = 3
+BubbleLoot_G.configuration.NUMBER = 4
+
 BubbleLoot_G.configuration.constant = 
 {
 	ATTENDANCE_VALUE  		= 0.6,

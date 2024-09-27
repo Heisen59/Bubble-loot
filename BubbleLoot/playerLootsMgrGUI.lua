@@ -7,6 +7,7 @@ player loots mgr windows
 
 --]]
 
+local cfg = BubbleLoot_G.configuration
 
 -- Store references to UI elements for easy updating later
 local PlayerslootsFrame = {}
@@ -27,21 +28,25 @@ local function getRGBItemLink(itemLink)
 		end
 end
 
--- Function to handle dropdown selection for Loots and Bonus/Malus
+-- Function to handle dropdown selection for Loots
 local function OnClickRemove(self, arg1, arg2)
     --print(arg2 .. ": removed")
-	BubbleLoot_G.storage.DeletePlayerSpecificLoot(arg1, arg2)
+	local playerName = arg1
+	local itemLink = arg2[1]
+	local DateRemoveItem = arg2[2]
+	BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, nil, DateRemoveItem)
 	--UpdateLootsList(arg1)	
 	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
 end
 
 -- Function to create the dropdown menu for the player name
-local function CreateLootDropdownMenu(playerName, lootName, lootId)
+local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate)
 	--print("CreateLootDropdownMenu")
+
     local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
     local menuItems  = {
 		{
-            text = lootName,  -- loot's name as the header
+            text = itemLink,  -- loot's name as the header
             isTitle = true,  -- This makes the text non-clickable and acts as a title
             notCheckable = true,  -- Don't show a checkbox
         },
@@ -49,7 +54,7 @@ local function CreateLootDropdownMenu(playerName, lootName, lootId)
             text = "Remove",
             func = OnClickRemove,
             arg1 = playerName, 
-			arg2 = lootId
+			arg2 = {itemLink, lootDropDate},
         },
 		{
 			text = "Give to player",
@@ -194,44 +199,52 @@ end
 
     -- Create item rows
     local rowIndex = 0
-    for lootId, lootData in pairs(PlayersData[playerName].items) do
-        local itemLink = lootData[1]
-        local lootDropDate = lootData[2]
+    for lootId, itemData in pairs(PlayersData[playerName].items) do
+        local itemLink = itemData[cfg.ITEMLINK]
 		local itemName = itemLink:match("%[(.+)%]")
 		itemName = "["..itemName.."]"
-		
-        rowIndex = rowIndex + 1
         
-        -- Create the item label
-        local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
-        itemLabel:SetText(itemName)
-		itemLabel:SetTextColor(getRGBItemLink(itemLink))
-        itemLabel:SetWidth(400)
-        itemLabel:SetJustifyH("LEFT")
+		for i, lootData in ipairs(itemData[cfg.LOOTDATA]) do
+		
+			local lootDropDate = lootData[1] -- last date
 
-        -- Set mouse click handler for the item label
-		itemLabel:EnableMouse(true)
-        itemLabel:SetScript("OnMouseUp", function(self, button)
-            if button == "RightButton" then
-				--print("Frame clicked : "..button)
-                CreateLootDropdownMenu(playerName, itemLink, lootId)
-            end
-        end)
-		itemLabel:SetScript("OnEnter", function(self)
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip:SetHyperlink(itemLink)
-			GameTooltip:Show()
-		end)
-		itemLabel:SetScript("OnLeave", function(self)
-			GameTooltip:Hide()
-		end)
 
-        -- Create a value label
-        local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
-        valueLabel:SetText(lootDropDate)
-        valueLabel:SetJustifyH("CENTER")
+
+			rowIndex = rowIndex + 1
+			
+			-- Create the item label
+			local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
+			itemLabel:SetText(itemName)
+			itemLabel:SetTextColor(getRGBItemLink(itemLink))
+			itemLabel:SetWidth(400)
+			itemLabel:SetJustifyH("LEFT")
+
+			-- Set mouse click handler for the item label
+			itemLabel:EnableMouse(true)
+			itemLabel:SetScript("OnMouseUp", function(self, button)
+				if button == "RightButton" then
+					--print("Frame clicked : "..button)
+					CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate)
+				end
+			end)
+			itemLabel:SetScript("OnEnter", function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+				GameTooltip:SetHyperlink(itemLink)
+				GameTooltip:Show()
+			end)
+			itemLabel:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+			end)
+
+			-- Create a value label
+			local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
+			valueLabel:SetText(lootDropDate)
+			valueLabel:SetJustifyH("CENTER")
+			
+		end
+			
     end
 
     -- Show the loot manager frame

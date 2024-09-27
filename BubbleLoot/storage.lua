@@ -3,6 +3,43 @@
 local cfg = BubbleLoot_G.configuration
 
 
+-- Helper function to parse date string and return a time table
+local function ParseDateString(dateString)
+    -- Example format: "23-09-2024 à 15:30:45"
+    local day, month, year, hour, min, sec = string.match(dateString, "(%d+)-(%d+)-(%d+) à (%d+):(%d+):(%d+)")
+    
+    -- Create a table with date values
+    local dateTable = {
+        day = tonumber(day),
+        month = tonumber(month),
+        year = tonumber(year),
+        hour = tonumber(hour),
+        min = tonumber(min),
+        sec = tonumber(sec)
+    }
+    
+    return dateTable
+end
+
+-- Function to calculate duration between two date strings
+local function GetDurationInHours(dateString1, dateString2)
+    -- Parse both date strings into date tables
+    local dateTable1 = ParseDateString(dateString1)
+    local dateTable2 = ParseDateString(dateString2)
+    
+    -- Convert both date tables to Unix timestamps
+    local timestamp1 = time(dateTable1)
+    local timestamp2 = time(dateTable2)
+    
+    -- Calculate the difference in seconds
+    local differenceInSeconds = math.abs(timestamp2 - timestamp1)
+    
+    -- Convert the difference from seconds to hours
+    local differenceInHours = differenceInSeconds / 3600
+    
+    return differenceInHours
+end
+
 -- function to create a new entry if it doesn't exist
 local function CreateNewPlayerEntry(playerName)
     if not PlayersData[playerName] then
@@ -22,41 +59,129 @@ end
 
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink)
-    --print("I'm in AddPlayerData")
-	-- Get current date and time
-    local currentTime = date("%Y-%m-%d %H:%M:%S")
-     
-	local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem)
 
-	instanceName = instanceName or "None"
+
+	LootAttribType = LootAttribType or 1
+    print("I'm in AddPlayerData")
+	print(playerName)
+	print(itemLink)
 	
-	if itemLink and playerName then	
+	if DateRemoveItem == nil then
 	
-		local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
-		-- if needed, create a new player entry
-		CreateNewPlayerEntry(playerName)
+		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
+		instanceName = instanceName or "None"
 		
-		if not PlayersData[playerName].items then
-		 print("items sublist not initialized")
-		end
-	
-		local dataItem = {itemLink, currentTime, instanceName}
-        --table.insert(PlayersData[playerName].items, dataItem)
-		PlayersData[playerName].items[itemId] = dataItem
+		local itemData = {}
+		local number = 0
 		
-		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
+		if itemLink and playerName then	
 		
-		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, 1, 1)
+			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+			-- if needed, create a new player entry
+			CreateNewPlayerEntry(playerName)
+			
+			if not PlayersData[playerName].items then
+			 print("items sublist not initialized")
+			end
 		
-		BubbleLoot_G.sync.SendEverything()
+			
+			
+			if(PlayersData[playerName].items[itemId]) then 
+				-- item already exist
+				
+				-- Get and set number of looted item
+				number = PlayersData[playerName].items[itemId][cfg.NUMBER]
+				
+				-- Get current itemData (contains date and lootAttribType)
+				itemData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
+			
+			
+			
+			
+				
+			end		
+			
+			
+			number = number +1
+			table.insert(itemData,1,  {date("%d-%m-%Y à %H:%M:%S"), LootAttribType})
+			
+			
+			
+			local dataItem = {itemLink, itemData, instanceName, number}
+			--table.insert(PlayersData[playerName].items, dataItem)
+			PlayersData[playerName].items[itemId] = dataItem
+			
+			
+
+			
+			-- Increase numbers of loots		
+			BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, 1, 1)
+			
+
+
 		
   
-	else
-		print("function AddPlayerData : error")	
+		else
+			print("function AddPlayerData adding: error")	
+		end
+	
+	else -- removeData = true
+		
+		if itemLink and playerName then
+		
+			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+			
+			BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[itemId])
+			
+			if	PlayersData[playerName].items[itemId][cfg.NUMBER] == 1 then
+			
+			
+				if GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][1]) < 3 then
+					local removedItemLootType = PlayersData[playerName].items[itemId][cfg.LOOTDATA][2]
+					-- Increase numbers of loots		
+					BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
+				end
+			
+				-- only one item, we can safely delete everything
+				PlayersData[playerName].items[itemId] = nil
+			
+			else
+				-- multiple item, let's remove the proper loot
+				-- let search for the proper item to remove
+				for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
+					if LootData[1] == DateRemoveItem then
+						
+						if GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), DateRemoveItem) < 3 then
+							local removedItemLootType = LootData[2]
+							-- Increase numbers of loots		
+							BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
+						end
+												
+						
+						table.remove(PlayersData[playerName].items[itemId][cfg.LOOTDATA], index)
+						break
+						
+					else
+						print("AddPlayerData : try to remove a LootData, but can't find it")
+					end
+				end
+			
+			end
+		
+		
+			
+		else
+			print("function AddPlayerData deleting: error")	
+		end
+	
 	end
 	
 	
+			-- update LootMgrFrame
+		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
+			-- Synchronisation functions
+		BubbleLoot_G.sync.SendEverything()
 end
 
 
@@ -144,8 +269,8 @@ function BubbleLoot_G.storage.GetPlayerData(playerName, verbose)
 		if PlayersData[playerName] then
 			print("Player: " .. playerName)
 			print("Items: ")
-			for index, value in pairs(PlayersData[playerName].items) do
-				print(value[1])
+			for index, lootData in pairs(PlayersData[playerName].items) do
+				print(lootData[cfg.ITEMLINK])
 				--[[if string.find(value[1].tostring(), "[") == nil then
 					local itemName = GetItemInfo(value[1])
 					print(itemName)
@@ -193,35 +318,6 @@ function BubbleLoot_G.storage.GetPlayerLootList(playerName)
 end
 
 
--- function delet loot to player in database
-function BubbleLoot_G.storage.DeletePlayerSpecificLoot(playerName, lootID)		
-			
-		
-	if(PlayersData[playerName].items[lootID]) then
-		BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[lootID])
-		PlayersData[playerName].items[lootID] = nil
-		
-		BubbleLoot_G.sync.SendEverything()
-		
-	else
-		print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
-	end
-	
-	--[[
-	for index, lootData in pairs(PlayersData[playerName].items) do
-		if lootName == lootData[1] then
-			--print(index)
-			table.remove(PlayersData[playerName].items,index)
-			return
-		end
-	end
-	]]--
-	--print("Function DeletePlayerSpecificLoot : "..playerName.." doesn't have "..lootName)
-
-
-end
-
-
 
 function BubbleLoot_G.storage.getAllPlayersFromDB()
 
@@ -243,12 +339,18 @@ function BubbleLoot_G.storage.playerGiveLootToPlayer(donor, recipient, lootId)
 
 	if(PlayersData[donor].items[lootId]) then
 		local itemData = PlayersData[donor].items[lootId]
-		PlayersData[recipient].items[lootId] = itemData
-		PlayersData[donor].items[lootId] = nil
-		print(donor.." gave " .. lootId .. " to " .. recipient)
 		
-		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(donor, 1, -1)
-		BubbleLoot_G.storage.ModifyNumberOfRaidLoot(recipient, 1, 1)
+		-- BubbleLoot_G.storage.AddPlayerData(recipient, itemData[ITEMLINK], itemData[LOOT_ATTRIBUTION_TYPE])
+		-- NEED TO BE MODIFIED
+		print("playerGiveLootToPlayer : need modification")
+		--PlayersData[recipient].items[lootId] = itemData		
+		-- PlayersData[donor].items[lootId] = nil
+		-- UNTIL HERE
+		
+		-- print(donor.." gave " .. lootId .. " to " .. recipient)
+		
+		-- BubbleLoot_G.storage.ModifyNumberOfRaidLoot(donor, 1, -1)
+		-- BubbleLoot_G.storage.ModifyNumberOfRaidLoot(recipient, 1, 1)
 		
 	else
 		print(donor.." doesn't have the required item "..lootId)
@@ -278,7 +380,18 @@ function BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
 
 	-- restore in PlayersData
 	local itemData = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
+	
+
+	
 	local itemId = tonumber(string.match(itemData[1], "item:(%d+):"))	
+	
+	-- print("RestoreLastDeletedItemForPlayer start test")
+	-- print(itemData[1])
+	-- print(itemId)
+	-- print(playerName)
+	
+	-- print("RestoreLastDeletedItemForPlayer end test")
+	
 	PlayersData[playerName].items[itemId] = itemData
 	
 	-- remove from CancelData
@@ -288,9 +401,24 @@ function BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
 
 end
 
+
+local function DeepCopy(original)
+    local copy = {}
+    for k, v in pairs(original) do
+        if type(v) == "table" then
+            copy[k] = DeepCopy(v)  -- Recursively copy tables
+        else
+            copy[k] = v  -- Copy values
+        end
+    end
+    return copy
+end
+
 function BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, itemData)
 
-	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  itemData)
+	local itemDataCopy = DeepCopy(itemData)
+
+	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  itemDataCopy)
 
 end
 
