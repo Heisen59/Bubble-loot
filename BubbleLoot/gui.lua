@@ -229,7 +229,7 @@ local function SendCountdownToRaidChat(itemLink)
 		local channel = "RAID" --"RAID"
 
 		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
-		SendChatMessage("Distribution de "..itemLink, "RAID_WARNING")
+		SendChatMessage(cfg.texts.LOOT_SEND..itemLink, "RAID_WARNING")
 		SendChatMessage("Choisissez +1/+2/pass pour "..itemLink.." et /rand si +2. Vous avez "..(delay+5).."s !", channel)
 	
         -- Loop through the countdown table
@@ -350,8 +350,8 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
                 info.hasArrow = false -- This tells the menu item to create a submenu
                 info.notCheckable = false
 				info.func = function()
-								BubbleLoot_G.rollerCollection:Clear()
-								BubbleLoot_G:Draw()
+								--BubbleLoot_G.rollerCollection:Clear()
+								-- BubbleLoot_G:Draw()
 								SendCountdownToRaidChat(itemLink)
 							end
                 UIDropDownMenu_AddButton(info, level)

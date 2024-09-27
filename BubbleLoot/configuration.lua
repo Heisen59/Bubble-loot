@@ -89,6 +89,7 @@ BubbleLoot_G.configuration.texts = {
 	ROLL_HEADER = "Roll",
 	UNIT_LOOT_SCORE_HEADER = "Loot Score",
     PASS = "pass",
+	LOOT_SEND = "Distribution de "
 
     -- LABELS BELONGING TO `GROUPTYPE`S.
 

@@ -56,6 +56,26 @@ local function CreateNewPlayerEntry(playerName)
 end
 
 
+-- Get Number of items looted as MS or OS
+function BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, LootAttribType)
+
+	-- print("NumberOfItemsMSOS debug start")
+	-- print(itemData)
+	-- print(itemData[cfg.NUMBER])
+	
+	-- print("NumberOfItemsMSOS debug end")
+
+	if LootAttribType == 0 then -- count everything
+		return itemData[cfg.NUMBER]
+	else 
+		local count = 0
+		for _, lootData in ipairs(itemData[cfg.LOOTDATA]) do
+			if lootData[2] == LootAttribType then count = count + 1 end
+		end
+		return count
+	end
+
+end
 
 
 -- Function to add player item data

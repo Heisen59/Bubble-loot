@@ -89,7 +89,7 @@ local LastPlayerLootTypeFilterUsed = {}
 -- Create the list of players
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName, refresh)
 
-LastPlayerLootTypeFilterUsed[playerName] = LastPlayerLootTypeFilterUsed[playerName] or 0
+LastPlayerLootTypeFilterUsed[playerName] = LastPlayerLootTypeFilterUsed[playerName] or 1
 
 -- refresh only if already exist
 if refresh==true and PlayerslootsFrame[playerName]==nil then
@@ -118,7 +118,7 @@ end
 	
     -- Create the main frame for the player list
     local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
-    lootsMgrFrame:SetSize(800, 500)
+    lootsMgrFrame:SetSize(850, 500)
 	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 20*NumberOfPlayerFrame, yOffset or -20*NumberOfPlayerFrame)
     lootsMgrFrame:SetMovable(true)
     lootsMgrFrame:EnableMouse(true)
@@ -163,14 +163,16 @@ end
 
     local dataHeader1 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     dataHeader1:SetPoint("LEFT", headerRow, "RIGHT", 50, 0)
-    dataHeader1:SetText("Score : " .. playerScore)
+    dataHeader1:SetText("Score : " .. round2(playerScore, 1))
+	dataHeader1:SetSize(80, 30)
 
     local dataHeader2 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     dataHeader2:SetPoint("LEFT", dataHeader1, "RIGHT", 50, 0)
-    dataHeader2:SetText("Items score : " .. itemPlayerScore)
+    dataHeader2:SetText("Items score : " .. round2(itemPlayerScore, 1))
+	dataHeader2:SetSize(120, 30)
 	
 	local dataHeader3 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 130, -35)
+    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 75, -35)
     dataHeader3:SetText("Date")
 	
 	local dataHeader4 = CreateFrame("Button", "ToggleMSOSButton", headerFrame, "UIPanelButtonTemplate") --headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
