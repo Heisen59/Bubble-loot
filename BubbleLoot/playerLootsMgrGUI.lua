@@ -83,10 +83,13 @@ end
 
 local LastFrameLevelUsed = 0
 local NumberOfPlayerFrame = 0
+local LastPlayerLootTypeFilterUsed = {}
+
 
 -- Create the list of players
-
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName, refresh)
+
+LastPlayerLootTypeFilterUsed[playerName] = LastPlayerLootTypeFilterUsed[playerName] or 0
 
 -- refresh only if already exist
 if refresh==true and PlayerslootsFrame[playerName]==nil then
@@ -166,6 +169,30 @@ end
     dataHeader2:SetPoint("LEFT", dataHeader1, "RIGHT", 50, 0)
     dataHeader2:SetText("Items score : " .. itemPlayerScore)
 	
+	local dataHeader3 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 130, -35)
+    dataHeader3:SetText("Date")
+	
+	local dataHeader4 = CreateFrame("Button", "ToggleMSOSButton", headerFrame, "UIPanelButtonTemplate") --headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    dataHeader4:SetPoint("LEFT", dataHeader3, "RIGHT", 170, 0)
+	dataHeader4:SetSize(60, 30)
+    dataHeader4:SetText("MS/OS")
+	-- Set mouse click handler for the item label
+	dataHeader4:EnableMouse(true)
+	dataHeader4:SetScript("OnMouseUp", function(self, button)
+											if button == "LeftButton" then
+												-- print(LastPlayerLootTypeFilterUsed[playerName])
+												 if LastPlayerLootTypeFilterUsed[playerName] == 0 then
+													LastPlayerLootTypeFilterUsed[playerName] = 1
+												elseif LastPlayerLootTypeFilterUsed[playerName] ==1 then
+													LastPlayerLootTypeFilterUsed[playerName] = 2
+												else
+													LastPlayerLootTypeFilterUsed[playerName] = 0
+												end
+												BubbleLoot_G.gui.createLootsMgrFrame(playerName)			
+											end
+										end)
+	
 	if LastDeletedItemData then
 	
 		local CancelButtonHeader3 = CreateFrame("Button", "CancelButton", headerFrame, "UIPanelButtonTemplate")
@@ -175,12 +202,12 @@ end
 		CancelButtonHeader3:EnableMouse(true)
 		CancelButtonHeader3:Show()
 		CancelButtonHeader3:SetScript("OnClick", function(self)
-			BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
-			BubbleLoot_G.gui.createLootsMgrFrame(playerName)
-		end)
+													BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
+													BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+												end)
 		
 		local CancelItemLinkHeader4 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-		CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 30, 0)
+		CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 20, 0)
 		CancelItemLinkHeader4:SetText(LastDeletedItemData[1])
 		CancelItemLinkHeader4:Show()
 	
@@ -189,7 +216,7 @@ end
 	
     -- Create the scroll frame
     local scrollFrame = CreateFrame("ScrollFrame", nil, lootsMgrFrame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -5)
+    scrollFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, -45)
     scrollFrame:SetPoint("BOTTOMRIGHT", lootsMgrFrame, "BOTTOMRIGHT", -30, 10)
 
     -- Content frame for items
@@ -205,44 +232,63 @@ end
 		itemName = "["..itemName.."]"
         
 		for i, lootData in ipairs(itemData[cfg.LOOTDATA]) do
-		
-			local lootDropDate = lootData[1] -- last date
-
-
-
-			rowIndex = rowIndex + 1
 			
-			-- Create the item label
-			local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-			itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
-			itemLabel:SetText(itemName)
-			itemLabel:SetTextColor(getRGBItemLink(itemLink))
-			itemLabel:SetWidth(400)
-			itemLabel:SetJustifyH("LEFT")
-
-			-- Set mouse click handler for the item label
-			itemLabel:EnableMouse(true)
-			itemLabel:SetScript("OnMouseUp", function(self, button)
-				if button == "RightButton" then
-					--print("Frame clicked : "..button)
-					CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate)
+			local continue = true
+			
+			if LastPlayerLootTypeFilterUsed[playerName] ~= 0 then
+				if lootData[2] ~= LastPlayerLootTypeFilterUsed[playerName] then 
+					continue = false
 				end
-			end)
-			itemLabel:SetScript("OnEnter", function(self)
-				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-				GameTooltip:SetHyperlink(itemLink)
-				GameTooltip:Show()
-			end)
-			itemLabel:SetScript("OnLeave", function(self)
-				GameTooltip:Hide()
-			end)
-
-			-- Create a value label
-			local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-			valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
-			valueLabel:SetText(lootDropDate)
-			valueLabel:SetJustifyH("CENTER")
+			end
+				
+			if 	continue then 
 			
+				local lootDropDate = lootData[1] -- last date
+				
+				local MSOS = ""
+				if lootData[2] == 1 then MSOS = "+1" else MSOS = "+2" end
+
+
+				rowIndex = rowIndex + 1
+				
+				-- Create the item label
+				local itemLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+				itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
+				itemLabel:SetText(itemName)
+				itemLabel:SetTextColor(getRGBItemLink(itemLink))
+				itemLabel:SetWidth(400)
+				itemLabel:SetJustifyH("LEFT")
+
+				-- Set mouse click handler for the item label
+				itemLabel:EnableMouse(true)
+				itemLabel:SetScript("OnMouseUp", function(self, button)
+					if button == "RightButton" then
+						--print("Frame clicked : "..button)
+						CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate)
+					end
+				end)
+				itemLabel:SetScript("OnEnter", function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+					GameTooltip:SetHyperlink(itemLink)
+					GameTooltip:Show()
+				end)
+				itemLabel:SetScript("OnLeave", function(self)
+					GameTooltip:Hide()
+				end)
+
+				-- Create a date label
+				local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+				valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
+				valueLabel:SetText(lootDropDate)
+				valueLabel:SetJustifyH("CENTER")
+				
+							-- Create a date label
+				local valueLabe2 = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+				valueLabe2:SetPoint("LEFT", valueLabel, "RIGHT", 70, 0)
+				valueLabe2:SetText(MSOS)
+				valueLabe2:SetJustifyH("CENTER")
+				
+			end
 		end
 			
     end
