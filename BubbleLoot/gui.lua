@@ -41,7 +41,7 @@ function BubbleLoot_G.gui.Initialize(self)
 			else
 				self_mainFrame:StartMoving();
 			end
-        elseif event == "RightButton" then
+        elseif event == "RightButton" and IsControlKeyDown() then
             BubbleLoot_G.rollerCollection:Clear()
             BubbleLoot_G:Draw()
         end
@@ -109,6 +109,58 @@ function BubbleLoot_G.gui.Initialize(self)
     return unitHeader -- relativePoint
 end
 
+
+-- Function to handle dropdown Remove player from rollerCollection
+local function OnClickRemovePlayer(self, arg1 )
+    -- print("OnClickRemovePlayer function" )
+	local playerName = arg1
+	-- BubbleLoot_G.rollerCollection:Save(playerName, 9)
+	BubbleLoot_G.rollerCollection:Remove(playerName)
+	BubbleLoot_G:Draw()
+
+end
+
+-- Function to handle dropdown Send current to player
+local function OnClickSendToPlayer(self, arg1)
+    print("OnClickSendToPlayer function not implemented yet" )
+	local playerName = arg1
+
+
+end
+
+-- Function to handle open the player loot pannel
+local function OnClickOpenPlayerLootPannel(self, arg1)
+
+	print("OnClickOpenPlayerLootPannel")
+	BubbleLoot_G.gui.OpenPlayerLootWindow(arg1)
+end
+
+-- Handle the creation of dropdown menu to manage players need during the attribution.
+local function CreateManageNeedDropdownMenu(playerName)
+	
+	local dropdown = CreateFrame("Frame", "ManageNeedDropdownMenu", UIParent, "UIDropDownMenuTemplate")
+	local menuItems  = {
+			{
+				text = playerName,  -- loot's name as the header
+				isTitle = true,  -- This makes the text non-clickable and acts as a title
+				notCheckable = true,  -- Don't show a checkbox
+			},
+			{
+				text = "Remove player",
+				func = OnClickRemovePlayer,
+				arg1 = playerName,
+			},
+			{
+				text = "Open loot pannel",
+				func = OnClickOpenPlayerLootPannel,
+				arg1 = playerName,
+			}
+		}
+		
+	EasyMenu(menuItems, dropdown, "cursor", 0 , 0, "MENU")
+end
+
+
 -- Handle FontStrings needed for listing rolling players.
 -- Uses as few rows as possible (recycles the old ones).
 -- Return i-th row (create if necessary). Zero gives headers.
@@ -137,7 +189,7 @@ function BubbleLoot_G.gui.GetRow(self, i)
         score:SetPoint("TOPLEFT", parents.score, "BOTTOMLEFT")
 		chance:SetPoint("TOPLEFT", parents.chance, "BOTTOMLEFT")
 		roll:SetPoint("TOPLEFT", parents.roll, "BOTTOMLEFT")
-
+	
         unit:SetHeight(cfg.size.ROW_HEIGHT)
         need:SetHeight(cfg.size.ROW_HEIGHT)		
         score:SetHeight(cfg.size.ROW_HEIGHT)
@@ -152,10 +204,18 @@ function BubbleLoot_G.gui.GetRow(self, i)
 end
 
 -- Write character name and their need to the given row index. Skip `nil`.
-function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanceText, rollText)
+function BubbleLoot_G.gui.WriteRow(self, i, unitText, needText, scoreText, chanceText, rollText, rollerName)
     local row = self:GetRow(i)
     if unitText ~= nil then
         row.unit:SetText(unitText)
+				-- Set mouse click handler for the item label
+		row.unit:EnableMouse(true)
+		row.unit:SetScript("OnMouseUp", function(self, button)
+			if button == "RightButton" then
+				-- print("Frame clicked : "..button)
+				 CreateManageNeedDropdownMenu(rollerName)
+			end
+		end)
     end
     if needText ~= nil then		
 		row.need:SetText(needText)

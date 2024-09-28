@@ -62,7 +62,7 @@ function BubbleLoot_G.rollerCollection.Draw(self)
     for index, roller in ipairs(self.values) do
 		if(roller.need<threshold+1)then
 			-- unit
-			local unitText = nil
+			local unitSimpleName = nil
 			if orderChanged or roller.unitChanged then
 				unitText = roller:MakeUnitText()
 				roller.unitChanged = false
@@ -93,7 +93,7 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 			end
 			
 			-- write
-			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText, chanceText, rollText)
+			BubbleLoot_G.gui:WriteRow(i, unitText, needText, scoreText, chanceText, rollText, roller.name)
 			currentRow = i
 			i = i+1		
 		end
@@ -189,6 +189,22 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
 			self.isSorted = false
 			self:LootChanceRoller()
 		end
+    end
+end
+
+-- Update `roller` to increase its need (we want to remove it from the roller.
+function BubbleLoot_G.rollerCollection.Remove(self, name)
+
+	local roller = self:FindRoller(name)
+    
+    if roller ~= nil then
+        roller:UpdateNeed(roller.need +1)
+		
+		self.isSorted = false
+		self:LootChanceRoller()
+		
+    else
+		print("rollerCollection.Remove : the roller SHOULD exist")
     end
 end
 
