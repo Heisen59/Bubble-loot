@@ -82,7 +82,7 @@ BubbleLoot_G.configuration.texts = {
     -- GENERAL.
 
     LIST_CMDS = "Commands: show, hide, toggle, help, reset, resize, test.",
-    UNIT_HEADER = "Player (class) [+1]",
+    UNIT_HEADER = "Player (class) [+1/+2]",
     NEED_HEADER = "Need",
 	SCORE_HEADER = "Score",
 	CHANCE_HEADER = "Chance",

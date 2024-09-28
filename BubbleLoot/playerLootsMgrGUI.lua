@@ -39,6 +39,28 @@ local function OnClickRemove(self, arg1, arg2)
 	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
 end
 
+
+local function makeTextDate(lootDropDate)
+
+local durationInHours = BubbleLoot_G.calculation.GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), lootDropDate)
+
+if durationInHours < 20 then
+	return "Today"
+end
+
+if durationInHours < 164 then
+	return "This week"
+end
+
+if durationInHours < 334 then
+	return "The last two week"
+end
+
+return lootDropDate
+
+end
+
+
 -- Function to create the dropdown menu for the player name
 local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate, lootAttribType)
 	--print("CreateLootDropdownMenu")
@@ -257,6 +279,7 @@ end
 			if 	continue then 
 			
 				local lootDropDate = lootData[1] -- last date
+				local lootDropDateText = makeTextDate(lootDropDate)
 				local lootAttribType = lootData[2]
 				
 				-- print(lootAttribType)
@@ -295,8 +318,9 @@ end
 				-- Create a date label
 				local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 				valueLabel:SetPoint("LEFT", itemLabel, "RIGHT", 30, 0)
-				valueLabel:SetText(lootDropDate)
+				valueLabel:SetText(lootDropDateText)
 				valueLabel:SetJustifyH("CENTER")
+				valueLabel:SetWidth(200)
 				
 							-- Create a date label
 				local valueLabe2 = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")

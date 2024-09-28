@@ -187,19 +187,21 @@ for _, playerName in pairs(SortPlayersData) do
         playerRows[playerName] = playerRows[playerName] or {}
         playerRows[playerName]["valueLabel" .. i] = valueLabel
 
+		-- Create "-" button
+        local minusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+        minusButton:SetSize(16, 16)  -- Reduce button size to 15
+		minusButton:SetPoint("TOP", valueLabel, "BOTTOM", -8, 0)  -- Align horizontally
+        minusButton:SetText("-")
+        minusButton:SetScript("OnClick", function() DecrementPlayer(playerName, i) end)
+	
         -- Create "+" button
         local plusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
         plusButton:SetSize(16, 16)  -- Reduce button size to 15
-        plusButton:SetPoint("TOP", valueLabel, "BOTTOM", -8, 0)  -- Align horizontally
+        plusButton:SetPoint("LEFT", minusButton, "RIGHT", 0, 0)  -- Stack vertically below plus button
         plusButton:SetText("+")
         plusButton:SetScript("OnClick", function() IncrementPlayer(playerName, i) end)
 
-        -- Create "-" button
-        local minusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
-        minusButton:SetSize(16, 16)  -- Reduce button size to 15
-        minusButton:SetPoint("LEFT", plusButton, "RIGHT", 0, 0)  -- Stack vertically below plus button
-        minusButton:SetText("-")
-        minusButton:SetScript("OnClick", function() DecrementPlayer(playerName, i) end)
+
 
         -- Store references to the buttons
         playerRows[playerName]["plusButton" .. i] = plusButton

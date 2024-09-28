@@ -159,7 +159,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			if	PlayersData[playerName].items[itemId][cfg.NUMBER] == 1 then
 			
 			
-				if GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][1]) < 3 then
+				if BubbleLoot_G.calculation.GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][1]) < 3 then
 					local removedItemLootType = PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][2]
 					-- Increase numbers of loots		
 					BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
@@ -174,7 +174,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 				for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
 					if LootData[1] == DateRemoveItem then
 						
-						if GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), DateRemoveItem) < 3 then
+						if BubbleLoot_G.calculation.GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), DateRemoveItem) < 3 then
 							local removedItemLootType = LootData[2]
 							-- Increase numbers of loots		
 							BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)

@@ -131,7 +131,7 @@ end
 -- Function to handle open the player loot pannel
 local function OnClickOpenPlayerLootPannel(self, arg1)
 
-	print("OnClickOpenPlayerLootPannel")
+	-- print("OnClickOpenPlayerLootPannel")
 	BubbleLoot_G.gui.OpenPlayerLootWindow(arg1)
 end
 

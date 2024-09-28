@@ -181,3 +181,47 @@ function BubbleLoot_G.calculation.getTheWinner(roll)
 
 end
 
+
+
+--[[
+
+Other calculations
+
+--]]
+
+-- Helper function to parse date string and return a time table
+local function ParseDateString(dateString)
+    -- Example format: "23-09-2024 à 15:30:45"
+    local day, month, year, hour, min, sec = string.match(dateString, "(%d+)-(%d+)-(%d+) à (%d+):(%d+):(%d+)")
+    
+    -- Create a table with date values
+    local dateTable = {
+        day = tonumber(day),
+        month = tonumber(month),
+        year = tonumber(year),
+        hour = tonumber(hour),
+        min = tonumber(min),
+        sec = tonumber(sec)
+    }
+    
+    return dateTable
+end
+
+-- Function to calculate duration between two date strings
+function BubbleLoot_G.calculation.GetDurationInHours(dateString1, dateString2)
+    -- Parse both date strings into date tables
+    local dateTable1 = ParseDateString(dateString1)
+    local dateTable2 = ParseDateString(dateString2)
+    
+    -- Convert both date tables to Unix timestamps
+    local timestamp1 = time(dateTable1)
+    local timestamp2 = time(dateTable2)
+    
+    -- Calculate the difference in seconds
+    local differenceInSeconds = math.abs(timestamp2 - timestamp1)
+    
+    -- Convert the difference from seconds to hours
+    local differenceInHours = differenceInSeconds / 3600
+    
+    return differenceInHours
+end
