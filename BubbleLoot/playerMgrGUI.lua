@@ -167,13 +167,13 @@ for _, playerName in pairs(SortPlayersData) do
 
     rowIndex = rowIndex + 1
 -- Player name label
-    local nameLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    nameLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20 )
-    nameLabel:SetText(playerName)
-	nameLabel:SetWidth(100)  -- Set a fixed width for alignment
-    nameLabel:SetJustifyH("LEFT")  -- Align text to the left
+    local playerNameLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    playerNameLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20 )
+    playerNameLabel:SetText(playerName)
+	playerNameLabel:SetWidth(100)  -- Set a fixed width for alignment
+    playerNameLabel:SetJustifyH("LEFT")  -- Align text to the left
     -- Add mouse click handler to show dropdown
-    nameLabel:SetScript("OnMouseDown", function()
+    playerNameLabel:SetScript("OnMouseDown", function()
         CreateDropdownMenu(playerName)
     end)
 
@@ -181,7 +181,7 @@ for _, playerName in pairs(SortPlayersData) do
     for i = 1, 3 do
         -- Value label
         local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        valueLabel:SetPoint("LEFT", nameLabel, "RIGHT", 30 + (i - 1) * 80, 5)
+        valueLabel:SetPoint("LEFT", playerNameLabel, "RIGHT", 30 + (i - 1) * 80, 5)
         valueLabel:SetText(playerData.participation[i])
 		valueLabel:SetJustifyH("CENTER")
         playerRows[playerName] = playerRows[playerName] or {}
