@@ -141,7 +141,7 @@ function ShowMinimapContextMenu()
 			info = UIDropDownMenu_CreateInfo()
             info.text = "Show raid loots per date"
             info.func = function()				
-				print("Open the raid loots info : not implemented yet")
+				BubbleLoot_G.gui.OpenRaidsLootWindow()
 				end
             UIDropDownMenu_AddButton(info, level)
 			

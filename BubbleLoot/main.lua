@@ -95,6 +95,10 @@ function BubbleLoot_G.Initialize(self)
 		RaidData[cfg.NUMBER_OF_RAID_DONE] = 0;
     end
 	
+	if RaidData[cfg.RAID_HISTORIC] == nil then -- Initialize when first loaded.
+		RaidData[cfg.RAID_HISTORIC] = {};
+    end
+	
 	-- check if major a database modification need a restructuration
 	while BubbleLootData[cfg.DATA_STRUCTURE] ~= "v1.2" do
 		PlayersData = MigrationToNewDataBase(PlayersData)				
@@ -181,6 +185,12 @@ end
 
 function BubbleLoot_G.increaseNumberOfRaid()
 	RaidData[cfg.NUMBER_OF_RAID_DONE] = RaidData[cfg.NUMBER_OF_RAID_DONE] + 1
+			
+	local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
+	instanceName = instanceName or "None"
+
+	table.insert(RaidData[2], {date("%d-%m-%Y à %H:%M:%S"), instanceName})
+
 end
 
 function BubbleLoot_G.setNumberOfRaid(num)

@@ -49,6 +49,9 @@ local function OnClickBonusMalus(self, arg1)
     print(arg1 .. ": Bonus/Malus clicked")
 end
 
+
+
+
 -- Function to create the dropdown menu for the player name
 local function CreateDropdownMenu(playerName)
     local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
@@ -71,6 +74,12 @@ local function CreateDropdownMenu(playerName)
     }
     
     EasyMenu(menuList, dropdown, "cursor", 0 , 0, "MENU")
+end
+
+function BubbleLoot_G.gui.CreateDropdownMenuGlobal(playerName)
+
+    CreateDropdownMenu(playerName)
+
 end
 
 

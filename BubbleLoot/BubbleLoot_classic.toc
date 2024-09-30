@@ -28,3 +28,4 @@ rollerCollection.lua
 playerInfo.lua
 storage.lua
 Calculation.lua
+RaidLootsMgrGUI.lua

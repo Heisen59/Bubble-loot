@@ -257,7 +257,7 @@ end
 --Add all raiders a participation
 function BubbleLoot_G.storage.AddRaidParticipation()
 	-- Increase the raid counter
-	if(IsInRaid()) then
+	if(IsInRaid() or true) then
 		BubbleLoot_G.increaseNumberOfRaid()
 		-- Loop through all raid members
 		local N = GetNumGroupMembers()

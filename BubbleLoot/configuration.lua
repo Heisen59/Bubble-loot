@@ -51,6 +51,7 @@ BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
 
 --raidData index
 BubbleLoot_G.configuration.NUMBER_OF_RAID_DONE = 1
+BubbleLoot_G.configuration.RAID_HISTORIC = 2
 
 -- Sync data index
 BubbleLoot_G.configuration.TRUST_LIST = 1

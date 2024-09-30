@@ -59,6 +59,8 @@ end
 
 function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 
+	-- print(itemId)
+	
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(itemId)
 	
@@ -190,7 +192,7 @@ Other calculations
 --]]
 
 -- Helper function to parse date string and return a time table
-local function ParseDateString(dateString)
+function BubbleLoot_G.calculation.ParseDateString(dateString)
     -- Example format: "23-09-2024 à 15:30:45"
     local day, month, year, hour, min, sec = string.match(dateString, "(%d+)-(%d+)-(%d+) à (%d+):(%d+):(%d+)")
     
@@ -210,8 +212,8 @@ end
 -- Function to calculate duration between two date strings
 function BubbleLoot_G.calculation.GetDurationInHours(dateString1, dateString2)
     -- Parse both date strings into date tables
-    local dateTable1 = ParseDateString(dateString1)
-    local dateTable2 = ParseDateString(dateString2)
+    local dateTable1 = BubbleLoot_G.calculation.ParseDateString(dateString1)
+    local dateTable2 = BubbleLoot_G.calculation.ParseDateString(dateString2)
     
     -- Convert both date tables to Unix timestamps
     local timestamp1 = time(dateTable1)
