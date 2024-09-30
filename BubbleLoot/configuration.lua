@@ -228,6 +228,27 @@ BubbleLoot_G.configuration.tokens =
 231730, --Ancient Boots
 231721,--Primeval Boots
 },
+["INVTYPE_2HWEAPON"] = 
+{--2H weapon
+231722,-- "Faux du Chaos épuisée",
+230904, --Parchemin : SEENECS ED UEF
+231814, --Cœur chromatique
+},
+["INVTYPE_WEAPONMAINHAND"] = 
+{--1H weapon
+231882,--Reçu de l’engin de suppression
+231452, --Sang du Porteur de Lumière
+229352,--Informations recueillies
+},
+["INVTYPE_TRINKET"] = 
+{--Trinket
+229906,--Écaille de bronze ternie
+},
+["INVTYPE_SHIELD"] = 
+{--SHIELD
+231995, --Scorie d’élémentium durcie
+231378,--Disque doré chatoyant
+},
 }
 
 

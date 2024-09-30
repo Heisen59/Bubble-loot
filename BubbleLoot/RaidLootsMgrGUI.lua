@@ -3,7 +3,7 @@ local cfg = BubbleLoot_G.configuration
 
 -- Define the addon and main frame
 local RaidLootFrame = CreateFrame("Frame", "RaidLootFrame", UIParent, "BasicFrameTemplateWithInset")
-RaidLootFrame:SetSize(400, 700) -- Width, Height
+RaidLootFrame:SetSize(600, 700) -- Width, Height
 RaidLootFrame:SetPoint("CENTER") -- Position in the center of the screen
 RaidLootFrame.title = RaidLootFrame:CreateFontString(nil, "OVERLAY")
 RaidLootFrame.title:SetFontObject("GameFontHighlightLarge")
@@ -79,11 +79,11 @@ local ShowRaidList, ShowLoot, RefreshView, ClearContent
 
 -- Create scrollable content for listing raids and dates
 local scrollFrame = CreateFrame("ScrollFrame", "scrollRaidLootFrame", RaidLootFrame, "UIPanelScrollFrameTemplate")
-scrollFrame:SetSize(355, 640)
+scrollFrame:SetSize(555, 640)
 scrollFrame:SetPoint("TOPLEFT", 10, -50)
 
 local RaidContentFrame = CreateFrame("Frame", "RaidContentFrame", scrollFrame)
-RaidContentFrame:SetSize(360, 800)
+RaidContentFrame:SetSize(560, 800)
 scrollFrame:SetScrollChild(RaidContentFrame)
 
 -- Function to clear the content frame
@@ -126,7 +126,7 @@ ShowLoot = function(raidDate)
     for _, loot in ipairs(loots) do
         local lootText = RaidContentFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         lootText:SetPoint("TOPLEFT", 10, yOffset)
-        lootText:SetText(loot.item .. " - Won by " .. loot.player)
+        lootText:SetText(loot.item .. " - Won by " .. loot.player.." as +"..loot.need)
         lootText:SetScript("OnMouseDown", function(self, button)
             if button == "RightButton" then 
                 BubbleLoot_G.gui.CreateDropdownMenuGlobal(loot.player)
@@ -178,7 +178,7 @@ ShowRaidList = function()
     local yOffset = -10
     for _, raid in ipairs(raids) do
         local raidButton = CreateFrame("Button", nil, RaidContentFrame, "UIPanelButtonTemplate")
-        raidButton:SetSize(350, 20)
+        raidButton:SetSize(550, 20)
         raidButton:SetPoint("TOPLEFT", 5, yOffset)
         raidButton:SetText(raid.name .. " - " .. raid.dateText)
 
