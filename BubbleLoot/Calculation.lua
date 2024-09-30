@@ -5,7 +5,7 @@ local cfg = BubbleLoot_G.configuration
 
 function BubbleLoot_G.calculation.GetPlayerItemList(playerName)
 
-local itemsList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
+local itemsList = BubbleLoot_G.storage.GetPlayerLootList(playerName) or {}
 
  for index, value in pairs(itemsList) do
         print(value[1].." at "..value[2].." in "..value[3])

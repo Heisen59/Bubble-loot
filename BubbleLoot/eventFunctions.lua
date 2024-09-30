@@ -141,7 +141,7 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
 	
 	if event == "CHAT_MSG_RAID_WARNING" then
         -- Check if the message contains "Distribution de "
-        if string.find(message, LOOT_SEND) then
+        if string.find(message, cfg.LOOT_SEND) then
             -- Do something when the phrase is found
 			BubbleLoot_G.rollerCollection:Clear()
 			BubbleLoot_G:Draw()

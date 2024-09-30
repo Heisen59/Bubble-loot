@@ -101,7 +101,7 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 					BubbleLoot_G.storage.AddPlayerData(RecevingPlayer, itemLink, lootAttribType, nil, true)
 					
 					-- let's remove the item to the donnor
-					BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, lootDropDate, true)
+					BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, lootAttribType, lootDropDate, true)
 					
 					--BubbleLoot_G.storage.playerGiveLootToPlayer(playerName, RecevingPlayer, lootId, lootDropDate, lootAttribType)
 					
@@ -152,7 +152,7 @@ end
     -- Create the main frame for the player list
     local lootsMgrFrame = CreateFrame("Frame", "lootsListFrame", UIParent, "BasicFrameTemplateWithInset")
     lootsMgrFrame:SetSize(850, 500)
-	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or 20*NumberOfPlayerFrame, yOffset or -20*NumberOfPlayerFrame)
+	lootsMgrFrame:SetPoint(point or "CENTER", relativeTo or UIParent , relativePoint or "CENTER", xOffset or (20*NumberOfPlayerFrame), yOffset or (-20*NumberOfPlayerFrame))
     lootsMgrFrame:SetMovable(true)
     lootsMgrFrame:EnableMouse(true)
     lootsMgrFrame:RegisterForDrag("LeftButton")

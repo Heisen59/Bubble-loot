@@ -160,48 +160,72 @@ BubbleLoot_G.configuration.tokens =
 227532,--"Chaperon incandescent",
 227755,-- "Heaume en écailles en fusion",
 227764,-- "Heaume du noyau incendié"
+231711,--Draconian Hood
+231728,--Ancient Helm
+231719,--Primeval Helm
 },
 ["INVTYPE_SHOULDER"] = 
 {--Shoulders
 227537,-- "Protège-épaules incandescents",
 227752,-- "Épaulières en écailles en fusion", 
 227762,-- "Protège-épaules du noyau incendié"
+231709,--Draconian Shoulderpads
+231726,--Ancient Shoulderpads
+231717,--Primeval Shoulderpads
 },
 ["INVTYPE_CHEST"] = 
 {--Chest
 227535,-- "Robe incandescente",
 227758,-- "Plastron en écailles en fusion",
 227766,-- "Plastron du noyau incendié"
+231714,--Draconian Robe
+231731,--Ancient Chest
+231723,--Primeval Chest
 },
 ["INVTYPE_HAND"] = 
 {--Gloves
 227533,-- "Gants incandescents",
 227756,-- "Gants en écailles en fusion",
 227759,-- "Gants du noyau incendié"
+231712,--Draconian Gloves
+231729,--Ancient Gloves
+231720,--Primeval Gloves
 },
 ["INVTYPE_WRIST"] = 
 {--Wrist
 227531,-- "Manchettes incandescentes",
 227750,-- "Manchettes en écailles en fusion",
 227760,-- "Manchettes du noyau incendié"
+231707,--Draconian Bindings
+231724,--Ancient Bindings
+231715,--Primeval Bindings
 },
 ["INVTYPE_WAIST"] = 
 {--Waist
 227530,-- "Ceinture incandescente",
 227751,-- "Ceinture en écailles en fusion",
 227761,-- "Ceinture du noyau incendié"
+231708,--Draconian Belt
+231725,--Ancient Belt
+231716,--Primeval Belt
 },
 ["INVTYPE_LEGS"] = 
 {--Legs
 227534,-- "Jambières incandescentes",
 227754,-- "Jambières en écailles en fusion",
 227763,-- "Jambières du noyau incendié"
+231710,--Draconian Leggings
+231727,--Ancient Leggings
+231718,--Primeval Leggings
 },
 ["INVTYPE_FEET"] = 
 {--Boots
 227536,-- "Bottes incandescentes",
 227536,-- "Bottes incandescentes",
 227765,-- "Bottes du noyau incendié"
+231713,--Draconian Boots
+231730, --Ancient Boots
+231721,--Primeval Boots
 },
 }
 

@@ -116,7 +116,7 @@ function ShowMinimapContextMenu()
 
         if level == 1 then
 			-- Add toggle main loot window
-			info = UIDropDownMenu_CreateInfo()
+			local info = UIDropDownMenu_CreateInfo()
             info.text = "Show/hide the main loot window"
             info.func = function()				
 				BubbleLoot_G.gui:ToggleVisibility()
@@ -124,7 +124,7 @@ function ShowMinimapContextMenu()
             UIDropDownMenu_AddButton(info, level)
 		
             -- Add a participation to all raiders
-            local info = UIDropDownMenu_CreateInfo()
+            info = UIDropDownMenu_CreateInfo()
             info.text = "Add a participation to all players in raid"
             info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
             UIDropDownMenu_AddButton(info, level)
@@ -134,6 +134,14 @@ function ShowMinimapContextMenu()
             info.text = "Modify a specific player's data"
             info.func = function()				
 				BubbleLoot_G.gui.OpenParticipationWindow()
+				end
+            UIDropDownMenu_AddButton(info, level)
+			
+			-- Add Check raid player's loot (per date)
+			info = UIDropDownMenu_CreateInfo()
+            info.text = "Show raid loots per date"
+            info.func = function()				
+				print("Open the raid loots info : not implemented yet")
 				end
             UIDropDownMenu_AddButton(info, level)
 			

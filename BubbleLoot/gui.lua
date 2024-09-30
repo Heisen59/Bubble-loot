@@ -536,9 +536,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 					-- Loop through all raid members
 					local MS_Rollers = BubbleLoot_G.rollerCollection:getMS_Rollers()
 					if MS_Rollers then
-						local N = table.getn(MS_Rollers)
-						for i = 1, N do
-							local playerName = MS_Rollers[i]
+						for _, playerName in ipairs(MS_Rollers) do
 							if playerName then
 								-- Create a menu item for each raid member
 								local info = UIDropDownMenu_CreateInfo()
