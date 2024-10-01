@@ -189,13 +189,19 @@ end
     -- Header elements
     local playerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName)
     local itemPlayerScore = BubbleLoot_G.calculation.GetPlayerScore(playerName, true)
+	local playerBonus = BubbleLoot_G.calculation.GetPlayerBonus(playerName)
 
     local headerRow = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     headerRow:SetPoint("LEFT", headerFrame, "LEFT", 20, 0)
     headerRow:SetText(playerName)
 
+	local dataHeader0 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    dataHeader0:SetPoint("LEFT", headerRow, "RIGHT", 50, 0)
+    dataHeader0:SetText("Bonus : " .. round2(playerBonus, 1))
+	dataHeader0:SetSize(80, 30)
+
     local dataHeader1 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader1:SetPoint("LEFT", headerRow, "RIGHT", 50, 0)
+    dataHeader1:SetPoint("LEFT", dataHeader0, "RIGHT", 50, 0)
     dataHeader1:SetText("Score : " .. round2(playerScore, 1))
 	dataHeader1:SetSize(80, 30)
 
@@ -205,7 +211,7 @@ end
 	dataHeader2:SetSize(120, 30)
 	
 	local dataHeader3 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 75, -35)
+    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", -75, -35)
     dataHeader3:SetText("Date")
 	
 	local dataHeader4 = CreateFrame("Button", "ToggleMSOSButton", headerFrame, "UIPanelButtonTemplate") --headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -295,7 +301,7 @@ end
 				itemLabel:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 20, -30 * rowIndex + 20)
 				itemLabel:SetText(itemName)
 				itemLabel:SetTextColor(getRGBItemLink(itemLink))
-				itemLabel:SetWidth(400)
+				itemLabel:SetWidth(300)
 				itemLabel:SetJustifyH("LEFT")
 
 				-- Set mouse click handler for the item label

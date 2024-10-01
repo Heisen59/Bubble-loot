@@ -46,7 +46,7 @@ local function OnClickLoots(self, arg1)
 end
 
 local function OnClickBonusMalus(self, arg1)
-    print(arg1 .. ": Bonus/Malus clicked")
+    BubbleLoot_G.gui.OpenBonusPanelGlobal(arg1)
 end
 
 

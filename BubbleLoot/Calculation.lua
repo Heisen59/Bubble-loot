@@ -14,39 +14,54 @@ local itemsList = BubbleLoot_G.storage.GetPlayerLootList(playerName) or {}
 
 end
 
+function BubbleLoot_G.calculation.GetPlayerBonus(playerName)
+
+	local playerBonus = PlayersData[playerName].BonusMalus or {}
+	local score = 0
+
+	for _, BonusData in ipairs(playerBonus) do 
+		score = score + BonusData[2]
+	end
+
+	return score
+
+end
+
+
+
 function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 
-lootscore = lootscore or false;
+	lootscore = lootscore or false;
 
---print("GetPlayerScore function")
+	--print("GetPlayerScore function")
 
-local score = 0
---Check if player exist in database
-if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score end
+	local score = 0
+	--Check if player exist in database
+	if not BubbleLoot_G.storage.GetPlayerData(playerName, false) then return score end
 
 
 
--- First, get loot score
-local itemsList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
-	if(itemsList) then
-		for itemId, itemData in pairs(itemsList) do
-			NumberOfItemsLooted = BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, 1) -- only count MS items
-			score = score +  NumberOfItemsLooted * BubbleLoot_G.calculation.GetItemScore(itemId)
+	-- First, get loot score
+	local itemsList = BubbleLoot_G.storage.GetPlayerLootList(playerName)
+		if(itemsList) then
+			for itemId, itemData in pairs(itemsList) do
+				NumberOfItemsLooted = BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, 1) -- only count MS items
+				score = score +  NumberOfItemsLooted * BubbleLoot_G.calculation.GetItemScore(itemId)
+			end
 		end
-	end
 
-if lootscore then return score end
+	if lootscore then return score end
 
--- Second, modify this loot score according to attendance
-local participation = BubbleLoot_G.storage.GetPlayerParticipation(playerName)
-	if(participation) then
-		score = score - cfg.constant.ATTENDANCE_VALUE*participation[cfg.index.ATTENDANCE] - cfg.constant.BENCH_VALUE*participation[cfg.index.BENCH] + cfg.constant.NON_ATTENDANCE_VALUE*participation[cfg.index.NON_ATTENDANCE]
-	end
-	
--- Third : bonus/malus
--- TO DO 
-	
-return score
+	-- Second, modify this loot score according to attendance
+	local participation = BubbleLoot_G.storage.GetPlayerParticipation(playerName)
+		if(participation) then
+			score = score - cfg.constant.ATTENDANCE_VALUE*participation[cfg.index.ATTENDANCE] - cfg.constant.BENCH_VALUE*participation[cfg.index.BENCH] + cfg.constant.NON_ATTENDANCE_VALUE*participation[cfg.index.NON_ATTENDANCE]
+		end
+		
+	-- Third : bonus/malus
+	score = score + BubbleLoot_G.calculation.GetPlayerBonus(playerName)
+		
+	return score
 
 end
 
@@ -226,4 +241,53 @@ function BubbleLoot_G.calculation.GetDurationInHours(dateString1, dateString2)
     local differenceInHours = differenceInSeconds / 3600
     
     return differenceInHours
+end
+
+
+-- Function to convert date format
+function BubbleLoot_G.calculation.ConvertDateFormat(dateStr)
+    -- Use pattern matching to extract day, month, year
+    local day, month, year = dateStr:match("(%d%d)-(%d%d)-(%d%d%d%d)")
+    
+    if day and month and year then
+        -- Create a table to represent the time structure
+        local timeTable = {
+            day = tonumber(day),
+            month = tonumber(month),
+            year = tonumber(year),
+            hour = 0,  -- Default time (not needed for final format)
+            min = 0,
+            sec = 0
+        }
+
+        -- Format to the desired format "%Y-%m-%d"
+        local newDateFormat = date("%Y-%m-%d", time(timeTable))
+        return newDateFormat
+    end
+
+    -- Return original if parsing fails
+    return dateStr
+end
+
+-- Function to convert date string to a timestamp
+function BubbleLoot_G.calculation.ConvertToTimestamp(dateStr)
+    -- Use pattern matching to extract day, month, year, hour, min, sec
+    local day, month, year, hour, min, sec = dateStr:match("(%d%d)-(%d%d)-(%d%d%d%d) à (%d%d):(%d%d):(%d%d)")
+
+    if day and month and year and hour and min and sec then
+        -- Create a table to represent the time structure
+        local timeTable = {
+            day = tonumber(day),
+            month = tonumber(month),
+            year = tonumber(year),
+            hour = tonumber(hour),
+            min = tonumber(min),
+            sec = tonumber(sec)
+        }
+
+        -- Convert to a Unix timestamp (seconds since epoch)
+        return time(timeTable)
+    end
+
+    return nil  -- Return nil if the date format is invalid
 end

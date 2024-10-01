@@ -29,3 +29,4 @@ playerInfo.lua
 storage.lua
 Calculation.lua
 RaidLootsMgrGUI.lua
+BonusMalusMgr.lua
