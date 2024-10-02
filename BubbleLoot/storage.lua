@@ -51,7 +51,6 @@ local function CreateNewPlayerEntry(playerName)
 		
 		BubbleLoot_G.gui.RefreshParticipationWindow()
 		
-		BubbleLoot_G.sync.SendEverything()
     end	
 end
 
@@ -79,7 +78,7 @@ end
 
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange)
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, NoSend)
 
 	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
@@ -89,6 +88,9 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 	
 	if DateRemoveItem == nil then
 	
+
+
+
 		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
 		instanceName = instanceName or "None"
 		
@@ -100,14 +102,24 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
 			-- if needed, create a new player entry
 			CreateNewPlayerEntry(playerName)
-			
+
 			if not PlayersData[playerName].items then
 			 print("items sublist not initialized")
 			end
 		
-			
+			local currentDate = date("%d-%m-%Y à %H:%M:%S")
 			
 			if(PlayersData[playerName].items[itemId]) then 
+			
+				-- first, check if we already added this item a few minutes ago
+				for _, lootData in pairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do 
+					if BubbleLoot_G.calculation.GetDurationInHours(lootData[1], currentDate) < 0.1 then
+						print("This item has been added in the database a few minutes ago ...")
+						--print("Override it for debug")
+						return -- we do nothing it already exist.
+					end
+				end
+
 				-- item already exist
 				
 				-- Get and set number of looted item
@@ -124,7 +136,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			
 			
 			number = number +1
-			table.insert(itemData,1,  {date("%d-%m-%Y à %H:%M:%S"), LootAttribType})
+			table.insert(itemData,1,  {currentDate, LootAttribType})
 			
 			
 			
@@ -202,9 +214,18 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 	
 			-- update LootMgrFrame
 		--BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
-		BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
 			-- Synchronisation functions
-		BubbleLoot_G.sync.SendEverything()
+			-- Let's send the data to other players and the whitelist if not in raid
+		
+		
+		if NoSend==true then
+			 return
+		else			
+			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, DateRemoveItem, exchange }
+			BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION, AddPlayerDataFunctionTbl, "Bubbleloot")
+		end
+
 end
 
 

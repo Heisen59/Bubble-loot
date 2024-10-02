@@ -290,7 +290,7 @@ local function SendCountdownToRaidChat(itemLink)
 
 		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
 		SendChatMessage(cfg.texts.LOOT_SEND..itemLink, "RAID_WARNING")
-		SendChatMessage("Choisissez +1/+2/pass pour "..itemLink.." et /rand si +2. Vous avez "..(delay+5).."s !", channel)
+		SendChatMessage(cfg.texts.LOOT_SEND_BIS..itemLink.." et /rand si +2. Vous avez "..(delay+5).."s !", channel)
 	
         -- Loop through the countdown table
         for i, number in ipairs(countdown) do
@@ -304,7 +304,7 @@ local function SendCountdownToRaidChat(itemLink)
         C_Timer.After(delay, function()
             SendChatMessage("Time's up!", channel)
         end)
-    else
+    else		
         print("You are not in a raid group.")
     end
 end

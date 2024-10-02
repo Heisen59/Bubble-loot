@@ -139,12 +139,25 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
 		BubbleLoot_G:Draw()
     end
 	
+    --[[
 	if event == "CHAT_MSG_RAID_WARNING" then
         -- Check if the message contains "Distribution de "
-        if string.find(message, cfg.LOOT_SEND) then
+        if string.find(text, cfg.texts.LOOT_SEND) then
             -- Do something when the phrase is found
 			BubbleLoot_G.rollerCollection:Clear()
 			BubbleLoot_G:Draw()
+            return
+        end
+    end
+    ]]--
+
+    if event == "CHAT_MSG_RAID" then
+        -- Check if the message contains ""Choisissez +1/+2/pass pour "
+        if string.find(text, cfg.texts.LOOT_SEND_BIS) then
+            -- Do something when the phrase is found
+			BubbleLoot_G.rollerCollection:Clear()
+			BubbleLoot_G:Draw()
+            return
         end
     end
 	

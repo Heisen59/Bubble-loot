@@ -37,7 +37,7 @@ BubbleLoot_G.sync = {}
 local cfg = BubbleLoot_G.configuration
 
 --- toggles
---Bubbleloot_G.attributionMode = false
+WritingMode = false
 
 ---@enum GroupTypeEnum addon user group status
 BubbleLoot_G.GroupType = {

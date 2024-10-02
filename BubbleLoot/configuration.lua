@@ -56,6 +56,10 @@ BubbleLoot_G.configuration.RAID_HISTORIC = 2
 -- Sync data index
 BubbleLoot_G.configuration.TRUST_LIST = 1
 BubbleLoot_G.configuration.BLACK_LIST = 2
+BubbleLoot_G.configuration.SYNC_MSG = {
+    ADD_PLAYER_DATA_FUNCTION = "AddPlayerDataFunction"
+}
+
 
 -- item data index
 BubbleLoot_G.configuration.ITEMLINK = 1
@@ -91,6 +95,7 @@ BubbleLoot_G.configuration.texts = {
 	UNIT_LOOT_SCORE_HEADER = "Loot Score",
     PASS = "pass",
 	LOOT_SEND = "Distribution de ",
+    LOOT_SEND_BIS = "Choisissez +1/+2/pass pour ",
 
     -- LABELS BELONGING TO `GROUPTYPE`S.
 

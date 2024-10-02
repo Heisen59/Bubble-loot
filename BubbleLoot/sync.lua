@@ -1,17 +1,50 @@
--- synchronisation functions
-
+-- Synchronisation functions
 local cfg = BubbleLoot_G.configuration
-
-local addonName = cfg.ADDON_NAME
 local prefix = cfg.PREFIX
 
+
 local tempSyncList = {{},{}}
+local receivedChunks = {}  -- Table to store chunks for each sender
+local expectedChunks = {}  -- Track how many chunks are expected
+
+-- Helping function to check if a player is a guild officer
+
+function IsGuildOfficer(playerName)
+    GuildRoster()
+    for i = 1, GetNumGuildMembers() do
+        local name, rank, rankIndex = GetGuildRosterInfo(i)
+        if name and string.lower(name) == string.lower(playerName) then
+            --print(rankIndex)
+            if rankIndex < 6 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+
+    -- check if sender is in BL
+local function checkIfInBL(sender)
+    
+	for _, tempTrustName in ipairs(tempSyncList[cfg.BLACK_LIST]) do
+        print(tempTrustName)
+        if sender == tempTrustName then return true end
+	end
+
+	for _, tempTrustName in ipairs(SyncTrustList[cfg.BLACK_LIST]) do
+        
+		if sender == tempTrustName then return true end
+	end
+
+    
+    return false
+
+end
 
 -- Create a frame to handle events
 local BubbleLootSyncFrame = CreateFrame("Frame")
 BubbleLootSyncFrame:RegisterEvent("CHAT_MSG_ADDON")
-
--- Register the addon prefix
 C_ChatInfo.RegisterAddonMessagePrefix(prefix)
 
 -- Serialize table to a string
@@ -23,7 +56,6 @@ local function SerializeMessage(msgType, tbl)
     local serialized = LibSerialize:Serialize(tbl)
     local compressed = LibDeflate:CompressDeflate(serialized)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
-    -- Prefix the message type with a separator so we can split it on the other end
     return msgType .. "|" .. encoded
 end
 
@@ -47,109 +79,119 @@ local function DeserializeMessage(message)
     end
 end
 
+-- Function to split a string into smaller chunks
+local function SplitIntoChunks(message, chunkSize)
+    local chunks = {}
+    for i = 1, #message, chunkSize do
+        table.insert(chunks, message:sub(i, i + chunkSize - 1))
+    end
+    return chunks
+end
 
--- Function to broadcast different data tables based on type
+-- Function to broadcast data in chunks
 function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
+    
     local serializedData = SerializeMessage(msgType, tbl)
-    if targetPlayer then
-        -- Whisper the data to a specific player
-        C_ChatInfo.SendAddonMessage(prefix, serializedData, "WHISPER", targetPlayer)
-    else
-        -- Broadcast to group (party/raid)
-        C_ChatInfo.SendAddonMessage(prefix, serializedData, "RAID")  -- Or "PARTY" if not in a raid
+    local chunkSize = 200  -- Adjust size to leave room for sequence and flags
+    local chunks = SplitIntoChunks(serializedData, chunkSize)
+    local totalChunks = #chunks
+
+    for i, chunk in ipairs(chunks) do
+        local isLast = (i == totalChunks) and "1" or "0"  -- "1" if last chunk, "0" otherwise
+        local chunkMessage = msgType .. "|" .. isLast .. "|" .. i .. "|" .. totalChunks .. "|" .. chunk
+
+        if targetPlayer then
+            C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", targetPlayer)
+        else
+            C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "RAID")  -- Or "PARTY"
+            for _, trustedPlayer in ipairs(SyncTrustList[1]) do
+                C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", trustedPlayer)
+            end
+        end
     end
 end
 
-function BubbleLoot_G.sync.SendEverything()
-
-	-- BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData, "Zatopec")
-	-- BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData, "Zatopec")
-	-- BubbleLoot_G.sync.BroadcastDataTable("RaidLootData", RaidLootData, "Zatopec")
-
-end
-
+-- Function to handle new data after verification
 local function registerNewData(msgType, receivedTable)
-
-	-- Process the data based on message type
-	if msgType == "RaidData" then
-		RaidData = receivedTable
-		print("Updated RaidData info table")
-		print("Now, Raid number is "..RaidData[cfg.NUMBER_OF_RAID_DONE])
-	elseif msgType == "PlayersData" then
-		PlayersData = receivedTable
-		print("Updated PlayersData table")
-	elseif msgType == "RaidLootData" then
-		RaidLootData = receivedTable
-		print("Updated RaidLootData  table")
-	elseif msgType == "inventory" then
-		
-	else
-		print("Unknown data type: " .. msgType)
-	end
-
+    if msgType == "RaidData" then
+        RaidData = receivedTable
+        print("Updated RaidData info table")
+    elseif msgType == "PlayersData" then
+        PlayersData = receivedTable
+        print("Updated PlayersData table")
+    elseif msgType == "RaidLootData" then
+        RaidLootData = receivedTable
+        print("Updated RaidLootData table")
+    elseif msgType == cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION then
+        print("Update PlayersData with a new loot")
+        local playerName, itemLink, LootAttribType, DateRemoveItem, exchange = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5]
+        BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, true)
+    else
+        print("Unknown data type: " .. msgType)
+    end
 end
 
 
-
-
-
+-- Function to check sender and display sync trust dialog
 local function checkSender(sender, msgType, receivedTable)
 
-	-- Check temp list
-	for _, tempTrustName in ipairs(tempSyncList[cfg.TRUST_LIST]) do
-		if sender == tempTrustName then registerNewData(msgType, receivedTable) end
-	end
-	
-	-- Check permanent list
-	for _, TrustName in ipairs(SyncTrustList[cfg.TRUST_LIST]) do
-		if sender == TrustName then registerNewData(msgType, receivedTable) end
-	end
+    
+  
+    for _, tempTrustName in ipairs(tempSyncList[cfg.TRUST_LIST]) do
+        if sender == tempTrustName then registerNewData(msgType, receivedTable) return end
+    end
 
-	
-	-- send dialog box
-	local syncFrameQuestion = CreateFrame("Frame", "syncFrameQuestion", UIParent, "BasicFrameTemplateWithInset")
+    
+
+    for _, TrustName in ipairs(SyncTrustList[cfg.TRUST_LIST]) do
+        if sender == TrustName then registerNewData(msgType, receivedTable) return end
+    end
+
+    
+--print("here")
+    --if not IsGuildOfficer(sender) then return end
+    print("Debug : Secured transfer from guildOfficer desactivated, players still have to get permission to write")
+--print("and here")
+    
+
+    -- Create sync trust dialog
+    local syncFrameQuestion = CreateFrame("Frame", "syncFrameQuestion", UIParent, "BasicFrameTemplateWithInset")
     syncFrameQuestion:SetSize(350, 150)
-    syncFrameQuestion:SetPoint("CENTER")  -- Center the frame
+    syncFrameQuestion:SetPoint("CENTER")
     syncFrameQuestion:SetMovable(true)
     syncFrameQuestion:EnableMouse(true)
     syncFrameQuestion:RegisterForDrag("LeftButton")
     syncFrameQuestion:SetScript("OnDragStart", syncFrameQuestion.StartMoving)
     syncFrameQuestion:SetScript("OnDragStop", syncFrameQuestion.StopMovingOrSizing)
 
-    -- Title of the frame
     syncFrameQuestion.title = syncFrameQuestion:CreateFontString(nil, "OVERLAY")
     syncFrameQuestion.title:SetFontObject("GameFontHighlight")
     syncFrameQuestion.title:SetPoint("CENTER", syncFrameQuestion.TitleBg, "CENTER", 0, 0)
     syncFrameQuestion.title:SetText("Sync Request")
 
-    -- Question text
     syncFrameQuestion.questionText = syncFrameQuestion:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     syncFrameQuestion.questionText:SetPoint("TOP", syncFrameQuestion, "TOP", 0, -40)
     syncFrameQuestion.questionText:SetText("Addon syncing, do you trust " .. sender .. "?")
 
-	    -- Function to handle button clicks
     local function HandleButtonClick(buttonText)
-        if buttonText=="Always" then
-			table.insert(SyncTrustList[cfg.TRUST_LIST], sender)
-			registerNewData(msgType, receivedTable)
-		elseif buttonText=="Yes" then
-			table.insert(tempSyncList[cfg.TRUST_LIST], sender)
-			registerNewData(msgType, receivedTable)
-		elseif buttonText=="No" then
-			table.insert(tempSyncList[cfg.BLACK_LIST], sender)
-		elseif buttonText=="Never" then
-			table.insert(SyncTrustList[cfg.BLACK_LIST], sender)
-		end		
-		
-        syncFrameQuestion:Hide()  -- Delete the frame after a button is clicked
-		syncFrameQuestion:SetParent(nil)
+        if buttonText == "Always" then
+            table.insert(SyncTrustList[cfg.TRUST_LIST], sender)  
+            registerNewData(msgType, receivedTable)
+        elseif buttonText == "Yes" then
+            table.insert(tempSyncList[cfg.TRUST_LIST], sender)
+            registerNewData(msgType, receivedTable)
+        elseif buttonText == "No" then
+            table.insert(tempSyncList[cfg.BLACK_LIST], sender)
+        elseif buttonText == "Never" then
+            table.insert(SyncTrustList[cfg.BLACK_LIST], sender)
+        end
+        syncFrameQuestion:Hide()
+        syncFrameQuestion:SetParent(nil)
         syncFrameQuestion = nil
     end
-	
-	-- Create 4 buttons
+
     local buttons = {}
     local buttonLabels = {"Always", "Yes", "No", "Never"}
-
     for i, label in ipairs(buttonLabels) do
         local button = CreateFrame("Button", nil, syncFrameQuestion, "GameMenuButtonTemplate")
         button:SetSize(70, 25)
@@ -159,42 +201,66 @@ local function checkSender(sender, msgType, receivedTable)
         table.insert(buttons, button)
     end
 
-    -- Show the frame
     syncFrameQuestion:Show()
-	
+
 
 end
+
+-- Function to reassemble chunks
+local function ReassembleChunks(sender, msgType, totalChunks)
+    if #receivedChunks[sender] == totalChunks then
+        local completeMessage = table.concat(receivedChunks[sender])
+        receivedChunks[sender] = nil
+        expectedChunks[sender] = nil
+
+        -- Process the reassembled message
+        local msgType, receivedTable = DeserializeMessage(completeMessage)
+        if receivedTable then
+            checkSender(sender, msgType, receivedTable)
+        else
+            print("Error: Failed to process reassembled message "..msgType.." from " .. sender)
+        end
+    else
+        print("Error: Missing chunks"..msgType.." from sender " .. sender)
+    end
+end
+
+-- Function to handle chunked messages
+local function HandleChunkedMessage(sender, msgType, isLast, chunkIndex, totalChunks, chunkData)
+    -- Debugging outputs
+    --print("Received chunk from " .. sender .. " with msgType "..msgType.." : " .. chunkIndex .. "/" .. totalChunks)
+    
+    if not receivedChunks[sender] then
+        receivedChunks[sender] = {}
+        expectedChunks[sender] = totalChunks
+    end
+
+    receivedChunks[sender][tonumber(chunkIndex)] = chunkData
+
+    if isLast == "1" then
+        ReassembleChunks(sender, msgType, totalChunks)
+    end
+end
+
+
 
 
 -- Event handler for receiving addon messages
 local function OnEvent(self, event, receivedPrefix, message, channel, sender)
 
-	-- check if sender is in BL
-	for _, tempTrustName in ipairs(tempSyncList[cfg.BLACK_LIST]) do
-		if sender == tempTrustName then return end
-	end
+    
+    -- check if sender is in BL
+    if checkIfInBL(sender) then return end
 
-	for _, tempTrustName in ipairs(SyncTrustList[cfg.BLACK_LIST]) do
-		if sender == tempTrustName then return end
-	end
-	
-	
-	-- Deserialize and ask if the sender is not know.
+    
+    
+    -- Deserialize and ask if the sender is not know.
     if event == "CHAT_MSG_ADDON" and receivedPrefix == prefix then
-        local msgType, receivedTable = DeserializeMessage(message)
-        if receivedTable then
-            print("Received data of type " .. msgType .. " from " .. sender)
-			checkSender(sender, msgType, receivedTable)
+        local msgType, isLast, chunkIndex, totalChunks, chunkData = strsplit("|", message, 5)
+        if chunkData then
+            HandleChunkedMessage(sender, msgType, isLast, chunkIndex, tonumber(totalChunks), chunkData)
         end
     end
 end
 
 BubbleLootSyncFrame:SetScript("OnEvent", OnEvent)
-
-
-
-
-
-
-
-
