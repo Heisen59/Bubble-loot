@@ -72,7 +72,7 @@ function HookBagItemRightClick()
             end
         end)
     else
-        print("Error: AdiBags addon not found.")
+        --print("Error: AdiBags addon not found.")
     end
 
 -- default 

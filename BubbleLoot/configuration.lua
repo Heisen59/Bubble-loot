@@ -30,6 +30,7 @@ BubbleLoot_G.configuration.colors = {
     MASTERLOOTER = "FFFF0000",
     MULTINEED = "FFFF0000",
     PASS = "FF00CCFF",
+    WARNING = "FFFF0479",
 
     -- MISC.
 
@@ -244,6 +245,8 @@ BubbleLoot_G.configuration.tokens =
 231882,--Reçu de l’engin de suppression
 231452, --Sang du Porteur de Lumière
 229352,--Informations recueillies
+18564, -- liens du cherchevents
+18563, -- liens du cherchevents
 },
 ["INVTYPE_TRINKET"] = 
 {--Trinket

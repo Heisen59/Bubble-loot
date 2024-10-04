@@ -82,7 +82,7 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 			text = "Give to player",
 			hasArrow = true,
 			menuList = {}
-		}
+		}		
     }
 	
 	-- Populate the player list for the "Give to player" option

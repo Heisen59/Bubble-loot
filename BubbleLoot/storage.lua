@@ -82,9 +82,9 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 
 	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
-    -- print("I'm in AddPlayerData")
-	-- print(playerName)
-	-- print(itemLink)
+    print("I'm in AddPlayerData")
+	print(playerName)
+	print(itemLink)
 	
 	if DateRemoveItem == nil then
 	
@@ -200,8 +200,9 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		if NoSend==true then
 			 return
 		else			
+			print("Data send "..itemLink)
 			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, DateRemoveItem, exchange }
-			BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION, AddPlayerDataFunctionTbl, "Bubbleloot")
+			BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION, AddPlayerDataFunctionTbl)
 		end
 
 end
@@ -398,6 +399,9 @@ end
 
 local function DeepCopy(original)
     local copy = {}
+	if original == nil then
+		return nil
+	end
     for k, v in pairs(original) do
         if type(v) == "table" then
             copy[k] = DeepCopy(v)  -- Recursively copy tables
@@ -412,7 +416,16 @@ function BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, itemData)
 
 	local itemDataCopy = DeepCopy(itemData)
 
+	if itemDataCopy == nil then
+		return
+	end
+
 	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  itemDataCopy)
 
 end
 
+function BubbleLoot_G.storage.RemovePlayerGlobal(playerName)
+
+	PlayersData[playerName] = nil
+
+end

@@ -101,6 +101,7 @@ function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
         local chunkMessage = msgType .. "|" .. isLast .. "|" .. i .. "|" .. totalChunks .. "|" .. chunk
 
         if targetPlayer then
+            print("Data send to "..targetPlayer)
             C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", targetPlayer)
         else
             C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "RAID")  -- Or "PARTY"
@@ -132,7 +133,14 @@ end
 -- Function to check sender and display sync trust dialog
 local function checkSender(sender, msgType, receivedTable)
 
-    
+    -- this data comes from me, discard it
+    local playerName, playerRealm = UnitName("player")
+    local senderPlayerName, senderPlayerRealm = string.match(sender, "([^%-]+)%-([^%-]+)")
+
+    if senderPlayerName == playerName then        
+        print("discard")
+        return
+    end
   
     for _, tempTrustName in ipairs(tempSyncList[cfg.TRUST_LIST]) do
         if sender == tempTrustName then registerNewData(msgType, receivedTable) return end
@@ -248,11 +256,14 @@ local function OnEvent(self, event, receivedPrefix, message, channel, sender)
     
     -- check if sender is in BL
     if checkIfInBL(sender) then return end
+    
+
 
     
     
     -- Deserialize and ask if the sender is not know.
     if event == "CHAT_MSG_ADDON" and receivedPrefix == prefix then
+        print("I have receive the event "..event)
         local msgType, isLast, chunkIndex, totalChunks, chunkData = strsplit("|", message, 5)
         if chunkData then
             HandleChunkedMessage(sender, msgType, isLast, chunkIndex, tonumber(totalChunks), chunkData)

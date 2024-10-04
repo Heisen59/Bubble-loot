@@ -7,10 +7,11 @@ player mgr windows
 
 --]]
 
-
+local cfg = BubbleLoot_G.configuration
 
 -- Store references to UI elements for easy updating later
 local playerRows = {}
+local selectedPlayer = nil
 
 
 -- Function to update the displayed player values
@@ -49,8 +50,32 @@ local function OnClickBonusMalus(self, arg1)
     BubbleLoot_G.gui.OpenBonusPanelGlobal(arg1)
 end
 
+local function RemovePlayer(self, arg1)
+    BubbleLoot_G.gui.RemovePlayerGlobal(arg1)
+end
 
 
+-- Create a StaticPopup dialog for confirmation
+
+StaticPopupDialogs["CONFIRM_DELETE_PLAYER"] = {
+    text = "Are you sure you want to delete %s?",
+    button1 = "Confirm",
+    button2 = "Cancel",
+    OnAccept = function()
+        -- Confirm was clicked, delete the player from the table
+        BubbleLoot_G.storage.RemovePlayerGlobal(selectedPlayer)  
+        BubbleLoot_G.gui.RefreshParticipationWindow()
+        selectedPlayer = nil
+    end,
+    OnCancel = function()
+        selectedPlayer = nil
+        print("Player deletion canceled.")
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3, -- Avoid taint issues    
+}
 
 -- Function to create the dropdown menu for the player name
 local function CreateDropdownMenu(playerName)
@@ -70,6 +95,13 @@ local function CreateDropdownMenu(playerName)
             text = "Bonus/Malus",
             func = OnClickBonusMalus,
             arg1 = playerName
+        },
+        {
+            text = "Remove player", --WrapTextInColorCode("Remove player", cfg.colors[self.WARNING]),
+            func = function()
+                selectedPlayer = playerName -- Set the player you want to delete (as an example)
+                StaticPopup_Show("CONFIRM_DELETE_PLAYER", selectedPlayer)
+            end,            
         }
     }
     
