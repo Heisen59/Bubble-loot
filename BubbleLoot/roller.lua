@@ -72,7 +72,7 @@ end
 --
 function methods.MakeUnitText(self)
     local subgroupText = WrapTextInColorCode(self.subgroup, cfg.colors[self.groupTypeUnit])
-	local MS_loot = tostring(BubbleLoot_G.storage.GetNumberOfRaidLoot(self.name, 1)).."/"..tostring(BubbleLoot_G.storage.GetNumberOfRaidLoot(self.name, 2))
+	local MS_loot = tostring(BubbleLoot_G.storage.GetNumberOfRaidLoot(self.name, 1, 4)).."/"..tostring(BubbleLoot_G.storage.GetNumberOfRaidLoot(self.name, 2, 4))
     return ("%s [%s]"):format(self.characterText, MS_loot)
 end
 

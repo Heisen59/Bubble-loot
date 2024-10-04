@@ -77,7 +77,7 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 	-- print(itemId)
 	
 -- First, try to get item info using the item name
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(itemId)
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = C_Item.GetItemInfo(itemId)
 	
 	-- print(itemName)
 	
@@ -131,6 +131,7 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 		if itemName then 
 			print("GetItemSlotMode function : "..itemName.." doesn't have any itemEquipLoc")			
 		else
+			print(itemId)
 			print("GetItemSlotMode function : should never enter here since working with item ID")
 		end		
 	 --[[
@@ -222,6 +223,27 @@ function BubbleLoot_G.calculation.ParseDateString(dateString)
     }
     
     return dateTable
+end
+
+
+function BubbleLoot_G.calculation.GetDurationInHoursFromCurrentTime(dateString1)
+local dateString2 = date("%d-%m-%Y à %H:%M:%S")
+
+ -- Parse both date strings into date tables
+ local dateTable1 = BubbleLoot_G.calculation.ParseDateString(dateString1)
+ local dateTable2 = BubbleLoot_G.calculation.ParseDateString(dateString2)
+ 
+ -- Convert both date tables to Unix timestamps
+ local timestamp1 = time(dateTable1)
+ local timestamp2 = time(dateTable2)
+ 
+ -- Calculate the difference in seconds
+ local differenceInSeconds = math.abs(timestamp2 - timestamp1)
+ 
+ -- Convert the difference from seconds to hours
+ local differenceInHours = differenceInSeconds / 3600
+ 
+ return differenceInHours
 end
 
 -- Function to calculate duration between two date strings

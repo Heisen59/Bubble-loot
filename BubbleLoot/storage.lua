@@ -144,15 +144,6 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			--table.insert(PlayersData[playerName].items, dataItem)
 			PlayersData[playerName].items[itemId] = dataItem
 			
-			
-
-			
-			-- Increase numbers of loots		
-			BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, 1, 1)
-			
-
-
-		
   
 		else
 			print("function AddPlayerData adding: error")	
@@ -170,13 +161,6 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			
 			if	PlayersData[playerName].items[itemId][cfg.NUMBER] == 1 then
 			
-			
-				if BubbleLoot_G.calculation.GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][1]) < 3 then
-					local removedItemLootType = PlayersData[playerName].items[itemId][cfg.LOOTDATA][1][2]
-					-- Increase numbers of loots		
-					BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
-				end
-			
 				-- only one item, we can safely delete everything
 				PlayersData[playerName].items[itemId] = nil
 			
@@ -185,13 +169,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 				-- let search for the proper item to remove
 				for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
 					if LootData[1] == DateRemoveItem then
-						
-						if BubbleLoot_G.calculation.GetDurationInHours(date("%d-%m-%Y à %H:%M:%S"), DateRemoveItem) < 3 then
-							local removedItemLootType = LootData[2]
-							-- Increase numbers of loots		
-							BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, removedItemLootType, -1)
-						end
-												
+																	
 						
 						table.remove(PlayersData[playerName].items[itemId][cfg.LOOTDATA], index)
 						break
@@ -229,29 +207,26 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 end
 
 
-function BubbleLoot_G.storage.ModifyNumberOfRaidLoot(playerName, lootType, value)
+function BubbleLoot_G.storage.GetNumberOfRaidLoot(playerName, lootType, DeltaT)
 
-	-- first initialized if needed
-	RaidLootData[playerName] = RaidLootData[playerName] or {0,0}
-	RaidLootData[playerName][lootType] = RaidLootData[playerName][lootType] + value
-	if RaidLootData[playerName][lootType]<0 then RaidLootData[playerName][lootType] = 0 end
+	local number = 0
 
-end
-
-function BubbleLoot_G.storage.GetNumberOfRaidLoot(playerName, lootType)
-
-	RaidLootData[playerName] = RaidLootData[playerName] or {0,0}
-	return RaidLootData[playerName][lootType]
-	
-end
-
-function BubbleLoot_G.storage.ResetNumberOfRaidLoot()
-
-	for index, _ in pairs(RaidLootData) do
-		RaidLootData[index] = {0,0}
+	for _, itemData in pairs(PlayersData[playerName].items) do
+		local lootsData = itemData[cfg.LOOTDATA]		
+		for _, lootData in ipairs(lootsData) do
+			if lootData[2] == lootType and BubbleLoot_G.calculation.GetDurationInHoursFromCurrentTime(lootData[1]) < DeltaT then
+				
+				number =  number + 1
+			end
+		end
+		
 	end
 
+	return number
+
 end
+
+
 
 -- Function to modify player participation
 function BubbleLoot_G.storage.ModifyPlayerParticipation(playerName, participation)
@@ -287,18 +262,17 @@ function BubbleLoot_G.storage.AddRaidParticipation()
 			BubbleLoot_G.storage.AddPlayerParticipation(name, cfg.index.ATTENDANCE)
 		end
 		
-		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
+		--BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		
 		print("Participation of all raid member increased")
 		print(BubbleLoot_G.getNumberOfRaid().." number of raids so far !")
 		
 		-- refresh participation mgr windows
 		BubbleLoot_G.gui.RefreshParticipationWindow()
-		
-		BubbleLoot_G.sync.SendEverything()
+				
 		
 	else
-		BubbleLoot_G.storage.ResetNumberOfRaidLoot()
+		--BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		print("Function available in raid only !")	
 	end
 end

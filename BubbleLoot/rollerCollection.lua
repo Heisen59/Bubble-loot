@@ -209,12 +209,18 @@ function BubbleLoot_G.rollerCollection.Remove(self, name)
 end
 
 
-function BubbleLoot_G.rollerCollection.getMS_Rollers(self)
+function BubbleLoot_G.rollerCollection. get_Rollers(self)
 
 	local listOfMS_Rollers = {}
 
 	for _, roller in ipairs(self.values) do
 		if roller.need == 1 then
+			table.insert(listOfMS_Rollers, roller.name)
+		end
+	end
+
+	if #listOfMS_Rollers == 0 then
+		for _, roller in ipairs(self.values) do
 			table.insert(listOfMS_Rollers, roller.name)
 		end
 	end

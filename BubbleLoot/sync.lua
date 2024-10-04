@@ -119,9 +119,6 @@ local function registerNewData(msgType, receivedTable)
     elseif msgType == "PlayersData" then
         PlayersData = receivedTable
         print("Updated PlayersData table")
-    elseif msgType == "RaidLootData" then
-        RaidLootData = receivedTable
-        print("Updated RaidLootData table")
     elseif msgType == cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION then
         print("Update PlayersData with a new loot")
         local playerName, itemLink, LootAttribType, DateRemoveItem, exchange = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5]
@@ -149,8 +146,8 @@ local function checkSender(sender, msgType, receivedTable)
 
     
 --print("here")
-    --if not IsGuildOfficer(sender) then return end
-    print("Debug : Secured transfer from guildOfficer desactivated, players still have to get permission to write")
+    if not IsGuildOfficer(sender) then return end
+    --print("Debug : Secured transfer from guildOfficer desactivated, players still have to get permission to write")
 --print("and here")
     
 

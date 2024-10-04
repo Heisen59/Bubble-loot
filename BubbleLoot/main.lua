@@ -104,8 +104,6 @@ function BubbleLoot_G.Initialize(self)
 		PlayersData = MigrationToNewDataBase(PlayersData)				
 	end
 	
-	-- keep track of who loot during the raid (+1/+2/other)
-	RaidLootData = RaidLootData or {}
 	
 	-- Sync trust list
 	SyncTrustList = SyncTrustList or {}

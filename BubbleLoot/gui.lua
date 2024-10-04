@@ -534,7 +534,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 					end
 				elseif menuList == "MS_ONLY_RAID_SUBMENU" then
 					-- Loop through all raid members
-					local MS_Rollers = BubbleLoot_G.rollerCollection:getMS_Rollers()
+					local MS_Rollers = BubbleLoot_G.rollerCollection:get_Rollers()
 					if MS_Rollers then
 						for _, playerName in ipairs(MS_Rollers) do
 							if playerName then

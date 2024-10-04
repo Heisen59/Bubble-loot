@@ -23,47 +23,86 @@ local function OnBagnonBagClick(self, button)
     end
 end
 
+
+
+
+local function OnAdiBagsBagClick(self, button)
+	if button == "RightButton" and IsAltKeyDown() then
+		
+		-- Attempt to retrieve the bag and slot information
+		local bag = self.bagId or self.bag -- Trying both
+		local slot = self.slotId or self.slot
+
+		if bag and slot then
+			BubbleLoot_G.gui.ShowItemRaidMemberMenu("bag", bag, slot, nil)
+		else
+			print("Error: Could not retrieve bag and slot information from AdiBags item button.")
+		end
+	end
+end
+
+
+
 -- Hook into bag slot right-click event
 function HookBagItemRightClick()
 
-	if not Bagnon then
-		for bag = 0, 4 do -- Loop over the 5 bags (0 = backpack, 1-4 = regular bags)
-			local numSlots = GetContainerNumSlots(bag)
-			for slot = 1, numSlots do
-				local itemButton = _G["ContainerFrame"..(bag + 1).."Item"..slot]
+    if Bagnon then
+                -- Hook when Bagnon creates new item buttons
+        hooksecurefunc(Bagnon.ItemSlot, "Update", function(itemButton)
+                                                -- We can't use HookScript, so we handle clicks manually
+                                                itemButton:EnableMouse(true)
+                                                itemButton:SetScript("OnMouseDown", function(self, button)
+                                                    OnBagnonBagClick(self, button)
+                                                end)
+                                            end)
+        return
+    end	
 
-				if itemButton then
-					-- Hook into the original OnClick script of each item button in the bag
-					itemButton:HookScript("OnMouseDown", function(self, button)
-						if button == "RightButton" and IsAltKeyDown() then -- 
-							-- Call the function to show the raid member menu
-							BubbleLoot_G.gui.ShowItemRaidMemberMenu("bag", bag, numSlots-slot+1, nil)
-						end
-					end)
-				end
-			end
-		end
-	else
-		-- Hook when Bagnon creates new item buttons
-		hooksecurefunc(Bagnon.ItemSlot, "Update", function(itemButton)
-        -- We can't use HookScript, so we handle clicks manually
-        itemButton:EnableMouse(true)
-        itemButton:SetScript("OnMouseDown", function(self, button)
-            OnBagnonBagClick(self, button)
+    local AdiBags = LibStub("AceAddon-3.0"):GetAddon("AdiBags", true)
+    if AdiBags then
+        
+        
+        -- Register message to listen for when item buttons are updated
+        AdiBags:RegisterMessage("AdiBags_UpdateButton", function(event, itemButton)
+            if itemButton then
+                itemButton:EnableMouse(true)
+                itemButton:SetScript("OnMouseDown", function(self, button)
+                    OnAdiBagsBagClick(self, button)
+                end)
+            end
         end)
-    end)
-	end	
+    else
+        print("Error: AdiBags addon not found.")
+    end
+
+-- default 
+    for bag = 0, 4 do -- Loop over the 5 bags (0 = backpack, 1-4 = regular bags)
+        local numSlots = GetContainerNumSlots(bag)
+        for slot = 1, numSlots do
+            local itemButton = _G["ContainerFrame"..(bag + 1).."Item"..slot]
+
+            if itemButton then
+                -- Hook into the original OnClick script of each item button in the bag
+                itemButton:HookScript("OnMouseDown", function(self, button)
+                    if button == "RightButton" and IsAltKeyDown() then -- 
+                        -- Call the function to show the raid member menu
+                        BubbleLoot_G.gui.ShowItemRaidMemberMenu("bag", bag, numSlots-slot+1, nil)
+                    end
+                end)
+            end
+        end
+    end
 	
 end
 
 -- Hook into loot window right-click event
-function HookLootItemRightClick()
+function HookLootItemRightClick_depreciated()
     for slot = 1, GetNumLootItems() do
         local lootButton = _G["LootButton"..slot]
 
         if lootButton then
             -- Hook into the original OnClick script of each loot button
-            lootButton:HookScript("OnMouseDown", function(self, button)
+            lootButton:HookScript("OnClick", function(self, button)
                 if button == "RightButton" and IsAltKeyDown() then --button == "RightButton" and
                     -- Call the function to show the raid member menu
                     BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, slot)
@@ -71,6 +110,40 @@ function HookLootItemRightClick()
             end)
         end
     end
+end
+
+
+-- Hook into loot window right-click event
+function HookLootItemRightClick()
+    -- This function will set up the hooks for the loot buttons
+    local function SetLootButtonHooks()
+        for slot = 1, GetNumLootItems() do
+            local lootButton = _G["LootButton"..slot]
+
+            if lootButton then
+                -- Ensure we don't hook the same button multiple times
+                if not lootButton.hookAdded then
+                    lootButton.hookAdded = true -- Flag to avoid re-adding the hook
+
+                    -- Hook into the original OnClick script of each loot button
+                    lootButton:HookScript("OnClick", function(self, button)
+                        if button == "RightButton" and IsAltKeyDown() then
+                            -- Call the function to show the raid member menu
+                            BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, slot)
+                        end
+                    end)
+                end
+            end
+        end
+    end
+
+    -- Set hooks when the loot window is shown
+    hooksecurefunc("LootFrame_Update", function()
+        SetLootButtonHooks()
+    end)
+
+    -- Also set hooks initially when the loot frame is created
+    SetLootButtonHooks()
 end
 
 
