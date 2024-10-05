@@ -83,6 +83,20 @@ function BubbleLoot_G.gui.Initialize(self)
 	itemText:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
 	self.itemText = itemText
 
+	local rollButton = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
+	rollButton:SetSize(65, 20)
+	rollButton:SetText("ML rand")
+	rollButton:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -8, -6)
+	rollButton:SetScript("OnClick", function(self)
+            -- Open the Add/Edit panel in edit mode
+            local editBox = ChatFrame1.editBox
+			editBox:SetText("/rand 10000") -- Set the command in the edit box
+			editBox:Show() -- Make sure the edit box is shown
+			editBox:SetFocus() -- Focus on the edit box
+			-- Send the command
+			ChatEdit_SendText(editBox) -- Sends the text as if Enter was pressed
+        end)
+
 	local OffSetDown = -30
 
 	-- UNIT

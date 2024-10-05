@@ -24,8 +24,6 @@ local function OnBagnonBagClick(self, button)
 end
 
 
-
-
 local function OnAdiBagsBagClick(self, button)
 	if button == "RightButton" and IsAltKeyDown() then
 		
@@ -40,7 +38,6 @@ local function OnAdiBagsBagClick(self, button)
 		end
 	end
 end
-
 
 
 -- Hook into bag slot right-click event
@@ -60,8 +57,6 @@ function HookBagItemRightClick()
 
     local AdiBags = LibStub("AceAddon-3.0"):GetAddon("AdiBags", true)
     if AdiBags then
-        
-        
         -- Register message to listen for when item buttons are updated
         AdiBags:RegisterMessage("AdiBags_UpdateButton", function(event, itemButton)
             if itemButton then
@@ -93,23 +88,6 @@ function HookBagItemRightClick()
         end
     end
 	
-end
-
--- Hook into loot window right-click event
-function HookLootItemRightClick_depreciated()
-    for slot = 1, GetNumLootItems() do
-        local lootButton = _G["LootButton"..slot]
-
-        if lootButton then
-            -- Hook into the original OnClick script of each loot button
-            lootButton:HookScript("OnClick", function(self, button)
-                if button == "RightButton" and IsAltKeyDown() then --button == "RightButton" and
-                    -- Call the function to show the raid member menu
-                    BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, slot)
-                end
-            end)
-        end
-    end
 end
 
 
