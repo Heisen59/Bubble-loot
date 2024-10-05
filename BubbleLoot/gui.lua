@@ -25,7 +25,8 @@ end
 
 --
 function BubbleLoot_G.gui.Initialize(self)
-    -- MAIN_FRAME
+	
+	-- MAIN_FRAME
     ---@class Frame : BackdropTemplate https://github.com/Ketho/vscode-wow-api/pull/29
     local mainFrame = CreateFrame("Frame", ("%s_MainFrame"):format(cfg.ADDON_NAME),
         UIParent, BackdropTemplateMixin and "BackdropTemplate")
@@ -49,7 +50,8 @@ function BubbleLoot_G.gui.Initialize(self)
     mainFrame:SetScript("OnMouseUp", function(self_mainFrame)
         self_mainFrame:StopMovingOrSizing()
     end)
-    -- Background
+    
+	-- Background
     mainFrame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -60,9 +62,32 @@ function BubbleLoot_G.gui.Initialize(self)
     })
     mainFrame:SetBackdropColor(hexColorToRGBA(cfg.colors.BACKGROUND))
     self.mainFrame = mainFrame
-    -- UNIT
+
+
+	-- ITEM ROLLED
+    local itemHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    itemHeader:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 5, -8) -- Offset right and down.
+    itemHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    itemHeader:SetJustifyH("LEFT")
+    itemHeader:SetJustifyV("TOP")
+    itemHeader:SetText(cfg.texts.ITEM_HEADER)
+    itemHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    self.itemHeader = itemHeader
+
+	-- ITEM ROLLED
+	local itemText = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+	itemText:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 40, -8) -- Offset right and down.
+	itemText:SetHeight(cfg.size.ROW_HEIGHT)
+	itemText:SetJustifyH("LEFT")
+	itemText:SetJustifyV("TOP")
+	itemText:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+	self.itemText = itemText
+
+	local OffSetDown = -30
+
+	-- UNIT
     local unitHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    unitHeader:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 5, -5) -- Offset right and down.
+    unitHeader:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 5, OffSetDown) -- Offset right and down.
     unitHeader:SetHeight(cfg.size.ROW_HEIGHT)
     unitHeader:SetJustifyH("LEFT")
     unitHeader:SetJustifyV("TOP")
@@ -71,7 +96,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.unitHeader = unitHeader
     -- NEED
     local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -150, -5)
+    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -150, OffSetDown)
     needHeader:SetHeight(cfg.size.ROW_HEIGHT)
     needHeader:SetJustifyH("LEFT")
     needHeader:SetJustifyV("TOP")
@@ -80,7 +105,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.needHeader = needHeader
 	-- SCORE
     local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, -5)
+    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, OffSetDown)
     scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
     scoreHeader:SetJustifyH("LEFT")
     scoreHeader:SetJustifyV("TOP")
@@ -89,7 +114,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.scoreHeader = scoreHeader
 	-- CHANCE
     local chanceHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, -5)
+    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, OffSetDown)
     chanceHeader:SetHeight(cfg.size.ROW_HEIGHT)
     chanceHeader:SetJustifyH("LEFT")
     chanceHeader:SetJustifyV("TOP")
@@ -98,7 +123,7 @@ function BubbleLoot_G.gui.Initialize(self)
     self.chanceHeader = chanceHeader
     -- ROLL
     local rollHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    rollHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, -5)
+    rollHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, OffSetDown)
     rollHeader:SetHeight(cfg.size.ROW_HEIGHT)
     rollHeader:SetJustifyH("LEFT")
     rollHeader:SetJustifyV("TOP")
@@ -177,6 +202,12 @@ local function CreateManageNeedDropdownMenu(playerName)
 		}
 		
 	EasyMenu(menuItems, dropdown, "cursor", 0 , 0, "MENU")
+end
+
+
+-- Set item header 
+function BubbleLoot_G.gui.setItemHeader(self, item)
+self.itemText:SetText(item)
 end
 
 
@@ -302,10 +333,13 @@ end
 
 -- countdown function
 local function SendCountdownToRaidChat(itemLink)
-    if IsInRaid() then  -- Ensure you're in a raid
+    if IsInRaid() or true then  -- Ensure you're in a raid
+
+		BubbleLoot_G.gui:setItemHeader(itemLink)
+
         local countdown = { "5", "4", "3", "2", "1" }
         local delay = 10  -- Start delay at 0 seconds
-		local channel = "RAID" --"RAID"
+		local channel = "RAID" --"RAID" "SAY" RAID_WARNING
 
 		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
 		SendChatMessage(cfg.texts.LOOT_SEND..itemLink, "RAID_WARNING")

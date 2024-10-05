@@ -56,7 +56,7 @@ function HookBagItemRightClick()
                                                 end)
                                             end)
         return
-    end	
+    end
 
     local AdiBags = LibStub("AceAddon-3.0"):GetAddon("AdiBags", true)
     if AdiBags then
@@ -226,7 +226,7 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
 
     if event == "CHAT_MSG_RAID" then
         -- Check if the message contains ""Choisissez +1/+2/pass pour "
-        if string.find(text, cfg.texts.LOOT_SEND_BIS) then
+        if string.find(text,cfg.texts.LOOT_SEND_BIS_PATERN ) then
             -- Do something when the phrase is found
 			BubbleLoot_G.rollerCollection:Clear()
 			BubbleLoot_G:Draw()

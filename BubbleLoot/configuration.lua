@@ -9,7 +9,7 @@ BubbleLoot_G.configuration.PREFIX = "BubbleLootSync"
 
 --
 BubbleLoot_G.configuration.size = {
-    EMPTY_HEIGHT = 30, -- Header and border: 30 = (5 + 15 + 10)
+    EMPTY_HEIGHT = 60, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
     FRAME_WIDTH = 400, -- Default value.
 }
@@ -92,6 +92,7 @@ BubbleLoot_G.configuration.texts = {
     -- GENERAL.
 
     LIST_CMDS = "Commands: show, hide, toggle, help, reset, resize, test.",
+    ITEM_HEADER = "Item : ",
     UNIT_HEADER = "Player (class) [+1/+2]",
     NEED_HEADER = "Need",
 	SCORE_HEADER = "Score",
@@ -101,6 +102,7 @@ BubbleLoot_G.configuration.texts = {
     PASS = "pass",
 	LOOT_SEND = "Distribution de ",
     LOOT_SEND_BIS = "Choisissez +1/+2/pass pour ",
+    LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
 
     -- LABELS BELONGING TO `GROUPTYPE`S.
 
