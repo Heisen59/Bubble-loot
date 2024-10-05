@@ -60,7 +60,7 @@ end
 
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
-    BubbleLoot_G.gui:SetVisibility(not BubbleLootData[cfg.SHOWN])
+    BubbleLoot_G.gui:SetVisibility(not BubbleLootData["SHOWN"])
 end
 
 -- Initialize self, plugins, saved variables
@@ -82,11 +82,14 @@ function BubbleLoot_G.Initialize(self)
 	
 	BubbleLootData = BubbleLootData or {}
 	
-	if BubbleLootData[cfg.SHOWN] == nil then -- Initialize when first loaded.
-        BubbleLootData[cfg.SHOWN] = true;
+	if BubbleLootData["SHOWN"] == nil then -- Initialize when first loaded.
+        BubbleLootData["SHOWN"] = true;
     end
-    self.gui:SetVisibility(BubbleLootData[cfg.SHOWN])
+    self.gui:SetVisibility(BubbleLootData["SHOWN"])
 	
+	--Time stamp
+	BubbleLootData["PLAYERS_DATA_TIME_STAMP"] = BubbleLootData["PLAYERS_DATA_TIME_STAMP"] or 0
+
 	
 	-- RaidData
 	RaidData = RaidData or {}
@@ -100,7 +103,8 @@ function BubbleLoot_G.Initialize(self)
     end
 	
 	-- check if major a database modification need a restructuration
-	while BubbleLootData[cfg.DATA_STRUCTURE] ~= "v1.2" do
+
+	while BubbleLootData["DATA_STRUCTURE"] ~= "v1.2" do
 		PlayersData = MigrationToNewDataBase(PlayersData)				
 	end
 	
@@ -207,7 +211,7 @@ end
 
 function MigrationToNewDataBase(PlayersDataBase)
 -- old not numbered database to v1.2
-if BubbleLootData[cfg.DATA_STRUCTURE] == nil then
+if BubbleLootData["DATA_STRUCTURE"] == nil then
 
 	local localPlayersDataBase = {}
 
@@ -230,7 +234,7 @@ if BubbleLootData[cfg.DATA_STRUCTURE] == nil then
 			
 			--print("item "..oldItemNameOrLink)
 			
-			local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = GetItemInfo(oldItemNameOrLink)
+			local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = C_Item.GetItemInfo(oldItemNameOrLink)
 			
 			if itemLink then
 				local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
@@ -251,7 +255,7 @@ if BubbleLootData[cfg.DATA_STRUCTURE] == nil then
 	end
 
 	print("Migration to players database v1.2 successfull")
-	BubbleLootData[cfg.DATA_STRUCTURE] = "v1.2"
+	BubbleLootData["DATA_STRUCTURE"] = "v1.2"
 	return localPlayersDataBase
 end
 

@@ -3,42 +3,38 @@
 local cfg = BubbleLoot_G.configuration
 
 
--- Helper function to parse date string and return a time table
-local function ParseDateString(dateString)
-    -- Example format: "23-09-2024 à 15:30:45"
-    local day, month, year, hour, min, sec = string.match(dateString, "(%d+)-(%d+)-(%d+) à (%d+):(%d+):(%d+)")
-    
-    -- Create a table with date values
-    local dateTable = {
-        day = tonumber(day),
-        month = tonumber(month),
-        year = tonumber(year),
-        hour = tonumber(hour),
-        min = tonumber(min),
-        sec = tonumber(sec)
-    }
-    
-    return dateTable
+-- Time stamp functions
+local function writeLastPlayerDataBaseTimeStamp()
+
+	local timeStamp = time()
+
+	if BubbleLootData["PLAYERS_DATA_TIME_STAMP"] > timeStamp then
+		print("playersData time stamp ERROR : the current time stamp is older than the database time stamp")
+	end
+
+	BubbleLootData["PLAYERS_DATA_TIME_STAMP"] = timeStamp
+
+	return timeStamp
+
 end
 
--- Function to calculate duration between two date strings
-local function GetDurationInHours(dateString1, dateString2)
-    -- Parse both date strings into date tables
-    local dateTable1 = ParseDateString(dateString1)
-    local dateTable2 = ParseDateString(dateString2)
-    
-    -- Convert both date tables to Unix timestamps
-    local timestamp1 = time(dateTable1)
-    local timestamp2 = time(dateTable2)
-    
-    -- Calculate the difference in seconds
-    local differenceInSeconds = math.abs(timestamp2 - timestamp1)
-    
-    -- Convert the difference from seconds to hours
-    local differenceInHours = differenceInSeconds / 3600
-    
-    return differenceInHours
+
+local function getPlayerDataBaseTimeStamp()
+
+	return BubbleLootData["PLAYERS_DATA_TIME_STAMP"]
+
 end
+
+local function forcePlayerDataBaseWriteTimeStamp(timeStamp)
+
+	if BubbleLootData["PLAYERS_DATA_TIME_STAMP"] > timeStamp then
+		print("playersData time stamp ERROR : the current time stamp is older than the database time stamp")
+	end
+
+	BubbleLootData["PLAYERS_DATA_TIME_STAMP"] = time()
+
+end
+
 
 -- function to create a new entry if it doesn't exist
 local function CreateNewPlayerEntry(playerName)
@@ -78,7 +74,7 @@ end
 
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, NoSend)
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, forcedTimeStamp)
 
 	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
@@ -193,16 +189,21 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			-- update LootMgrFrame
 		--BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
 		BubbleLoot_G.gui.createLootsMgrFrame(playerName, true)
-			-- Synchronisation functions
-			-- Let's send the data to other players and the whitelist if not in raid
+
 		
 		
-		if NoSend==true then
-			 return
-		else			
-			print("Data send "..itemLink)
-			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, DateRemoveItem, exchange }
+		-- Synchronisation functions
+		-- Let's send the data to other players and the whitelist if not in raid			
+		if forcedTimeStamp == nul then
+			--TIme Stamp functions
+			local currentplayerDBTimeStamp = writeLastPlayerDataBaseTimeStamp()
+
+			--print("Data send "..itemLink)
+			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, DateRemoveItem, exchange, currentplayerDBTimeStamp }
 			BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION, AddPlayerDataFunctionTbl)
+		else			
+			forcePlayerDataBaseWriteTimeStamp(forcedTimeStamp)
+			 return
 		end
 
 end
@@ -252,7 +253,7 @@ function BubbleLoot_G.storage.ModifyIndexPlayerParticipation(playerName, index, 
 end
 
 --Add all raiders a participation
-function BubbleLoot_G.storage.AddRaidParticipation()
+function BubbleLoot_G.storage.AddRaidParticipation(isFromBroadCast)
 	-- Increase the raid counter
 	if(IsInRaid() or true) then
 		BubbleLoot_G.increaseNumberOfRaid()
@@ -276,6 +277,16 @@ function BubbleLoot_G.storage.AddRaidParticipation()
 		--BubbleLoot_G.storage.ResetNumberOfRaidLoot()
 		print("Function available in raid only !")	
 	end
+
+		-- Synchronisation functions
+	-- Let's send the data to other players and the whitelist if not in raid			
+	if isFromBroadCast == true then
+	else			
+		--TIme Stamp functions
+		print("Boadcast Add raid participation")
+		BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_RAID_PARTICIPATIOn, 0)
+	end
+
 end
 
 -- Function to retrieve and print Player data
@@ -429,3 +440,5 @@ function BubbleLoot_G.storage.RemovePlayerGlobal(playerName)
 	PlayersData[playerName] = nil
 
 end
+
+

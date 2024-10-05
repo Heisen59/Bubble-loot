@@ -74,7 +74,7 @@ StaticPopupDialogs["CONFIRM_DELETE_PLAYER"] = {
     timeout = 0,
     whileDead = true,
     hideOnEscape = true,
-    preferredIndex = 3, -- Avoid taint issues    
+    preferredIndex = 3,  
 }
 
 -- Function to create the dropdown menu for the player name

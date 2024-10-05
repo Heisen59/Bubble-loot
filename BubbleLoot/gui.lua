@@ -111,12 +111,31 @@ end
 
 
 -- Function to handle dropdown Remove player from rollerCollection
-local function OnClickRemovePlayer(self, arg1 )
+function BubbleLoot_G.gui.DemotePlayer(playerName, isFromBroadCast )
     -- print("OnClickRemovePlayer function" )
-	local playerName = arg1
+	
 	-- BubbleLoot_G.rollerCollection:Save(playerName, 9)
-	BubbleLoot_G.rollerCollection:Remove(playerName)
+	BubbleLoot_G.rollerCollection:Demote(playerName)
 	BubbleLoot_G:Draw()
+
+	-- send synchro
+			-- Synchronisation functions
+	-- Let's send the data to other players and the whitelist if not in raid			
+	if isFromBroadCast == true then
+	else			
+		--TIme Stamp functions
+		print("Demote need player "..playerName)
+		BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.DEMOTE_PLAYER_NEED, playerName)
+	end
+
+end
+
+
+-- Function to handle dropdown Remove player from rollerCollection
+function OnClickDemotePlayer(self, playerName )
+    -- print("OnClickRemovePlayer function" )
+	
+		BubbleLoot_G.gui.DemotePlayer(playerName, false )
 
 end
 
@@ -146,8 +165,8 @@ local function CreateManageNeedDropdownMenu(playerName)
 				notCheckable = true,  -- Don't show a checkbox
 			},
 			{
-				text = "Remove player",
-				func = OnClickRemovePlayer,
+				text = "Demote player need",
+				func = BubbleLoot_G.gui.OnClickDemotePlayer,
 				arg1 = playerName,
 			},
 			{
@@ -246,13 +265,13 @@ end
 
 -- Show or hide the GUI.
 function BubbleLoot_G.gui.SetVisibility(self, bool)
-    BubbleLootData[cfg.SHOWN] = bool
+    BubbleLootData["SHOWN"] = bool
     self.mainFrame:SetShown(bool)
 end
 
 function BubbleLoot_G.gui.ToggleVisibility(self)
-	BubbleLootData[cfg.SHOWN] = not BubbleLootData[cfg.SHOWN]
-	self.mainFrame:SetShown(BubbleLootData[cfg.SHOWN])
+	BubbleLootData["SHOWN"] = not BubbleLootData["SHOWN"]
+	self.mainFrame:SetShown(BubbleLootData["SHOWN"])
 end
 
 function BubbleLoot_G.gui.SetWidth(self, width)

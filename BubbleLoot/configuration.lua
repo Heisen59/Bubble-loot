@@ -46,9 +46,9 @@ BubbleLoot_G.configuration.index =
 	NON_ATTENDANCE  = 3,
 }
 
-BubbleLoot_G.configuration.SHOWN			= 1
-BubbleLoot_G.configuration.NOT_USED 	= 2
-BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
+--BubbleLoot_G.configuration.SHOWN			= 1
+--BubbleLoot_G.configuration.NOT_USED 	= 2
+--BubbleLoot_G.configuration.DATA_STRUCTURE 	= 3
 
 --raidData index
 BubbleLoot_G.configuration.NUMBER_OF_RAID_DONE = 1
@@ -58,7 +58,9 @@ BubbleLoot_G.configuration.RAID_HISTORIC = 2
 BubbleLoot_G.configuration.TRUST_LIST = 1
 BubbleLoot_G.configuration.BLACK_LIST = 2
 BubbleLoot_G.configuration.SYNC_MSG = {
-    ADD_PLAYER_DATA_FUNCTION = "AddPlayerDataFunction"
+    ADD_PLAYER_DATA_FUNCTION = "AddPlayerDataFunction",
+    ADD_RAID_PARTICIPATIOn = "AddRaidParticipationFunction",
+    DEMOTE_PLAYER_NEED = "DemoteNeedPlayerFunction",
 }
 
 

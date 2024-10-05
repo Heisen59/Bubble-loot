@@ -165,7 +165,7 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
     elseif command == "hide" then
         BubbleLoot_G.gui:SetVisibility(false)
     elseif command == "toggle" then
-        BubbleLoot_G.gui:SetVisibility(not BubbleLootData[cfg.SHOWN])
+        BubbleLoot_G.gui:SetVisibility(not BubbleLootData["SHOWN"])
     elseif command == "help" then
         Help()
     elseif command == "reset" then

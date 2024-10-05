@@ -122,8 +122,15 @@ local function registerNewData(msgType, receivedTable)
         print("Updated PlayersData table")
     elseif msgType == cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION then
         print("Update PlayersData with a new loot")
-        local playerName, itemLink, LootAttribType, DateRemoveItem, exchange = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5]
-        BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, true)
+        local playerName, itemLink, LootAttribType, DateRemoveItem, exchange, DBTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
+        BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, DBTimeStamp)
+    elseif msgType == cfg.SYNC_MSG.ADD_RAID_PARTICIPATIOn then
+        print("Update raid participation")        
+        BubbleLoot_G.storage.AddRaidParticipation(true)
+    elseif msgType == cfg.SYNC_MSG.DEMOTE_PLAYER_NEED then
+        --print("Update raid participation")     
+        local playerName = receivedTable
+        BubbleLoot_G.gui.DemotePlayer(playerName, true )
     else
         print("Unknown data type: " .. msgType)
     end
@@ -208,7 +215,6 @@ local function checkSender(sender, msgType, receivedTable)
 
     syncFrameQuestion:Show()
 
-
 end
 
 -- Function to reassemble chunks
@@ -253,17 +259,12 @@ end
 -- Event handler for receiving addon messages
 local function OnEvent(self, event, receivedPrefix, message, channel, sender)
 
-    
-    -- check if sender is in BL
-    if checkIfInBL(sender) then return end
-    
-
-
-    
-    
     -- Deserialize and ask if the sender is not know.
     if event == "CHAT_MSG_ADDON" and receivedPrefix == prefix then
-        print("I have receive the event "..event)
+                    
+        -- check if sender is in BL
+        if checkIfInBL(sender) then return end
+    
         local msgType, isLast, chunkIndex, totalChunks, chunkData = strsplit("|", message, 5)
         if chunkData then
             HandleChunkedMessage(sender, msgType, isLast, chunkIndex, tonumber(totalChunks), chunkData)

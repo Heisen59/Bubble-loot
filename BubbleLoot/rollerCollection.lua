@@ -193,7 +193,7 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
 end
 
 -- Update `roller` to increase its need (we want to remove it from the roller.
-function BubbleLoot_G.rollerCollection.Remove(self, name)
+function BubbleLoot_G.rollerCollection.Demote(self, name)
 
 	local roller = self:FindRoller(name)
     
