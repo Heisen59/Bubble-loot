@@ -173,7 +173,7 @@ ShowRaidList = function()
 
 
 
-    SortRaidsByDate()
+    --SortRaidsByDate()
 
     local yOffset = -10
     for _, raid in ipairs(raids) do

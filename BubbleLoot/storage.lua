@@ -18,6 +18,10 @@ local function writeLastPlayerDataBaseTimeStamp()
 
 end
 
+function BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
+	return writeLastPlayerDataBaseTimeStamp()
+end
+
 
 local function getPlayerDataBaseTimeStamp()
 
@@ -31,9 +35,15 @@ local function forcePlayerDataBaseWriteTimeStamp(timeStamp)
 		print("playersData time stamp ERROR : the current time stamp is older than the database time stamp")
 	end
 
-	BubbleLootData["PLAYERS_DATA_TIME_STAMP"] = time()
+	BubbleLootData["PLAYERS_DATA_TIME_STAMP"] = timeStamp
 
 end
+
+
+function BubbleLoot_G.storage.forcePlayerDataBaseWriteTimeStampGlobal(timeStamp)
+	forcePlayerDataBaseWriteTimeStamp(timeStamp)
+end
+
 
 
 -- function to create a new entry if it doesn't exist
@@ -72,15 +82,52 @@ function BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, LootAttribType)
 
 end
 
+-- function to toogle the loot need
+function BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, forcedTimeStamp)
+
+	if itemLink and playerName then
+		local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+
+		if(PlayersData[playerName].items[itemId]) then 
+			local lootsData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
+			for index, LootData in ipairs(lootsData) do
+				print(LootData[1])
+				if LootData[1] == lootdate then
+					-- toogle
+					if LootData[2] == 1 then
+						LootData[2] = 2
+					elseif LootData[2] == 2 then LootData[2] = 1
+					end
+				end
+			end
+		end
+	end
+
+	-- Synchronisation functions
+	-- Let's send the data to other players and the whitelist if not in raid			
+	if forcedTimeStamp == nil then
+		--TIme Stamp functions
+		local currentplayerDBTimeStamp = writeLastPlayerDataBaseTimeStamp()
+
+		--print("Data send "..itemLink)
+		local LootNeedToogleFunctionTbl = {playerName, itemLink, lootdate, currentplayerDBTimeStamp }
+		BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.MODIFY_ITEM_NEED_IN_DATABASE, LootNeedToogleFunctionTbl)
+	else			
+		forcePlayerDataBaseWriteTimeStamp(forcedTimeStamp)
+			return
+	end
+
+
+end
 
 -- Function to add player item data
 function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, forcedTimeStamp)
 
 	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
-    print("I'm in AddPlayerData")
-	print(playerName)
-	print(itemLink)
+    --print("I'm in AddPlayerData")
+	--print(playerName)
+	--print(itemLink)
 	
 	if DateRemoveItem == nil then
 	
@@ -104,6 +151,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			end
 		
 			local currentDate = date("%d-%m-%Y à %H:%M:%S")
+			local lootsData ={}
 			
 			if(PlayersData[playerName].items[itemId]) then 
 			
@@ -121,8 +169,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 				-- Get and set number of looted item
 				number = PlayersData[playerName].items[itemId][cfg.NUMBER]
 				
-				-- Get current itemData (contains date and lootAttribType)
-				itemData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
+				-- Get current lootsData (contains date and lootAttribType)
+				lootsData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
 			
 			
 			
@@ -132,11 +180,11 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			
 			
 			number = number +1
-			table.insert(itemData,1,  {currentDate, LootAttribType})
+			table.insert(lootsData,1,  {currentDate, LootAttribType})
 			
 			
 			
-			local dataItem = {itemLink, itemData, instanceName, number}
+			local dataItem = {itemLink, lootsData, instanceName, number}
 			--table.insert(PlayersData[playerName].items, dataItem)
 			PlayersData[playerName].items[itemId] = dataItem
 			
@@ -194,7 +242,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		
 		-- Synchronisation functions
 		-- Let's send the data to other players and the whitelist if not in raid			
-		if forcedTimeStamp == nul then
+		if forcedTimeStamp == nil then
 			--TIme Stamp functions
 			local currentplayerDBTimeStamp = writeLastPlayerDataBaseTimeStamp()
 

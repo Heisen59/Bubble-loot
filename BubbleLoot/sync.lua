@@ -42,6 +42,37 @@ local function checkIfInBL(sender)
 
 end
 
+-- Function to check if a player in the guild is connected
+local function IsPlayerInGuildConnected(playerName)
+    -- Get the number of guild members
+    local totalMembers = GetNumGuildMembers()
+
+    -- Iterate through the guild roster
+    for i = 1, totalMembers do
+        -- Get guild member info
+        local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
+
+        -- Remove server name from the playerName if it has one
+        local cleanName = Ambiguate(name, "guild")
+
+        -- Check if the current guild member is the one we are looking for
+        if cleanName == playerName then
+            if online then
+                --print(playerName .. " is online!")
+                return true
+            else
+                --print(playerName .. " is offline.")
+                return false
+            end
+        end
+    end
+
+    -- If player was not found in the guild
+    --print(playerName .. " is not in the guild.")
+    return false
+end
+
+
 -- Create a frame to handle events
 local BubbleLootSyncFrame = CreateFrame("Frame")
 BubbleLootSyncFrame:RegisterEvent("CHAT_MSG_ADDON")
@@ -106,7 +137,9 @@ function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
         else
             C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "RAID")  -- Or "PARTY"
             for _, trustedPlayer in ipairs(SyncTrustList[1]) do
-                C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", trustedPlayer)
+                if IsPlayerInGuildConnected(trustedPlayer) then
+                    C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", trustedPlayer)
+                end
             end
         end
     end
@@ -127,10 +160,15 @@ local function registerNewData(msgType, receivedTable)
     elseif msgType == cfg.SYNC_MSG.ADD_RAID_PARTICIPATIOn then
         print("Update raid participation")        
         BubbleLoot_G.storage.AddRaidParticipation(true)
-    elseif msgType == cfg.SYNC_MSG.DEMOTE_PLAYER_NEED then
-        --print("Update raid participation")     
+    elseif msgType == cfg.SYNC_MSG.DEMOTE_PLAYER_NEED then            
         local playerName = receivedTable
         BubbleLoot_G.gui.DemotePlayer(playerName, true )
+    elseif msgType == cfg.SYNC_MSG.MODIFY_ITEM_NEED_IN_DATABASE then        
+        local playerName, itemLink, lootdate, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4]
+        BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, forcedTimeStamp)
+    elseif msgType == cfg.SYNC_MSG.MODIFY_BONUS_DATA then        
+        local playerName, bonusText, score, date, remove, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
+        BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, forcedTimeStamp)
     else
         print("Unknown data type: " .. msgType)
     end

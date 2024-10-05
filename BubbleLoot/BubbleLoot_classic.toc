@@ -3,7 +3,7 @@
 ## Notes: Lightweight addon for recording /rolls to simplify items distribution.
 ## Author: RomainLGD
 ## Version: 1.0.0
-## SavedVariables: BubbleLootData, PlayersData, CancelData, RaidLootData, RaidData, SyncTrustList
+## SavedVariables: BubbleLootData, PlayersData, CancelData, RaidData, SyncTrustList
 ## OptionalDeps: LibStub, LibSerialize, LibDeflate
 
 Libs\LibStub\LibStub.lua

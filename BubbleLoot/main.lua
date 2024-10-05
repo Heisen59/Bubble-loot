@@ -191,7 +191,7 @@ function BubbleLoot_G.increaseNumberOfRaid()
 	local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
 	instanceName = instanceName or "None"
 
-	table.insert(RaidData[2], {date("%d-%m-%Y à %H:%M:%S"), instanceName})
+	table.insert(RaidData[2],1, {date("%d-%m-%Y à %H:%M:%S"), instanceName})
 
 end
 

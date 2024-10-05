@@ -61,6 +61,8 @@ BubbleLoot_G.configuration.SYNC_MSG = {
     ADD_PLAYER_DATA_FUNCTION = "AddPlayerDataFunction",
     ADD_RAID_PARTICIPATIOn = "AddRaidParticipationFunction",
     DEMOTE_PLAYER_NEED = "DemoteNeedPlayerFunction",
+    MODIFY_ITEM_NEED_IN_DATABASE = "LootNeedToogleFunction",
+    MODIFY_BONUS_DATA = "writeOrEditBonusFunction",
 }
 
 

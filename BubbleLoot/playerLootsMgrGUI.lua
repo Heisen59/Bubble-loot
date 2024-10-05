@@ -39,6 +39,17 @@ local function OnClickRemove(self, arg1, arg2)
 	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
 end
 
+-- Function to handle dropdown selection for Loots
+local function OnClickChangeNeed(self, arg1, arg2)
+    --print(arg2 .. ": removed")
+	local playerName = arg1
+	local itemLink = arg2[1]
+	local lootDate = arg2[2]
+	BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootDate)
+	--UpdateLootsList(arg1)	
+	BubbleLoot_G.gui.createLootsMgrFrame(arg1)
+end
+
 
 local function makeTextDate(lootDropDate)
 
@@ -79,17 +90,23 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 			arg2 = {itemLink, lootDropDate},
         },
 		{
+            text = "set as +1/+2",
+            func = OnClickChangeNeed,
+            arg1 = playerName, 
+			arg2 = {itemLink, lootDropDate},
+        },
+		{
 			text = "Give to player",
 			hasArrow = true,
 			menuList = {}
-		}		
+		},		
     }
 	
 	-- Populate the player list for the "Give to player" option
 	local allPlayersListFromDB = BubbleLoot_G.storage.getAllPlayersFromDB()
 	
 	for _, RecevingPlayer in ipairs(allPlayersListFromDB) do
-		table.insert(menuItems[3].menuList, {
+		table.insert(menuItems[4].menuList, {
 			text = RecevingPlayer,
 			func = function() 
 					
@@ -121,6 +138,7 @@ local LastPlayerLootTypeFilterUsed = {}
 
 -- Create the list of players
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName, refresh)
+
 
 LastPlayerLootTypeFilterUsed[playerName] = LastPlayerLootTypeFilterUsed[playerName] or 1
 
@@ -361,6 +379,7 @@ end
 
 
 function BubbleLoot_G.gui.OpenPlayerLootWindow(playerName)
+
 	BubbleLoot_G.gui.createLootsMgrFrame(playerName, 0, 0)
 	
 

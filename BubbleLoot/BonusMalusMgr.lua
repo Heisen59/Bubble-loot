@@ -83,13 +83,19 @@ local function UpdateBonusPanel()
         deleteButton:SetScript("OnClick", function()
             -- Remove the selected bonus from the table
             table.remove(BonusData, i)
+
+            -- let's sync it to other players
+            local currentplayerDBTimeStamp = BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
+            local localBonusTbl = {BonusDataPlayerName, nil, nil, date, true, currentplayerDBTimeStamp }
+            BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.MODIFY_BONUS_DATA, localBonusTbl)
+
             UpdateBonusPanel()
         end)
     end
 
     -- last update player panel if needed
     if BonusDataPlayerName then 
-        BubbleLoot_G.gui.createLootsMgrFrame(BonusDataPlayerName)
+        BubbleLoot_G.gui.createLootsMgrFrame(BonusDataPlayerName, true)
     end
 
 end
@@ -127,6 +133,7 @@ function BonusAddon:CreateBonusPanel(playerName)
     addButton:SetText("Add a Bonus")
     addButton:SetPoint("BOTTOM", 0, 10)  -- Set to bottom center of the panel
     addButton:SetScript("OnClick", function()
+        print("click new bonus")
         BonusAddon:OpenAddBonusPanel(nil)  -- Pass nil for new bonus (not editing)
     end)
 
@@ -138,12 +145,11 @@ function BonusAddon:CreateBonusPanel(playerName)
     self.bonusPanel = bonusPanel
 end
 
+
 -- Function to create the "Add/Edit Bonus" panel
 function BonusAddon:OpenAddBonusPanel(editIndex)    
-
     -- Create the frame if it doesn't exist yet
     if not self.addBonusPanel then       
-
         local addBonusPanel = CreateFrame("Frame", "AddBonusPanel", UIParent, "BasicFrameTemplateWithInset")
         addBonusPanel:SetSize(300, 200)
         addBonusPanel:SetPoint("CENTER")
@@ -177,17 +183,24 @@ function BonusAddon:OpenAddBonusPanel(editIndex)
         saveButton:SetScript("OnClick", function()
             local bonusText = bonusInput:GetText()
             local score = tonumber(scoreInput:GetText())
-            local date = date("%d-%m-%Y à %H:%M:%S")--date("%Y-%m-%d")
+            local date = date("%d-%m-%Y à %H:%M:%S")
 
             if bonusText and score then
-                if editIndex then
+                if self.editIndex ~= nil then
                     -- Editing an existing bonus
-                    BonusData[editIndex] = {bonusText, score, date}
-                    --SortBonusesByDate()
+                    print("Editing")
+                    BonusData[self.editIndex] = {bonusText, score, date}
                 else
                     -- Adding a new bonus
-                    table.insert(BonusData,1, {bonusText, score, date})
+                    print("Adding")
+                    table.insert(BonusData, 1, {bonusText, score, date})
                 end
+
+                -- Sync it with other players
+                local currentplayerDBTimeStamp = BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
+                local localBonusTbl = {BonusDataPlayerName, bonusText, score, date, false, currentplayerDBTimeStamp}
+                BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.MODIFY_BONUS_DATA, localBonusTbl)
+
                 UpdateBonusPanel()
                 addBonusPanel:Hide()
             else
@@ -199,6 +212,9 @@ function BonusAddon:OpenAddBonusPanel(editIndex)
         self.addBonusPanel.bonusInput = bonusInput
         self.addBonusPanel.scoreInput = scoreInput
     end
+
+    -- Store editIndex in the frame for later use
+    self.editIndex = editIndex
 
     -- Reset input fields for new entry or fill them for editing
     if editIndex then
@@ -213,6 +229,30 @@ function BonusAddon:OpenAddBonusPanel(editIndex)
     self.addBonusPanel:Show()
 end
 
+
+function BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, currentplayerDBTimeStamp)
+
+    local bonusDataTable = PlayersData[playerName].BonusMalus or {}
+
+    for _, bonus in ipairs(bonusDataTable) do 
+        if bonus[3] == date then -- we edit 
+            if remove then
+                bonus = nil
+            else
+                bonus = {bonusText, score, date}  
+            end
+            UpdateBonusPanel()            
+            BubbleLoot_G.storage.forcePlayerDataBaseWriteTimeStampGlobal(currentplayerDBTimeStamp)
+            return
+        end
+    end
+
+    -- if we reach it, it means we didn't find a bonus to edit
+
+    table.insert(bonusDataTable,1, {bonusText, score, date})
+    UpdateBonusPanel()
+    BubbleLoot_G.storage.forcePlayerDataBaseWriteTimeStampGlobal(currentplayerDBTimeStamp)
+end
 
 
 
