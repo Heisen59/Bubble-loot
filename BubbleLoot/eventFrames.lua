@@ -105,13 +105,46 @@ local MyMinimapLDB = LDB:NewDataObject("MyMinimapIcon", {
 })
 
 
+
+-- delete data 
+local selectedDB = ""
+
+-- Create a StaticPopup dialog for confirmation
+
+StaticPopupDialogs["CONFIRM_DELETE_DATABASE"] = {
+    text = "Are you sure you want to delete the %s data?",
+    button1 = "Confirm",
+    button2 = "Cancel",
+    OnAccept = function()
+        -- Confirm was clicked, delete the player from the table
+        if selectedDB=="playersDB" then
+            BubbleLoot_G.initPlayersData(true)
+        elseif selectedDB=="raidDB" then
+            BubbleLoot_G.initRaiData(true)
+        elseif selectedDB == "cancelDB" then
+            BubbleLoot_G.initCancelData(true)
+        elseif selectedDB == "syncDB" then
+            BubbleLoot_G.initSyncData(true)
+        end
+        selectedDB = ""
+    end,
+    OnCancel = function()
+        selectedDB = ""
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3,  
+}
+
+
 -- Function to display the context menu for the minimap button
 function ShowMinimapContextMenu()
     -- Create a dropdown menu frame
     local dropdownMenu = CreateFrame("Frame", "MyAddonMinimapMenu", UIParent, "UIDropDownMenuTemplate")
 
     -- Initialize the dropdown menu with options
-    UIDropDownMenu_Initialize(dropdownMenu, function(self, level)
+    UIDropDownMenu_Initialize(dropdownMenu, function(self, level, menuList)
         if not level then return end
 
         if level == 1 then
@@ -144,8 +177,65 @@ function ShowMinimapContextMenu()
 				BubbleLoot_G.gui.OpenRaidsLootWindow()
 				end
             UIDropDownMenu_AddButton(info, level)
-			
 
+
+            -- Add reset menu
+            info = UIDropDownMenu_CreateInfo()
+            info.text = "Reset database"
+            info.hasArrow = true -- This tells the menu item to create a submenu
+            info.notCheckable = true
+            info.menuList = "RESET_SUBMENU" -- Assigns a name to the submenu
+            UIDropDownMenu_AddButton(info, level)
+			
+        elseif level == 2 then
+            if menuList == "RESET_SUBMENU" then                
+                
+                -- Add a menu entry to reset the player database
+                local info = UIDropDownMenu_CreateInfo()
+                info.text = "player database"
+                info.hasArrow = false -- This tells the menu item to create a submenu
+                info.notCheckable = false
+                info.func = function()				
+                    selectedDB = "playersDB" -- Set the player you want to delete (as an example)
+                    StaticPopup_Show("CONFIRM_DELETE_DATABASE", "players")
+                    end
+                UIDropDownMenu_AddButton(info, level)
+
+                -- Add a menu entry to reset the raid database
+                info = UIDropDownMenu_CreateInfo()
+                info.text = "raid database"
+                info.hasArrow = false -- This tells the menu item to create a submenu
+                info.notCheckable = false
+                info.func = function()				
+                    selectedDB = "raidDB" -- Set the player you want to delete (as an example)
+                    StaticPopup_Show("CONFIRM_DELETE_DATABASE", "raid")
+                    end
+                UIDropDownMenu_AddButton(info, level)
+
+                -- Add a menu entry to reset the cancel data
+                info = UIDropDownMenu_CreateInfo()
+                info.text = "sync data"
+                info.hasArrow = false -- This tells the menu item to create a submenu
+                info.notCheckable = false
+                info.func = function()		
+                    selectedDB = "syncDB" -- Set the player you want to delete (as an example)
+                    StaticPopup_Show("CONFIRM_DELETE_DATABASE", "sync")	                    
+                    end
+                UIDropDownMenu_AddButton(info, level)
+
+                -- Add a menu entry to reset the cancel data
+                info = UIDropDownMenu_CreateInfo()
+                info.text = "cancel data"
+                info.hasArrow = false -- This tells the menu item to create a submenu
+                info.notCheckable = false
+                info.func = function()		
+                    selectedDB = "cancelDB" -- Set the player you want to delete (as an example)
+                    StaticPopup_Show("CONFIRM_DELETE_DATABASE", "cancel")	                    
+                    end
+                UIDropDownMenu_AddButton(info, level)
+
+
+            end
 			
         end
     end)

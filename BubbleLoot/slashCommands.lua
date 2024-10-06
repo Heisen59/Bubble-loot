@@ -152,6 +152,26 @@ local function sendData(playerName)
 	
 end
 
+
+local function sendDataToRaid(DBname)
+	
+	--Broadcast everything
+    if DBname == "RaidData" then
+        BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData)
+    end
+
+    if DBname == "PlayersData" then
+        BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData)
+    end
+	
+end
+
+local function sendFunction()
+	
+    BubbleLoot_G:Draw()
+	
+end
+
 -- Slash commands.
 SLASH_BUBBLELOOT1 = '/bubbleloot'
 SLASH_BUBBLELOOT2 = '/bl'
@@ -182,6 +202,10 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		getPlayerScore(args)
 	elseif command == "send" then
 		sendData(args)
+    elseif command == "sendToRaid" then
+		sendDataToRaid(args)
+    elseif command == "fun" then
+		sendFunction()
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

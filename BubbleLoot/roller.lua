@@ -56,10 +56,18 @@ function methods.UpdateRoll(self, roll)
 		--self.repeated = true
 	else
 		self.roll = roll
-		self.rollChanged = true
+		self.scoreTextChanged = true
 	end
 	
 
+end
+
+-- Update need and set connected flags.
+function methods.UpdateScoreChance(self)
+	
+		--self.scoreTextChanged = true
+		self.score = BubbleLoot_G.calculation.GetPlayerScore(self.name)
+	
 end
 
 -- Update raid subgroup or group state.
@@ -166,6 +174,7 @@ function BubbleLoot_G.roller.New(name, need, playerInfo)
 		cumulative_chance = 0,
 		roll = 0,
 		rollChanged = true,
+		scoreTextChanged = true,
     }
     -- Add methods.
     for funcName, func in pairs(methods) do

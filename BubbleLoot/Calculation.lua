@@ -20,7 +20,9 @@ function BubbleLoot_G.calculation.GetPlayerBonus(playerName)
 	local score = 0
 
 	for _, BonusData in ipairs(playerBonus) do 
-		score = score + BonusData[2]
+		if BonusData[2] ~= nil then
+			score = score + BonusData[2]
+		end
 	end
 
 	return score
@@ -59,7 +61,7 @@ function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 		end
 		
 	-- Third : bonus/malus
-	score = score + BubbleLoot_G.calculation.GetPlayerBonus(playerName)
+	score = score - BubbleLoot_G.calculation.GetPlayerBonus(playerName)
 		
 	return score
 
@@ -78,6 +80,8 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 	
 -- First, try to get item info using the item name
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc = C_Item.GetItemInfo(itemId)
+
+
 	
 	-- print(itemName)
 	
@@ -131,7 +135,7 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 		if itemName then 
 			print("GetItemSlotMode function : "..itemName.." doesn't have any itemEquipLoc")			
 		else
-			print(itemId)
+			--print(itemId)
 			print("GetItemSlotMode function : should never enter here since working with item ID")
 		end		
 	 --[[

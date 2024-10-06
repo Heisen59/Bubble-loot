@@ -163,7 +163,7 @@ function BubbleLoot_G.gui.DemotePlayer(playerName, isFromBroadCast )
 	if isFromBroadCast == true then
 	else			
 		--TIme Stamp functions
-		print("Demote need player "..playerName)
+		--print("Demote need player "..playerName)
 		BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.DEMOTE_PLAYER_NEED, playerName)
 	end
 
@@ -173,7 +173,6 @@ end
 -- Function to handle dropdown Remove player from rollerCollection
 function OnClickDemotePlayer(self, playerName )
     -- print("OnClickRemovePlayer function" )
-	
 		BubbleLoot_G.gui.DemotePlayer(playerName, false )
 
 end
@@ -205,7 +204,7 @@ local function CreateManageNeedDropdownMenu(playerName)
 			},
 			{
 				text = "Demote player need",
-				func = BubbleLoot_G.gui.OnClickDemotePlayer,
+				func = OnClickDemotePlayer,
 				arg1 = playerName,
 			},
 			{

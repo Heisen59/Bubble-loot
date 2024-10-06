@@ -65,20 +65,17 @@ end
 
 -- Initialize self, plugins, saved variables
 function BubbleLoot_G.Initialize(self)
-	--Storage data initialize
-	if PlayersData == nil then -- Initialize when first loaded.
-        PlayersData = {};
-    end
-
     local relativePoint = self.gui:Initialize()
     -- Plugins initialize.
     for _, plugin in ipairs(self.plugins) do
         relativePoint = plugin:Initialize(self.gui.mainFrame, relativePoint)
     end
 
+
+	--Storage data initialize
+	BubbleLoot_G.initPlayersData(false)
     -- Load saved variables.
-	CancelData = CancelData or {}
-	CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] or {}
+	BubbleLoot_G.initCancelData(false)
 	
 	BubbleLootData = BubbleLootData or {}
 	
@@ -92,15 +89,7 @@ function BubbleLoot_G.Initialize(self)
 
 	
 	-- RaidData
-	RaidData = RaidData or {}
-	
-	if RaidData[cfg.NUMBER_OF_RAID_DONE] == nil then -- Initialize when first loaded.
-		RaidData[cfg.NUMBER_OF_RAID_DONE] = 0;
-    end
-	
-	if RaidData[cfg.RAID_HISTORIC] == nil then -- Initialize when first loaded.
-		RaidData[cfg.RAID_HISTORIC] = {};
-    end
+	BubbleLoot_G.initRaiData(false)
 	
 	-- check if major a database modification need a restructuration
 
@@ -110,9 +99,7 @@ function BubbleLoot_G.Initialize(self)
 	
 	
 	-- Sync trust list
-	SyncTrustList = SyncTrustList or {}
-	SyncTrustList[cfg.TRUST_LIST] = SyncTrustList[cfg.TRUST_LIST] or {}
-	SyncTrustList[cfg.BLACK_LIST] = SyncTrustList[cfg.BLACK_LIST] or {}
+	BubbleLoot_G.initSyncData(false)
 
     -- Starting in a group?
     if IsInGroup() then
@@ -122,6 +109,58 @@ function BubbleLoot_G.Initialize(self)
 	
     -- Plugins might have sth to say.
     self:Draw()
+end
+
+function BubbleLoot_G.initSyncData(forced)
+	if forced == true then
+		SyncTrustList = {}
+	else
+		SyncTrustList = SyncTrustList or {}
+	end
+
+	SyncTrustList[cfg.TRUST_LIST] = SyncTrustList[cfg.TRUST_LIST] or {}
+	SyncTrustList[cfg.BLACK_LIST] = SyncTrustList[cfg.BLACK_LIST] or {}
+
+end
+
+function BubbleLoot_G.initPlayersData(forced)
+	if forced == true then
+		PlayersData = {}
+	else
+		PlayersData = PlayersData or {}
+	end
+end
+
+function  BubbleLoot_G.initRaiData(forced)
+
+	if forced == true then
+		RaidData = {}
+	else
+		RaidData = RaidData or {}
+	end
+
+	
+	if RaidData[cfg.NUMBER_OF_RAID_DONE] == nil then -- Initialize when first loaded.
+		RaidData[cfg.NUMBER_OF_RAID_DONE] = 0;
+	end
+
+	if RaidData[cfg.RAID_HISTORIC] == nil then -- Initialize when first loaded.
+		RaidData[cfg.RAID_HISTORIC] = {};
+	end	
+
+end
+
+
+function BubbleLoot_G.initCancelData(forced)
+
+	if forced == true then
+		CancelData = {}
+	else
+		CancelData = CancelData or {}
+	end
+
+	CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST] or {}
+
 end
 
 --
@@ -150,6 +189,9 @@ end--]]
 
 -- Main drawing function.
 function BubbleLoot_G.Draw(self)
+
+	--print("draw")
+
     -- Start at 0 for header.
     local currentRow = 0
 
@@ -315,3 +357,17 @@ end
 DEBUG
 
 ]]--
+
+
+function PrintCallStack()
+    -- Use debugstack to get the full call stack
+    local stack = debugstack(3, 1, 0)  -- Adjusted to skip the current function and its immediate caller
+    
+    -- Print the stack trace to the chat frame
+    DEFAULT_CHAT_FRAME:AddMessage("Call Stack:")
+    for line in stack:gmatch("[^\r\n]+") do
+        if line ~= "" then  -- Skip empty lines
+            DEFAULT_CHAT_FRAME:AddMessage("  " .. line)
+        end
+    end
+end

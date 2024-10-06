@@ -55,19 +55,22 @@ function HookBagItemRightClick()
         return
     end
 
-    local AdiBags = LibStub("AceAddon-3.0"):GetAddon("AdiBags", true)
-    if AdiBags then
-        -- Register message to listen for when item buttons are updated
-        AdiBags:RegisterMessage("AdiBags_UpdateButton", function(event, itemButton)
-            if itemButton then
-                itemButton:EnableMouse(true)
-                itemButton:SetScript("OnMouseDown", function(self, button)
-                    OnAdiBagsBagClick(self, button)
-                end)
-            end
-        end)
-    else
-        --print("Error: AdiBags addon not found.")
+    local AceAddon = LibStub:GetLibrary("AceAddon-3.0", true)
+    if AceAddon then 
+        local AdiBags = LibStub("AceAddon-3.0"):GetAddon("AdiBags", true)
+        if AdiBags then
+            -- Register message to listen for when item buttons are updated
+            AdiBags:RegisterMessage("AdiBags_UpdateButton", function(event, itemButton)
+                if itemButton then
+                    itemButton:EnableMouse(true)
+                    itemButton:SetScript("OnMouseDown", function(self, button)
+                        OnAdiBagsBagClick(self, button)
+                    end)
+                end
+            end)
+        else
+            --print("Error: AdiBags addon not found.")
+        end
     end
 
 -- default 
@@ -131,10 +134,10 @@ function BubbleLoot_G.eventFunctions.OnLoad(self, event, addOnName)
 		--bprint("I'm in SetScript ADDON_LOADED")
         BubbleLoot_G:Initialize()
 		
-		print("BubbleLoot_G.eventFunctions.OnLoad")
+		--print("BubbleLoot_G.eventFunctions.OnLoad")
 		-- items Hooks
 		C_Timer.After(3,function()
-							print("Bubble loot : delayed function")
+							--print("Bubble loot : delayed function")
 							HookBagItemRightClick()
 						end
 		) -- Set up the hook for bag items after login
@@ -165,6 +168,7 @@ end
 -- Look for "pass" in the group channels.
 function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
     local name, server = strsplit("-", playerName)
+
 	--print("point 1")
     if text:lower() == "pass" then
 		--print("point 2")
@@ -172,7 +176,7 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
         BubbleLoot_G:Draw()
     end
 	if text:lower() == "+1" then
-        --print("point 3")
+        --print("+1 found")
 		-- Perform some action, e.g., print a message to the player
         --print(playerName .. " has typed +1 in the chat!")
 		BubbleLoot_G.rollerCollection:Save(name, 1)
@@ -201,10 +205,9 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
         end
     end
     ]]--
-
-    if event == "CHAT_MSG_RAID" then
-        -- Check if the message contains ""Choisissez +1/+2/pass pour "
-        if string.find(text,cfg.texts.LOOT_SEND_BIS_PATERN ) then
+    if event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" then
+        --Check if the message contains ""Choisissez +1/+2/pass pour "
+        if string.find(text,cfg.texts.LOOT_SEND_BIS_PATERN) then
             -- Do something when the phrase is found
 			BubbleLoot_G.rollerCollection:Clear()
 			BubbleLoot_G:Draw()

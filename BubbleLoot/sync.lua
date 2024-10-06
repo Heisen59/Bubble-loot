@@ -28,7 +28,7 @@ end
 local function checkIfInBL(sender)
     
 	for _, tempTrustName in ipairs(tempSyncList[cfg.BLACK_LIST]) do
-        print(tempTrustName)
+        --print(tempTrustName)
         if sender == tempTrustName then return true end
 	end
 
@@ -122,6 +122,8 @@ end
 -- Function to broadcast data in chunks
 function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
     
+    local delay = 1
+
     local serializedData = SerializeMessage(msgType, tbl)
     local chunkSize = 200  -- Adjust size to leave room for sequence and flags
     local chunks = SplitIntoChunks(serializedData, chunkSize)
@@ -132,15 +134,20 @@ function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
         local chunkMessage = msgType .. "|" .. isLast .. "|" .. i .. "|" .. totalChunks .. "|" .. chunk
 
         if targetPlayer then
-            print("Data send to "..targetPlayer)
+            --print("Data send to "..targetPlayer)
             C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", targetPlayer)
         else
-            C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "RAID")  -- Or "PARTY"
-            for _, trustedPlayer in ipairs(SyncTrustList[1]) do
+            C_Timer.After(1 + (i-1)*delay, function()
+                C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "RAID")  -- Or "PARTY"
+            end)
+            
+            for j, trustedPlayer in ipairs(SyncTrustList[1]) do
                 if IsPlayerInGuildConnected(trustedPlayer) then
-                    C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", trustedPlayer)
+                    C_Timer.After(0.5 + (j+j*i-1)*delay, function()
+                        C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", trustedPlayer)
+                    end)
                 end
-            end
+            end            
         end
     end
 end
@@ -270,7 +277,7 @@ local function ReassembleChunks(sender, msgType, totalChunks)
             print("Error: Failed to process reassembled message "..msgType.." from " .. sender)
         end
     else
-        print("Error: Missing chunks"..msgType.." from sender " .. sender)
+        print("Error: Missing chunks "..msgType.." from sender " .. sender)
     end
 end
 

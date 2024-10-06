@@ -28,6 +28,10 @@ end
 -- Redraw `scoreText` of all rollers and reorder (new roller or new roll).
 
 function BubbleLoot_G.rollerCollection.Draw(self)
+
+	--print("rollerCollection.Draw")
+
+	--PrintCallStack()
     local currentRow = 0
     local orderChanged = false
 
@@ -62,7 +66,7 @@ function BubbleLoot_G.rollerCollection.Draw(self)
     for index, roller in ipairs(self.values) do
 		if(roller.need<threshold+1)then
 			-- unit
-			local unitSimpleName = nil
+			local unitText = nil
 			if orderChanged or roller.unitChanged then
 				unitText = roller:MakeUnitText()
 				roller.unitChanged = false
@@ -73,18 +77,16 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 				needText = roller:MakeNeedText()
 				roller.needChanged = false
 			end
-			-- score
+			-- score & chance
 			local scoreText = nil
-			if orderChanged then
-				scoreText = roller:MakeScoreText()
-				--roller.scoreTextChanged = false
-			end
-			-- chance
 			local chanceText = nil
-			if orderChanged then
+			if orderChanged or roller.scoreTextChanged then
+				--print("scoreTextChanged")
+				scoreText = roller:MakeScoreText()				
 				chanceText = roller:MakeChanceText()
-				--roller.chanceTextChanged = false
-			end		
+				roller.scoreTextChanged = false
+			end
+
 			-- roll
 			local rollText = nil
 			if orderChanged or roller.rollChanged then
@@ -103,6 +105,27 @@ function BubbleLoot_G.rollerCollection.Draw(self)
     BubbleLoot_G.gui:HideTailRows(currentRow + 1)
 
     return currentRow, BubbleLoot_G.gui:GetRow(currentRow).unit
+end
+
+
+-- set scoreTextChanged to true
+function BubbleLoot_G.rollerCollection.SetScoreTextChanged(self, playerName)
+	local roller = self:FindRoller(playerName)
+	if roller then 
+		--print("SetScoreTextChanged")
+		--print(roller.name)
+		--print(roller.scoreTextChanged)
+		--roller:UpdateScoreChance()
+		-- update score
+		roller.score = BubbleLoot_G.calculation.GetPlayerScore(roller.name)
+		-- recalc all cumulative chance
+		self:LootChanceRoller()
+		
+		--print(roller.scoreTextChanged)
+		
+		-- redrawn the frame
+		BubbleLoot_G:Draw()
+	end
 end
 
 --
@@ -131,6 +154,8 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 
 	local chance_sum = 0
 	
+	--print("LootChanceRoller")
+
 	-- first, compute brut chance
 	for _, roller in ipairs(self.values) do
 		--print(roller.name)
@@ -152,6 +177,10 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 		roller.chance =	roller.chance*10000/chance_sum
 		roller.cumulative_chance = roller.chance+last_roller_chance
 		last_roller_chance=roller.cumulative_chance
+
+		-- need a refresh
+		roller.scoreTextChanged = true
+
 	end		
 	
 end
@@ -171,11 +200,19 @@ end
 -- Update `roller` (if exists) or create a new one.
 function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
 
+	--print("+1 save")
+
 	local roller = self:FindRoller(name)
+
+	--print(roller)
     
     if roller ~= nil then
         roller:UpdateNeed(need)
 		roller:UpdateRoll(roll)
+
+		--print(need)
+		--print(roll)
+
 		
 		self.isSorted = false
 		self:LootChanceRoller()
@@ -194,7 +231,7 @@ end
 
 -- Update `roller` to increase its need (we want to remove it from the roller.
 function BubbleLoot_G.rollerCollection.Demote(self, name)
-
+	--print(name)
 	local roller = self:FindRoller(name)
     
     if roller ~= nil then

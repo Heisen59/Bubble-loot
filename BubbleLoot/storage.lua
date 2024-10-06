@@ -91,7 +91,7 @@ function BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, for
 		if(PlayersData[playerName].items[itemId]) then 
 			local lootsData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
 			for index, LootData in ipairs(lootsData) do
-				print(LootData[1])
+				--print(LootData[1])
 				if LootData[1] == lootdate then
 					-- toogle
 					if LootData[2] == 1 then
@@ -488,5 +488,6 @@ function BubbleLoot_G.storage.RemovePlayerGlobal(playerName)
 	PlayersData[playerName] = nil
 
 end
+
 
 
