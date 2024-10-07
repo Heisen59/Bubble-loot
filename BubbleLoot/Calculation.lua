@@ -33,6 +33,7 @@ end
 
 function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 
+	--print("Get loot score player")
 	lootscore = lootscore or false;
 
 	--print("GetPlayerScore function")
@@ -48,7 +49,8 @@ function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 		if(itemsList) then
 			for itemId, itemData in pairs(itemsList) do
 				NumberOfItemsLooted = BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, 1) -- only count MS items
-				score = score +  NumberOfItemsLooted * BubbleLoot_G.calculation.GetItemScore(itemId)
+				--print(NumberOfItemsLooted)
+				score = score +  NumberOfItemsLooted * BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)--BubbleLoot_G.calculation.GetItemScore(itemId)
 			end
 		end
 
@@ -136,7 +138,8 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 			print("GetItemSlotMode function : "..itemName.." doesn't have any itemEquipLoc")			
 		else
 			--print(itemId)
-			print("GetItemSlotMode function : should never enter here since working with item ID")
+			print("GetItemSlotMode function : item not in cache. Wait for server response.")
+			return nil
 		end		
 	 --[[
 		slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(item)]

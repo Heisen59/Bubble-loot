@@ -3,6 +3,50 @@
 local cfg = BubbleLoot_G.configuration
 
 
+
+-- get item score from DB
+
+function BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
+
+	local itemData = PlayersData[playerName].items[itemId]
+
+	if itemData == nil then
+		print("Error :"..playerName.." doesn't have the itemid "..itemId.." in his player DB !")
+		return 0
+	end
+
+	local itemLink = itemData[cfg.ITEMLINK ]
+	local itemScore = itemData[cfg.ITEM_SCORE]
+
+	if itemScore == nil or itemScore == -1 or recalc then
+		-- need calculation
+		local calcItemScore = BubbleLoot_G.calculation.GetItemScore(itemId)
+
+		if calcItemScore == nil then
+			-- recalc and write it later
+			C_Timer.After(2, function()
+				BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
+            end)
+
+			return 0
+
+		else
+			-- let's write it in the DB
+			PlayersData[playerName].items[itemId][cfg.ITEM_SCORE] = calcItemScore
+			return calcItemScore
+		end
+
+
+	else
+		if itemScore == 0 then
+			print("getItemScoreFromDB function : "..itemLink.." have a score of 0")
+		end
+		return itemScore
+	end
+
+end
+
+
 -- Time stamp functions
 local function writeLastPlayerDataBaseTimeStamp()
 
@@ -139,6 +183,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		
 		local itemData = {}
 		local number = 0
+		local itemScore = -1
 		
 		if itemLink and playerName then	
 		
@@ -172,11 +217,11 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 				-- Get current lootsData (contains date and lootAttribType)
 				lootsData = PlayersData[playerName].items[itemId][cfg.LOOTDATA]
 			
-			
+				itemScore = PlayersData[playerName].items[itemId][cfg.ITEM_SCORE]
 			
 			
 				
-			end		
+			end				
 			
 			
 			number = number +1
@@ -184,10 +229,11 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			
 			
 			
-			local dataItem = {itemLink, lootsData, instanceName, number}
+			local dataItem = {itemLink, lootsData, instanceName, number, itemScore}
+			
 			--table.insert(PlayersData[playerName].items, dataItem)
 			PlayersData[playerName].items[itemId] = dataItem
-			
+			BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)
   
 		else
 			print("function AddPlayerData adding: error")	
