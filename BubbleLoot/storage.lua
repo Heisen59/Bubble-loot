@@ -197,7 +197,6 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		local instanceName, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize = GetInstanceInfo()
 		instanceName = instanceName or "None"
 		
-		local itemData = {}
 		local number = 0
 		local itemScore = -1
 		
@@ -262,31 +261,26 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		
 			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
 			
-			if not exchange and not forcedTimeStamp then
-				BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[itemId])
-			end
+
 			
-			if	PlayersData[playerName].items[itemId][cfg.NUMBER] == 1 then
-			
-				-- only one item, we can safely delete everything
-				PlayersData[playerName].items[itemId] = nil
-			
-			else
-				-- multiple item, let's remove the proper loot
-				-- let search for the proper item to remove
-				for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
-					if LootData[1] == itemDateLocal then
-																	
 						
-						table.remove(PlayersData[playerName].items[itemId][cfg.LOOTDATA], index)
-						break
-						
-					else
-						print("AddPlayerData : try to remove a LootData, but can't find it")
+			-- let search for the proper item to remove
+			for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
+				if LootData[1] == itemDateLocal then
+							
+					if not exchange and not forcedTimeStamp then
+						BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName,itemLink,LootData)
 					end
+					
+					table.remove(PlayersData[playerName].items[itemId][cfg.LOOTDATA], index)
+					break
+					
+				else
+					print("AddPlayerData : try to remove a LootData, but can't find it")
 				end
-			
 			end
+			
+			
 		
 		
 			
@@ -482,12 +476,12 @@ end
 
 --]]
 
-function BubbleLoot_G.storage.getLastDeletedItemForPlayer(playerName)
+function BubbleLoot_G.storage.getLastDeletedItemLinkForPlayer(playerName)
 	
-	if CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] then
-		return CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
+	if CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] ~=nil and CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1] then
+		return CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1][1]
 	else
-		CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] = {}
+		--CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] = {}
 		return nil
 	end
 	
@@ -496,21 +490,23 @@ end
 function BubbleLoot_G.storage.RestoreLastDeletedItemForPlayer(playerName)
 
 	-- restore in PlayersData
-	local itemData = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
-	
+	local itemCancelData = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName][1]
+	local itemLink = itemCancelData[1]
+	local lootData = itemCancelData[2]
+	local LootAttribType = lootData[2]
+	local itemDate = cfg.texts.FORCE_ADD_STR..lootData[1]
 
 	
-	local itemId = tonumber(string.match(itemData[1], "item:(%d+):"))	
+	local itemId = tonumber(string.match(itemLink, "item:(%d+):"))	
 	
+	BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, itemDate)
 	-- print("RestoreLastDeletedItemForPlayer start test")
 	-- print(itemData[1])
 	-- print(itemId)
 	-- print(playerName)
 	
 	-- print("RestoreLastDeletedItemForPlayer end test")
-	
-	PlayersData[playerName].items[itemId] = itemData
-	
+		
 	-- remove from CancelData
 	table.remove(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName], 1)
 	
@@ -534,15 +530,10 @@ local function DeepCopy(original)
     return copy
 end
 
-function BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, itemData)
+function BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, itemLink, lootData)
 
-	local itemDataCopy = DeepCopy(itemData)
-
-	if itemDataCopy == nil then
-		return
-	end
-
-	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  itemDataCopy)
+	CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] = CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName] or {}
+	table.insert(CancelData[cfg.cancelIndex.LAST_DELETED_LOOT_PLAYER_LIST][playerName],1,  {itemLink, lootData})
 
 end
 

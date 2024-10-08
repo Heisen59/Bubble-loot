@@ -163,7 +163,7 @@ end
 	NumberOfPlayerFrame = NumberOfPlayerFrame +1
 	
 	-- Last deleted item
-	local LastDeletedItemData = BubbleLoot_G.storage.getLastDeletedItemForPlayer(playerName)
+	local LastDeletedItemLink = BubbleLoot_G.storage.getLastDeletedItemLinkForPlayer(playerName)
 	
 	
 	
@@ -252,7 +252,7 @@ end
 											end
 										end)
 	
-	if LastDeletedItemData then
+	if LastDeletedItemLink then
 	
 		local CancelButtonHeader3 = CreateFrame("Button", "CancelButton", headerFrame, "UIPanelButtonTemplate")
 		CancelButtonHeader3:SetSize(200, 30)
@@ -267,7 +267,7 @@ end
 		
 		local CancelItemLinkHeader4 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 20, 0)
-		CancelItemLinkHeader4:SetText(LastDeletedItemData[1])
+		CancelItemLinkHeader4:SetText(LastDeletedItemLink)
 		CancelItemLinkHeader4:Show()
 	
 	end
