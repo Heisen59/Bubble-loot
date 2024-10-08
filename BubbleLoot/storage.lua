@@ -177,20 +177,18 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		local forceAdd = false
 
 		local datePattern = "(%d%d%-%d%d%-%d%d%d%d à %d%d:%d%d:%d%d)"
-		local itemDateLocal =  string.match(itemDate, datePattern)
+		local itemDateLocal
 		local usedDate = date("%d-%m-%Y à %H:%M:%S")
 
-		if string.find(itemDate, cfg.texts.FORCE_ADD_STR) then
-			forceAdd = true
-			usedDate = itemDateLocal
+		if itemDate ~= nil then
+			itemDateLocal =  string.match(itemDate, datePattern)
+			if string.find(itemDate, cfg.texts.FORCE_ADD_STR) then
+				forceAdd = true
+				usedDate = itemDateLocal
+			end	
 		end
-	
-		
-		print(forceAdd)
-		print("use date "..usedDate)
-		print("item date "..itemDateLocal)
 
-	
+
 	if itemDate == nil  or forceAdd then
 	
 
