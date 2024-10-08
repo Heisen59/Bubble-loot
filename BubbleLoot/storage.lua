@@ -165,15 +165,33 @@ function BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, for
 end
 
 -- Function to add player item data
-function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, DateRemoveItem, exchange, forcedTimeStamp)
+function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType, itemDate, exchange, forcedTimeStamp)
 
 	exchange = exchange or false
 	LootAttribType = LootAttribType or 1
     --print("I'm in AddPlayerData")
 	--print(playerName)
 	--print(itemLink)
+
+	-- do some work on itemDate :
+		local forceAdd = false
+
+		local datePattern = "(%d%d%-%d%d%-%d%d%d%d à %d%d:%d%d:%d%d)"
+		local itemDateLocal =  string.match(itemDate, datePattern)
+		local usedDate = date("%d-%m-%Y à %H:%M:%S")
+
+		if string.find(itemDate, cfg.texts.FORCE_ADD_STR) then
+			forceAdd = true
+			usedDate = itemDateLocal
+		end
 	
-	if DateRemoveItem == nil then
+		
+		print(forceAdd)
+		print("use date "..usedDate)
+		print("item date "..itemDateLocal)
+
+	
+	if itemDate == nil  or forceAdd then
 	
 
 
@@ -188,21 +206,22 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		if itemLink and playerName then	
 		
 			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+			if itemId == nil then print("AddPlayerData error : can't extract itemId from itemLink "..itemLink) return end
+
 			-- if needed, create a new player entry
 			CreateNewPlayerEntry(playerName)
 
 			if not PlayersData[playerName].items then
-			 print("items sublist not initialized")
+			 	print("items sublist not initialized")
 			end
 		
-			local currentDate = date("%d-%m-%Y à %H:%M:%S")
 			local lootsData ={}
 			
 			if(PlayersData[playerName].items[itemId]) then 
 			
 				-- first, check if we already added this item a few minutes ago
 				for _, lootData in pairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do 
-					if BubbleLoot_G.calculation.GetDurationInHours(lootData[1], currentDate) < 0.1 then
+					if BubbleLoot_G.calculation.GetDurationInHours(lootData[1], usedDate) < 0.1 then
 						print("This item has been added in the database a few minutes ago ...")
 						--print("Override it for debug")
 						return -- we do nothing it already exist.
@@ -225,7 +244,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			
 			
 			number = number +1
-			table.insert(lootsData,1,  {currentDate, LootAttribType})
+			table.insert(lootsData,1,  {usedDate, LootAttribType})
 			
 			
 			
@@ -245,7 +264,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 		
 			local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
 			
-			if not exchange then
+			if not exchange and not forcedTimeStamp then
 				BubbleLoot_G.storage.AddDeletedItemForPlayer(playerName, PlayersData[playerName].items[itemId])
 			end
 			
@@ -258,7 +277,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 				-- multiple item, let's remove the proper loot
 				-- let search for the proper item to remove
 				for index, LootData in ipairs(PlayersData[playerName].items[itemId][cfg.LOOTDATA]) do
-					if LootData[1] == DateRemoveItem then
+					if LootData[1] == itemDateLocal then
 																	
 						
 						table.remove(PlayersData[playerName].items[itemId][cfg.LOOTDATA], index)
@@ -293,7 +312,7 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			local currentplayerDBTimeStamp = writeLastPlayerDataBaseTimeStamp()
 
 			--print("Data send "..itemLink)
-			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, DateRemoveItem, exchange, currentplayerDBTimeStamp }
+			local AddPlayerDataFunctionTbl = {playerName, itemLink, LootAttribType, itemDate, exchange, currentplayerDBTimeStamp }
 			BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION, AddPlayerDataFunctionTbl)
 		else			
 			forcePlayerDataBaseWriteTimeStamp(forcedTimeStamp)

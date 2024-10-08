@@ -104,6 +104,7 @@ BubbleLoot_G.configuration.texts = {
 	LOOT_SEND = "Distribution de ",
     LOOT_SEND_BIS = "Choisissez +1/+2/pass pour ",
     LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
+    FORCE_ADD_STR ="force add:",
 
     -- LABELS BELONGING TO `GROUPTYPE`S.
 

@@ -115,7 +115,7 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 					
 					-- print("exchange function debug end")
 					-- let's add the item to the receiver
-					BubbleLoot_G.storage.AddPlayerData(RecevingPlayer, itemLink, lootAttribType, nil, true)
+					BubbleLoot_G.storage.AddPlayerData(RecevingPlayer, itemLink, lootAttribType, cfg.texts.FORCE_ADD_STR..lootDropDate, true)
 					
 					-- let's remove the item to the donnor
 					BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, lootAttribType, lootDropDate, true)

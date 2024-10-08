@@ -96,7 +96,7 @@ local function addItemToPlayer(args)
 	--print(itemName)
 	
 	
-	local item, itemLink,_,_,_,_,_,_,_  = GetItemInfo(itemName)
+	local item, itemLink,_,_,_,_,_,_,_  = C_Item.GetItemInfo(itemName)
 		
 	if playerName and itemLink then
 		BubbleLoot_G.storage.AddPlayerData(playerName,  itemLink )
