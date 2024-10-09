@@ -66,32 +66,34 @@ local function UpdateBonusPanel()
         scoreDateLabel:SetText("Date: " .. date.." | Score: " .. score)
         scoreDateLabel:SetPoint("TOPLEFT", 0, -20)
 
-        -- Edit Button
-        local editButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-        editButton:SetSize(40, 20)
-        editButton:SetText("Edit")
-        editButton:SetPoint("LEFT", scoreDateLabel, "RIGHT", 10, 0)
-        editButton:SetScript("OnClick", function(self)
-            -- Open the Add/Edit panel in edit mode
-            BonusAddon:OpenAddBonusPanel(i)
-        end)
+        if BubbleLoot_G.IsOfficier then
+            -- Edit Button
+            local editButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+            editButton:SetSize(40, 20)
+            editButton:SetText(cfg.texts.EDIT_A_BONUS)
+            editButton:SetPoint("LEFT", scoreDateLabel, "RIGHT", 10, 0)
+            editButton:SetScript("OnClick", function(self)
+                -- Open the Add/Edit panel in edit mode
+                BonusAddon:OpenAddBonusPanel(i)
+            end)
 
-        -- Delete Button
-        local deleteButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-        deleteButton:SetSize(40, 20)
-        deleteButton:SetText("Del")
-        deleteButton:SetPoint("LEFT", editButton, "RIGHT", 10, 0)
-        deleteButton:SetScript("OnClick", function()
-            -- Remove the selected bonus from the table
-            table.remove(BonusData, i)
+            -- Delete Button
+            local deleteButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+            deleteButton:SetSize(40, 20)
+            deleteButton:SetText(cfg.texts.DEL_A_BONUS)
+            deleteButton:SetPoint("LEFT", editButton, "RIGHT", 10, 0)
+            deleteButton:SetScript("OnClick", function()
+                -- Remove the selected bonus from the table
+                table.remove(BonusData, i)
 
-            -- let's sync it to other players
-            local currentplayerDBTimeStamp = BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
-            local localBonusTbl = {BonusDataPlayerName, nil, nil, longDate, true, currentplayerDBTimeStamp }
-            BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.MODIFY_BONUS_DATA, localBonusTbl)
+                -- let's sync it to other players
+                local currentplayerDBTimeStamp = BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
+                local localBonusTbl = {BonusDataPlayerName, nil, nil, longDate, true, currentplayerDBTimeStamp }
+                BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.MODIFY_BONUS_DATA, localBonusTbl)
 
-            UpdateBonusPanel()
-        end)
+                UpdateBonusPanel()
+            end)
+        end
     end
 
     -- last update player panel if needed
@@ -130,15 +132,17 @@ function BonusAddon:CreateBonusPanel(playerName)
     BonusAddon.scrollChild:SetSize(460, 800)  -- Arbitrary large size to allow scrolling
     scrollFrame:SetScrollChild(BonusAddon.scrollChild)
 
-    -- Add Bonus Button
-    local addButton = CreateFrame("Button", nil, bonusPanel, "UIPanelButtonTemplate")
-    addButton:SetSize(120, 30)  -- Make sure the button is large enough
-    addButton:SetText("Add a Bonus")
-    addButton:SetPoint("BOTTOM", 0, 10)  -- Set to bottom center of the panel
-    addButton:SetScript("OnClick", function()
-        --print("click new bonus")
-        BonusAddon:OpenAddBonusPanel(nil)  -- Pass nil for new bonus (not editing)
-    end)
+    if BubbleLoot_G.IsOfficier then
+        -- Add Bonus Button
+        local addButton = CreateFrame("Button", nil, bonusPanel, "UIPanelButtonTemplate")
+        addButton:SetSize(120, 30)  -- Make sure the button is large enough
+        addButton:SetText(cfg.texts.ADD_A_BONUS)
+        addButton:SetPoint("BOTTOM", 0, 10)  -- Set to bottom center of the panel
+        addButton:SetScript("OnClick", function()
+            --print("click new bonus")
+            BonusAddon:OpenAddBonusPanel(nil)  -- Pass nil for new bonus (not editing)
+        end)
+    end
 
 
     -- Update the scroll child with data

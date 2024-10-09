@@ -381,8 +381,7 @@ local function AttemptTradeWithPlayer(playerName, bag, slot)
 	
     -- Check if the player is close enough to trade
     if CheckInteractDistance(playerName, 2) then
-		
-	
+			
         -- Open trade window
         InitiateTrade(playerName)
         
@@ -432,7 +431,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 	--print(lootslot)
 	--print(IsAltKeyDown())
     -- Check if the player is in a raid and holding Alt
-	local test = true
+	local test = false
     if IsInRaid() or test then
         -- Get the item name based on the source (bag or loot window)
         local itemName

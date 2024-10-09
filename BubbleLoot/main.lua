@@ -37,7 +37,7 @@ BubbleLoot_G.sync = {}
 local cfg = BubbleLoot_G.configuration
 
 --- toggles
-WritingMode = false
+BubbleLoot_G.IsOfficier = false
 
 ---@enum GroupTypeEnum addon user group status
 BubbleLoot_G.GroupType = {
@@ -58,6 +58,23 @@ function BubbleLoot_G.GetGroupType(self)
     end
 end
 
+
+-- Helping function to check if a player is a guild officer
+
+	function BubbleLoot_G.IsGuildOfficer(playerName)
+		GuildRoster()
+		for i = 1, GetNumGuildMembers() do
+			local name, rank, rankIndex = GetGuildRosterInfo(i)
+			if name and string.lower(name) == string.lower(playerName) then
+				--print(rankIndex)
+				if rankIndex < 6 then
+					return true
+				end
+			end
+		end
+		return false
+	end
+
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
     BubbleLoot_G.gui:SetVisibility(not BubbleLootData["SHOWN"])
@@ -70,6 +87,15 @@ function BubbleLoot_G.Initialize(self)
     for _, plugin in ipairs(self.plugins) do
         relativePoint = plugin:Initialize(self.gui.mainFrame, relativePoint)
     end
+
+	-- Set isOfficer
+	GuildRoster()
+	C_Timer.After(1, function()
+		local OwnerName = UnitName("player")
+		BubbleLoot_G.IsOfficier = BubbleLoot_G.IsGuildOfficer(OwnerName)
+	end)
+	
+
 
 
 	--Storage data initialize

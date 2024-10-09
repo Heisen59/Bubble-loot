@@ -95,15 +95,20 @@ local function CreateDropdownMenu(playerName)
             text = "Bonus/Malus",
             func = OnClickBonusMalus,
             arg1 = playerName
-        },
-        {
-            text = "Remove player", --WrapTextInColorCode("Remove player", cfg.colors[self.WARNING]),
-            func = function()
-                selectedPlayer = playerName -- Set the player you want to delete (as an example)
-                StaticPopup_Show("CONFIRM_DELETE_PLAYER", selectedPlayer)
-            end,            
-        }
+        },        
     }
+
+    if BubbleLoot_G.IsOfficier then
+        table.insert(menuList, {
+                                    text = cfg.texts.REMOVE_PLAYER, --WrapTextInColorCode("Remove player", cfg.colors[self.WARNING]),
+                                    func = function()
+                                        selectedPlayer = playerName -- Set the player you want to delete (as an example)
+                                        StaticPopup_Show("CONFIRM_DELETE_PLAYER", selectedPlayer)
+                                    end,            
+                                }
+                    )
+    end
+
     
     EasyMenu(menuList, dropdown, "cursor", 0 , 0, "MENU")
 end
@@ -228,20 +233,21 @@ for _, playerName in pairs(SortPlayersData) do
         playerRows[playerName] = playerRows[playerName] or {}
         playerRows[playerName]["valueLabel" .. i] = valueLabel
 
-		-- Create "-" button
-        local minusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
-        minusButton:SetSize(16, 16)  -- Reduce button size to 15
-		minusButton:SetPoint("TOP", valueLabel, "BOTTOM", -8, 0)  -- Align horizontally
-        minusButton:SetText("-")
-        minusButton:SetScript("OnClick", function() DecrementPlayer(playerName, i) end)
-	
-        -- Create "+" button
-        local plusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
-        plusButton:SetSize(16, 16)  -- Reduce button size to 15
-        plusButton:SetPoint("LEFT", minusButton, "RIGHT", 0, 0)  -- Stack vertically below plus button
-        plusButton:SetText("+")
-        plusButton:SetScript("OnClick", function() IncrementPlayer(playerName, i) end)
-
+        if BubbleLoot_G.IsOfficier then
+            -- Create "-" button
+            local minusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+            minusButton:SetSize(16, 16)  -- Reduce button size to 15
+            minusButton:SetPoint("TOP", valueLabel, "BOTTOM", -8, 0)  -- Align horizontally
+            minusButton:SetText("-")
+            minusButton:SetScript("OnClick", function() DecrementPlayer(playerName, i) end)
+        
+            -- Create "+" button
+            local plusButton = CreateFrame("Button", nil, contentFrame, "UIPanelButtonTemplate")
+            plusButton:SetSize(16, 16)  -- Reduce button size to 15
+            plusButton:SetPoint("LEFT", minusButton, "RIGHT", 0, 0)  -- Stack vertically below plus button
+            plusButton:SetText("+")
+            plusButton:SetScript("OnClick", function() IncrementPlayer(playerName, i) end)
+        end
 
 
         -- Store references to the buttons

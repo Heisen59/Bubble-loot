@@ -2,6 +2,8 @@
 -- Define register helper functions.
 -- Populate `BubbleLoot_G.eventFrames`.
 
+local cfg = BubbleLoot_G.configuration
+
 -- CREATE EVENT FRAMES
 
 -- The first time saved variables are accessible (they are not while built-in onLoad is run).
@@ -150,21 +152,23 @@ function ShowMinimapContextMenu()
         if level == 1 then
 			-- Add toggle main loot window
 			local info = UIDropDownMenu_CreateInfo()
-            info.text = "Show/hide the main loot window"
+            info.text = cfg.texts.SHOW_HIDE_MAIN_PANEL
             info.func = function()				
 				BubbleLoot_G.gui:ToggleVisibility()
 				end
             UIDropDownMenu_AddButton(info, level)
 		
-            -- Add a participation to all raiders
-            info = UIDropDownMenu_CreateInfo()
-            info.text = "Add a participation to all players in raid"
-            info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
-            UIDropDownMenu_AddButton(info, level)
+            if BubbleLoot_G.IsOfficier then
+                -- Add a participation to all raiders
+                info = UIDropDownMenu_CreateInfo()
+                info.text = cfg.texts.ADD_RAID_PARTICIPATIOn
+                info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
+                UIDropDownMenu_AddButton(info, level)
+            end
 
             -- Add Modify a player's data
 			info = UIDropDownMenu_CreateInfo()
-            info.text = "Modify a specific player's data"
+            info.text = cfg.texts.SHOW_ROSTER_PANEL
             info.func = function()				
 				BubbleLoot_G.gui.OpenParticipationWindow()
 				end

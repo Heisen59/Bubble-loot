@@ -7,23 +7,6 @@ local tempSyncList = {{},{}}
 local receivedChunks = {}  -- Table to store chunks for each sender
 local expectedChunks = {}  -- Track how many chunks are expected
 
--- Helping function to check if a player is a guild officer
-
-function IsGuildOfficer(playerName)
-    GuildRoster()
-    for i = 1, GetNumGuildMembers() do
-        local name, rank, rankIndex = GetGuildRosterInfo(i)
-        if name and string.lower(name) == string.lower(playerName) then
-            --print(rankIndex)
-            if rankIndex < 6 then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-
     -- check if sender is in BL
 local function checkIfInBL(sender)
     
@@ -206,7 +189,7 @@ local function checkSender(sender, msgType, receivedTable)
 
     
 --print("here")
-    if not IsGuildOfficer(sender) then return end
+    if not BubbleLoot_G.IsGuildOfficer(sender) then return end
     --print("Debug : Secured transfer from guildOfficer desactivated, players still have to get permission to write")
 --print("and here")
     

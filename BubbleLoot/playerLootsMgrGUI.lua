@@ -77,30 +77,38 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 	--print("CreateLootDropdownMenu")
 
     local dropdown = CreateFrame("Frame", "PlayerDropdownMenu", UIParent, "UIDropDownMenuTemplate")
-    local menuItems  = {
-		{
+    local menuItems  = {{
             text = itemLink,  -- loot's name as the header
             isTitle = true,  -- This makes the text non-clickable and acts as a title
             notCheckable = true,  -- Don't show a checkbox
-        },
-        {
-            text = "Remove",
-            func = OnClickRemove,
-            arg1 = playerName, 
-			arg2 = {itemLink, lootDropDate},
-        },
-		{
-            text = "set as +1/+2",
-            func = OnClickChangeNeed,
-            arg1 = playerName, 
-			arg2 = {itemLink, lootDropDate},
-        },
-		{
-			text = "Give to player",
-			hasArrow = true,
-			menuList = {}
-		},		
-    }
+        				} }
+
+
+	if BubbleLoot_G.IsOfficier then
+		table.insert(menuItems,{
+				text = cfg.texts.LOOT_REMOVE,
+				func = OnClickRemove,
+				arg1 = playerName, 
+				arg2 = {itemLink, lootDropDate},
+			})
+
+		
+		table.insert(menuItems,{
+				text = cfg.texts.LOOT_SET_MSOS,
+				func = OnClickChangeNeed,
+				arg1 = playerName, 
+				arg2 = {itemLink, lootDropDate},
+			} )
+
+		
+		table.insert(menuItems,		{
+				text = cfg.texts.LOOT_GIVE,
+				hasArrow = true,
+				menuList = {}
+			})
+	end
+
+    
 	
 	-- Populate the player list for the "Give to player" option
 	local allPlayersListFromDB = BubbleLoot_G.storage.getAllPlayersFromDB()
