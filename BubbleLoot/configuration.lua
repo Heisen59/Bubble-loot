@@ -11,7 +11,7 @@ BubbleLoot_G.configuration.PREFIX = "BubbleLootSync"
 BubbleLoot_G.configuration.size = {
     EMPTY_HEIGHT = 60, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
-    FRAME_WIDTH = 400, -- Default value.
+    FRAME_WIDTH = 440, -- Default value.
 }
 
 local systemMessageColor = "FFFFFF00"
@@ -80,6 +80,7 @@ BubbleLoot_G.configuration.constant =
 	NON_ATTENDANCE_VALUE  	= 1,
 }
 
+
 BubbleLoot_G.configuration.tau = 3
 
 -- Cancel table
@@ -104,7 +105,7 @@ BubbleLoot_G.configuration.texts = {
 	LOOT_SEND = "Distribution de ",
     LOOT_SEND_BIS = "Choisissez +1/+2/pass pour ",
     LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
-    FORCE_ADD_STR ="force add:",
+    FORCE_ADD_STR ="force add:", 
     ADD_RAID_PARTICIPATIOn = "Ajoute une participation aux joueurs présents",--"Add a participation to all players in raid",
     SHOW_ROSTER_PANEL = "Liste des joueurs",--"Show the roster panel",
     REMOVE_PLAYER = "Retirer joueur",--"Remove player",
@@ -115,6 +116,10 @@ BubbleLoot_G.configuration.texts = {
     LOOT_SET_MSOS = "Changer +1/+2",--"set as +1/+2",
     LOOT_GIVE = "Donner au joueur",--"Give to player",
     SHOW_HIDE_MAIN_PANEL = "Montrer/cacher la fenêtre principale", --"Show/hide the main loot window",
+    ML_RAND = "/rand 10000",
+    PLAYERS_LIST = "Joueurs du roster",
+    TOOLTIP_PLAYER_ROSTER = "clic droit sur un joueur pour faire apparaitre le menu",
+    ITEM_VALUE = "Valeur d'item",
 
     -- LABELS BELONGING TO `GROUPTYPE`S.
 

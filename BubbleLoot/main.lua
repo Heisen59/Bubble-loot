@@ -63,11 +63,14 @@ end
 
 	function BubbleLoot_G.IsGuildOfficer(playerName)
 		GuildRoster()
+		--print(playerName)
 		for i = 1, GetNumGuildMembers() do
 			local name, rank, rankIndex = GetGuildRosterInfo(i)
-			if name and string.lower(name) == string.lower(playerName) then
+			GuildPlayerName, _ = string.match(name, "([^%-]+)%-([^%-]+)")
+			if rankIndex < 6 then
+				--print(GuildPlayerName)
 				--print(rankIndex)
-				if rankIndex < 6 then
+				if GuildPlayerName and string.lower(GuildPlayerName) == string.lower(playerName) then					
 					return true
 				end
 			end
@@ -82,20 +85,17 @@ end
 
 -- Initialize self, plugins, saved variables
 function BubbleLoot_G.Initialize(self)
+		-- Set isOfficer
+		local OwnerName, _ = UnitName("player")	
+		--BubbleLoot_G.IsGuildOfficer(OwnerName)
+		BubbleLoot_G.IsOfficier = BubbleLoot_G.IsGuildOfficer(OwnerName) -- BubbleLoot_G.IsGuildOfficer(OwnerName)
+
+
     local relativePoint = self.gui:Initialize()
     -- Plugins initialize.
     for _, plugin in ipairs(self.plugins) do
         relativePoint = plugin:Initialize(self.gui.mainFrame, relativePoint)
     end
-
-	-- Set isOfficer
-	GuildRoster()
-	C_Timer.After(1, function()
-		local OwnerName = UnitName("player")
-		BubbleLoot_G.IsOfficier = BubbleLoot_G.IsGuildOfficer(OwnerName)
-	end)
-	
-
 
 
 	--Storage data initialize

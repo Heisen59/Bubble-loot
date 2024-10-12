@@ -211,6 +211,7 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
             -- Do something when the phrase is found
 			BubbleLoot_G.rollerCollection:Clear()
 			BubbleLoot_G:Draw()
+            BubbleLoot_G.gui:SetVisibility(true)
             return
         end
     end

@@ -83,21 +83,43 @@ function BubbleLoot_G.gui.Initialize(self)
 	itemText:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
 	self.itemText = itemText
 
-	local rollButton = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
-	rollButton:SetSize(65, 20)
-	rollButton:SetText("ML rand")
-	rollButton:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -8, -6)
-	rollButton:SetScript("OnClick", function(self)
-            -- Open the Add/Edit panel in edit mode
-            local editBox = ChatFrame1.editBox
-			editBox:SetText("/rand 10000") -- Set the command in the edit box
-			editBox:Show() -- Make sure the edit box is shown
-			editBox:SetFocus() -- Focus on the edit box
-			-- Send the command
-			ChatEdit_SendText(editBox) -- Sends the text as if Enter was pressed
-        end)
+	local hideButton = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
+	-- Create a FontString for text
+	local texthide = hideButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	texthide:SetPoint("CENTER", hideButton, "CENTER")
+	texthide:SetText("x")  -- Set your desired text here
+	local textWidth = texthide:GetStringWidth()
+	local textHeight = texthide:GetStringHeight()
+	hideButton:SetSize(textWidth+20, textHeight+10)
+	--rollButton:SetText(text)
+	hideButton:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -8, -6)
+	hideButton:SetScript("OnClick", function(self)
+			BubbleLoot_G.gui:SetVisibility(false)
+		end)
 
-	local OffSetDown = -30
+	if BubbleLoot_G.IsOfficier then
+		local rollButton = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
+		-- Create a FontString for text
+		local text = rollButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		text:SetPoint("CENTER", rollButton, "CENTER")
+		text:SetText(cfg.texts.ML_RAND)  -- Set your desired text here
+		local textWidth = text:GetStringWidth()
+		local textHeight = text:GetStringHeight()
+		rollButton:SetSize(textWidth+20, textHeight+10)
+		--rollButton:SetText(text)
+		rollButton:SetPoint("TOPRIGHT", hideButton, "TOPLEFT", -3, 0)
+		rollButton:SetScript("OnClick", function(self)
+				-- Open the Add/Edit panel in edit mode
+				local editBox = ChatFrame1.editBox
+				editBox:SetText("/rand 10000") -- Set the command in the edit box
+				editBox:Show() -- Make sure the edit box is shown
+				editBox:SetFocus() -- Focus on the edit box
+				-- Send the command
+				ChatEdit_SendText(editBox) -- Sends the text as if Enter was pressed
+			end)
+	end
+
+	local OffSetDown = -35
 
 	-- UNIT
     local unitHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
@@ -108,33 +130,7 @@ function BubbleLoot_G.gui.Initialize(self)
     unitHeader:SetText(cfg.texts.UNIT_HEADER)
     unitHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     self.unitHeader = unitHeader
-    -- NEED
-    local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    needHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -150, OffSetDown)
-    needHeader:SetHeight(cfg.size.ROW_HEIGHT)
-    needHeader:SetJustifyH("LEFT")
-    needHeader:SetJustifyV("TOP")
-    needHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
-    needHeader:SetText(cfg.texts.NEED_HEADER)
-    self.needHeader = needHeader
-	-- SCORE
-    local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    scoreHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -105, OffSetDown)
-    scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
-    scoreHeader:SetJustifyH("LEFT")
-    scoreHeader:SetJustifyV("TOP")
-    scoreHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
-    scoreHeader:SetText(cfg.texts.SCORE_HEADER)
-    self.scoreHeader = scoreHeader
-	-- CHANCE
-    local chanceHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-    chanceHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -60, OffSetDown)
-    chanceHeader:SetHeight(cfg.size.ROW_HEIGHT)
-    chanceHeader:SetJustifyH("LEFT")
-    chanceHeader:SetJustifyV("TOP")
-    chanceHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
-    chanceHeader:SetText(cfg.texts.CHANCE_HEADER)
-    self.chanceHeader = chanceHeader
+
     -- ROLL
     local rollHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
     rollHeader:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -10, OffSetDown)
@@ -144,6 +140,36 @@ function BubbleLoot_G.gui.Initialize(self)
     rollHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     rollHeader:SetText(cfg.texts.ROLL_HEADER)
     self.rollHeader = rollHeader
+
+	-- CHANCE
+	local chanceHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+	chanceHeader:SetPoint("TOPRIGHT", rollHeader, "TOPLEFT", -10, 0)
+	chanceHeader:SetHeight(cfg.size.ROW_HEIGHT)
+	chanceHeader:SetJustifyH("LEFT")
+	chanceHeader:SetJustifyV("TOP")
+	chanceHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+	chanceHeader:SetText(cfg.texts.CHANCE_HEADER)
+	self.chanceHeader = chanceHeader
+
+	-- SCORE
+	local scoreHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+	scoreHeader:SetPoint("TOPRIGHT", chanceHeader, "TOPLEFT", -10, 0)
+	scoreHeader:SetHeight(cfg.size.ROW_HEIGHT)
+	scoreHeader:SetJustifyH("LEFT")
+	scoreHeader:SetJustifyV("TOP")
+	scoreHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+	scoreHeader:SetText(cfg.texts.SCORE_HEADER)
+	self.scoreHeader = scoreHeader
+
+    -- NEED
+    local needHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
+    needHeader:SetPoint("TOPRIGHT", scoreHeader, "TOPLEFT", -10, 0)
+    needHeader:SetHeight(cfg.size.ROW_HEIGHT)
+    needHeader:SetJustifyH("LEFT")
+    needHeader:SetJustifyV("TOP")
+    needHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
+    needHeader:SetText(cfg.texts.NEED_HEADER)
+    self.needHeader = needHeader
 
     return unitHeader -- relativePoint
 end
@@ -248,10 +274,10 @@ function BubbleLoot_G.gui.GetRow(self, i)
 
         local parents = self:GetRow(i - 1)
         unit:SetPoint("TOPLEFT", parents.unit, "BOTTOMLEFT")
-        need:SetPoint("TOPLEFT", parents.need, "BOTTOMLEFT")		
-        score:SetPoint("TOPLEFT", parents.score, "BOTTOMLEFT")
-		chance:SetPoint("TOPLEFT", parents.chance, "BOTTOMLEFT")
-		roll:SetPoint("TOPLEFT", parents.roll, "BOTTOMLEFT")
+        need:SetPoint("TOP", parents.need, "BOTTOM")		
+        score:SetPoint("TOP", parents.score, "BOTTOM")
+		chance:SetPoint("TOP", parents.chance, "BOTTOM")
+		roll:SetPoint("TOP", parents.roll, "BOTTOM")
 	
         unit:SetHeight(cfg.size.ROW_HEIGHT)
         need:SetHeight(cfg.size.ROW_HEIGHT)		

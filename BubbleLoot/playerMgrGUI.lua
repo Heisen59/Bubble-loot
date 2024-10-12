@@ -136,7 +136,7 @@ playerMgrFrame:Hide()  -- Start hidden until the toggle button is clicked
 playerMgrFrame.title = playerMgrFrame:CreateFontString(nil, "OVERLAY")
 playerMgrFrame.title:SetFontObject("GameFontHighlight")
 playerMgrFrame.title:SetPoint("CENTER", playerMgrFrame.TitleBg, "CENTER", 0, 0)
-playerMgrFrame.title:SetText("Participation Manager")
+playerMgrFrame.title:SetText(cfg.texts.PLAYERS_LIST)
 
 -- Create a header frame to hold the non-scrollable header
 local headerFrame = CreateFrame("Frame", nil, playerMgrFrame)
@@ -162,6 +162,25 @@ local dataHeader3 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighli
 dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 35, 0)
 dataHeader3:SetText("Absence")
 dataHeader3:SetJustifyH("CENTER")
+
+
+
+-- Function to display the tooltip
+local function ShowTooltip(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")  -- Attach the tooltip to the frame
+    GameTooltip:SetText(cfg.texts.TOOLTIP_PLAYER_ROSTER, 1, 1, 1, 1, true)  -- Set the tooltip text
+    GameTooltip:Show()  -- Show the tooltip
+end
+
+-- Function to hide the tooltip
+local function HideTooltip(self)
+    GameTooltip:Hide()  -- Hide the tooltip when the mouse leaves the frame
+end
+
+-- Attach the OnEnter and OnLeave scripts to the frame
+playerMgrFrame:SetScript("OnEnter", ShowTooltip)  -- Show the tooltip on mouseover
+playerMgrFrame:SetScript("OnLeave", HideTooltip)  -- Hide the tooltip when the mouse leaves
+
 
 
 scrollFrame = nil

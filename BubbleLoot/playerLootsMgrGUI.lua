@@ -241,7 +241,7 @@ end
     dataHeader3:SetText("Date")
 	
 	local dataHeader4 = CreateFrame("Button", "ToggleMSOSButton", headerFrame, "UIPanelButtonTemplate") --headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader4:SetPoint("LEFT", dataHeader3, "RIGHT", 170, 0)
+    dataHeader4:SetPoint("LEFT", dataHeader3, "RIGHT", 150, 0)
 	dataHeader4:SetSize(60, 30)
     dataHeader4:SetText("MS/OS")
 	-- Set mouse click handler for the item label
@@ -259,6 +259,11 @@ end
 												BubbleLoot_G.gui.createLootsMgrFrame(playerName)			
 											end
 										end)
+
+	local dataHeader5 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	dataHeader5:SetPoint("LEFT", dataHeader4, "RIGHT", 25, 0)
+	dataHeader5:SetText(cfg.texts.ITEM_VALUE)
+
 	
 	if LastDeletedItemLink then
 	
@@ -318,6 +323,7 @@ end
 				
 				local MSOS = ""
 				if lootData[2] == 1 then MSOS = "+1" else MSOS = "+2" end
+				local itemScore = BubbleLoot_G.storage.getItemScoreFromDB(playerName, lootId)
 
 
 				rowIndex = rowIndex + 1
@@ -359,6 +365,11 @@ end
 				valueLabe2:SetPoint("LEFT", valueLabel, "RIGHT", 70, 0)
 				valueLabe2:SetText(MSOS)
 				valueLabe2:SetJustifyH("CENTER")
+
+				local valueLabe3 = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+				valueLabe3:SetPoint("LEFT", valueLabe2, "RIGHT", 70, 0)
+				valueLabe3:SetText(itemScore)
+				valueLabe3:SetJustifyH("CENTER")
 				
 			end
 		end
