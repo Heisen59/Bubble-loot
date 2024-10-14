@@ -102,7 +102,7 @@ local MyMinimapLDB = LDB:NewDataObject("MyMinimapIcon", {
     end,
     OnTooltipShow = function(tooltip)
         tooltip:AddLine("Bubble Loot")
-        tooltip:AddLine("Left-click to open options menu.")
+        tooltip:AddLine(cfg.texts.TOOLTIP_PLAYER_ROSTER)
     end,
 })
 
@@ -114,9 +114,9 @@ local selectedDB = ""
 -- Create a StaticPopup dialog for confirmation
 
 StaticPopupDialogs["CONFIRM_DELETE_DATABASE"] = {
-    text = "Are you sure you want to delete the %s data?",
-    button1 = "Confirm",
-    button2 = "Cancel",
+    text = cfg.texts.CONFIRM_DELETE_DB,
+    button1 =cfg.texts.CONFIRM,
+    button2 = cfg.texts.CANCEL,
     OnAccept = function()
         -- Confirm was clicked, delete the player from the table
         if selectedDB=="playersDB" then
@@ -176,9 +176,17 @@ function ShowMinimapContextMenu()
 			
 			-- Add Check raid player's loot (per date)
 			info = UIDropDownMenu_CreateInfo()
-            info.text = "Show raid loots per date"
+            info.text = cfg.texts.SHOW_RAID_LOOT_PER_DATE
             info.func = function()				
 				BubbleLoot_G.gui.OpenRaidsLootWindow()
+				end
+            UIDropDownMenu_AddButton(info, level)
+
+            -- Add Check raid player's loot (per date)
+			info = UIDropDownMenu_CreateInfo()
+            info.text = cfg.texts.SHOW_PLAYERS_LOOTS
+            info.func = function()				
+				BubbleLoot_G.gui.OpenPlayerLootWindow(UnitName("player"))
 				end
             UIDropDownMenu_AddButton(info, level)
 

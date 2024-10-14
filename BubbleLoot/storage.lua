@@ -18,7 +18,7 @@ function BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
 	local itemLink = itemData[cfg.ITEMLINK ]
 	local itemScore = itemData[cfg.ITEM_SCORE]
 
-	if itemScore == nil or itemScore == -1 or recalc then
+	if itemScore == nil or itemScore == -1 or itemScore == 0 or itemScore == 0.601 or recalc then
 		-- need calculation
 		local calcItemScore = BubbleLoot_G.calculation.GetItemScore(itemId)
 
@@ -28,19 +28,23 @@ function BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
 				BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
             end)
 
-			return 0
+			return 0.601
 
 		else
 			-- let's write it in the DB
+
+			if calcItemScore == 0 or calcItemScore == 0.601 then
+				print("getItemScoreFromDB function : "..itemLink.." itemID "..itemId.." have a score of "..calcItemScore)
+			end
+
 			PlayersData[playerName].items[itemId][cfg.ITEM_SCORE] = calcItemScore
 			return calcItemScore
 		end
 
 
+
+
 	else
-		if itemScore == 0 then
-			print("getItemScoreFromDB function : "..itemLink.." have a score of 0")
-		end
 		return itemScore
 	end
 

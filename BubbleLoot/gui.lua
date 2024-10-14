@@ -354,20 +354,20 @@ end
 
 
 
-	-- Function to give loot to the selected player
-	local function GiveLootToPlayer(lootSlot, playerName)
-		-- Find the raid index for the player
-		for i = 1, GetNumGroupMembers() do
-			local name = GetMasterLootCandidate(lootSlot, i)
-			if name == playerName then
-				-- Assign the loot to the player
-				GiveMasterLoot(lootSlot, i)
-				--print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
-				return
-			end
+-- Function to give loot to the selected player
+local function GiveLootToPlayer(lootSlot, playerName)
+	-- Find the raid index for the player
+	for i = 1, GetNumGroupMembers() do
+		local name = GetMasterLootCandidate(lootSlot, i)
+		if name == playerName then
+			-- Assign the loot to the player
+			GiveMasterLoot(lootSlot, i)
+			--print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
+			return
 		end
-		print("Player " .. playerName .. " not found in raid.")
-	end	
+	end
+	print("Player " .. playerName .. " not found in raid.")
+end	
 
 
 -- countdown function
@@ -457,7 +457,7 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 	--print(lootslot)
 	--print(IsAltKeyDown())
     -- Check if the player is in a raid and holding Alt
-	local test = false
+	local test = true
     if IsInRaid() or test then
         -- Get the item name based on the source (bag or loot window)
         local itemName

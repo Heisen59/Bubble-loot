@@ -120,7 +120,11 @@ BubbleLoot_G.configuration.texts = {
     PLAYERS_LIST = "Joueurs du roster",
     TOOLTIP_PLAYER_ROSTER = "clic droit sur un joueur pour faire apparaitre le menu",
     ITEM_VALUE = "Valeur d'item",
-
+    CONFIRM_DELETE_DB ="Voulez-vous effacer %s ?", -- "Are you sure you want to delete the %s data?",
+    CONFIRM = "Confirmer",
+    CANCEL = "Annuler",
+    SHOW_RAID_LOOT_PER_DATE = "Montrer loots de raids", --"Show raid loots per date"
+    SHOW_PLAYERS_LOOTS = "Montrer les loots du joueur",
     -- LABELS BELONGING TO `GROUPTYPE`S.
 
     NOGROUP_LABEL = "S",
@@ -279,6 +283,10 @@ BubbleLoot_G.configuration.tokens =
 {--SHIELD
 231995, --Scorie d’élémentium durcie
 231378,--Disque doré chatoyant
+},
+["INVTYPE_NECK"] = 
+{
+19003, -- Tête de Nefarian (neck, ring or offhand, all have the same slotmod value)
 },
 }
 

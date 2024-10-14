@@ -4,6 +4,14 @@
 
 local cfg = BubbleLoot_G.configuration
 
+local DroppedLoot = {
+
+    ---@type boolean
+    lootWindowIsOpened = false,
+
+    ---@type table
+    LootButtonItemLinkCache = {},
+};
 
 --[[
 
@@ -95,37 +103,109 @@ end
 
 
 -- Hook into loot window right-click event
-function HookLootItemRightClick()
+function BubbleLoot_G.eventFunctions.HookLootItemRightClick()
     -- This function will set up the hooks for the loot buttons
     local function SetLootButtonHooks()
-        for slot = 1, GetNumLootItems() do
-            local lootButton = _G["LootButton"..slot]
+        for buttonIndex = 1, LOOTFRAME_NUMBUTTONS do --GetNumLootItems()
+            local lootButton = getglobal("LootButton" .. buttonIndex);--_G["LootButton"..slot]
 
-            if lootButton then
+            if (lootButton
+            and lootButton:IsVisible()
+            and lootButton.slot)
+            then
                 -- Ensure we don't hook the same button multiple times
-                if not lootButton.hookAdded then
-                    lootButton.hookAdded = true -- Flag to avoid re-adding the hook
-
+                --if not lootButton.hookAdded then
+                    --lootButton.hookAdded = true -- Flag to avoid re-adding the hook
+                --print("hook added on slot "..lootButton.slot)       
                     -- Hook into the original OnClick script of each loot button
-                    lootButton:HookScript("OnClick", function(self, button)
-                        if button == "RightButton" and IsAltKeyDown() then
-                            -- Call the function to show the raid member menu
-                            BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, slot)
-                        end
-                    end)
-                end
+                lootButton:HookScript("OnClick", function(self, button)
+                                                    if button == "RightButton" and IsAltKeyDown() then
+                                                        -- Call the function to show the raid member menu
+                                                        BubbleLoot_G.gui.ShowItemRaidMemberMenu("loot", nil, nil, self.slot)
+                                                    end
+                                                end)
+                --end
             end
         end
     end
 
-    -- Set hooks when the loot window is shown
-    hooksecurefunc("LootFrame_Update", function()
-        SetLootButtonHooks()
-    end)
-
     -- Also set hooks initially when the loot frame is created
     SetLootButtonHooks()
 end
+
+local function lootChanged()
+
+    --print("loot changed function")
+    
+
+    if DroppedLoot.lootWindowIsOpened == false then
+        return false
+    end
+
+    local lootChanged = false;
+    for buttonIndex = 1, LOOTFRAME_NUMBUTTONS do
+        local buttonName = "LootButton" .. buttonIndex;
+        local Button = getglobal("LootButton" .. buttonIndex);
+        local itemLink = "";
+
+        if (Button
+            and Button:IsVisible()
+            and Button.slot
+        ) then
+            
+            itemLink = GetLootSlotLink(Button.slot);
+
+            if (itemLink == nil) then
+                itemLink = "";
+            end
+        end
+
+        if (DroppedLoot.LootButtonItemLinkCache[buttonName] ~= itemLink) then
+            --print(itemLink)
+            lootChanged = true;
+        end
+
+        DroppedLoot.LootButtonItemLinkCache[buttonName] = itemLink;
+    end
+
+    return lootChanged;
+end
+
+
+local function checkLootChange()
+
+   -- print("checkLootChange function")
+
+    if lootChanged() then
+        --print("loot HAS changed")
+        BubbleLoot_G.eventFunctions.lootWindowOpen()
+    else
+        if DroppedLoot.lootWindowIsOpened == true then
+            --print("recheck later ")
+            C_Timer.After(1, function() checkLootChange() end)
+        --else
+            --print("lootWindowIsOpened is closed")
+        end
+    end
+end
+
+function BubbleLoot_G.eventFunctions.lootWindowOpen()
+    --print("lootWindowOpen function")
+    DroppedLoot.lootWindowIsOpened = true;
+
+    --lootChanged()
+
+    C_Timer.After(1,function() checkLootChange() end)
+
+
+    BubbleLoot_G.eventFunctions.HookLootItemRightClick()
+
+    
+
+
+end
+
+
 
 
 -- ADDON_LOADED
@@ -141,7 +221,11 @@ function BubbleLoot_G.eventFunctions.OnLoad(self, event, addOnName)
 							HookBagItemRightClick()
 						end
 		) -- Set up the hook for bag items after login
-        LootFrame:HookScript("OnShow", HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
+
+
+        --LootFrame:HookScript("OnShow", BubbleLoot_G.eventFunctions.HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
+        LootFrame:HookScript("OnShow", BubbleLoot_G.eventFunctions.lootWindowOpen)
+        LootFrame:HookScript("OnHide", function ()   DroppedLoot.lootWindowIsOpened = false;  end)
 		
 		-- attendance frame
 		BubbleLoot_G.gui.createAttendanceFrame()
