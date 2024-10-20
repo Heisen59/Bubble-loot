@@ -82,6 +82,7 @@ BubbleLoot_G.configuration.constant =
 
 
 BubbleLoot_G.configuration.tau = 3
+BubbleLoot_G.configuration.seuilMultiplicatif = 5
 
 -- Cancel table
 BubbleLoot_G.configuration.cancelIndex = 
@@ -107,6 +108,7 @@ BubbleLoot_G.configuration.texts = {
     LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
     FORCE_ADD_STR ="force add:", 
     ADD_RAID_PARTICIPATIOn = "Ajoute une participation aux joueurs présents",--"Add a participation to all players in raid",
+    SYNC_WITH_ALL_RAIDERS = "Sync avec les membres du raid",
     SHOW_ROSTER_PANEL = "Liste des joueurs",--"Show the roster panel",
     REMOVE_PLAYER = "Retirer joueur",--"Remove player",
     ADD_A_BONUS = "Ajouter Bonus",--"Add a Bonus",
@@ -255,7 +257,7 @@ BubbleLoot_G.configuration.tokens =
 ["INVTYPE_FEET"] = 
 {--Boots
 227536,-- "Bottes incandescentes",
-227536,-- "Bottes incandescentes",
+227757,-- "Bottes en écailles en fusion",
 227765,-- "Bottes du noyau incendié"
 231713,--Draconian Boots
 231730, --Ancient Boots
@@ -272,8 +274,6 @@ BubbleLoot_G.configuration.tokens =
 231882,--Reçu de l’engin de suppression
 231452, --Sang du Porteur de Lumière
 229352,--Informations recueillies
-18564, -- liens du cherchevents
-18563, -- liens du cherchevents
 },
 ["INVTYPE_TRINKET"] = 
 {--Trinket
@@ -287,6 +287,11 @@ BubbleLoot_G.configuration.tokens =
 ["INVTYPE_NECK"] = 
 {
 19003, -- Tête de Nefarian (neck, ring or offhand, all have the same slotmod value)
+},
+["INVTYPE_SPECIFIC"] = 
+{
+    18564, -- liens du cherchevents
+    18563, -- liens du cherchevents
 },
 }
 

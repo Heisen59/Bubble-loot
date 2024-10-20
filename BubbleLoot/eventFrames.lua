@@ -164,6 +164,18 @@ function ShowMinimapContextMenu()
                 info.text = cfg.texts.ADD_RAID_PARTICIPATIOn
                 info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
                 UIDropDownMenu_AddButton(info, level)
+
+                -- sync data with all raiders
+                info = UIDropDownMenu_CreateInfo()
+                info.text = cfg.texts.SYNC_WITH_ALL_RAIDERS
+                info.func = function() 
+                    BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData)
+
+                    C_Timer.After(10,function() BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData) end)
+                    
+                 end
+                UIDropDownMenu_AddButton(info, level)
+                
             end
 
             -- Add Modify a player's data

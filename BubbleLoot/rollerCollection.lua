@@ -3,6 +3,7 @@
 
 local cfg = BubbleLoot_G.configuration
 local tau = BubbleLoot_G.configuration.tau
+local Seuil = BubbleLoot_G.configuration.seuilMultiplicatif
 
 -- Array of player rolls.
 ---@type Roller[]
@@ -27,6 +28,23 @@ end
 -- Redraw `needText` of all rollers and reorder (new roller or new roll).
 -- Redraw `scoreText` of all rollers and reorder (new roller or new roll).
 
+function BubbleLoot_G.rollerCollection.SortRollers(self, method)
+
+	if method == 1 then -- sort with player score
+		table.sort(self.values, function(lhs, rhs)
+			--return lhs.need < rhs.need
+			return lhs.score < rhs.score
+		end)
+	else -- sort with rand results
+		table.sort(self.values, function(lhs, rhs)
+			--return lhs.need < rhs.need
+			return lhs.roll < rhs.roll
+		end)	
+	end
+
+end
+
+
 function BubbleLoot_G.rollerCollection.Draw(self)
 
 	--print("rollerCollection.Draw")
@@ -46,17 +64,7 @@ function BubbleLoot_G.rollerCollection.Draw(self)
 	
 	
 	if not self.isSorted then
-		if threshold == 1 then
-			table.sort(self.values, function(lhs, rhs)
-				--return lhs.need < rhs.need
-				return lhs.score < rhs.score
-			end)
-		else
-			table.sort(self.values, function(lhs, rhs)
-				--return lhs.need < rhs.need
-				return lhs.roll < rhs.roll
-			end)
-		end
+		self:SortRollers(threshold)
         orderChanged = true
         self.isSorted = true
     end
@@ -156,17 +164,29 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 	
 	--print("LootChanceRoller")
 
-	-- first, compute brut chance
+	-- first, set the highest score, rollers must already be sorted
+	local HighestChance = 0
 	for _, roller in ipairs(self.values) do
 		--print(roller.name)
 		--print(roller.need)
 		--print(roller.score)
-		if(roller.need == 1) then
-			roller.chance =	tau^(-roller.score)	
-			chance_sum = chance_sum + roller.chance
+		if(roller.need == 1) then			
+			roller.chance =	tau^(-roller.score)
 		else
 			roller.chance = 0
 		end
+
+		if HighestChance < roller.chance then HighestChance = roller.chance end
+
+	end
+
+
+	-- then, compute cummulative chances
+	for _, roller in ipairs(self.values) do		
+
+		if roller.chance*Seuil < HighestChance then roller.chance = 0 end -- we remove the lowest chance.		
+		chance_sum = chance_sum + roller.chance
+
 	end
 	
 	if chance_sum == 0 then return end

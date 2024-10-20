@@ -116,6 +116,11 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
             ["INVTYPE_BAG"] = 0,
             ["INVTYPE_QUIVER"] = 0,
         }
+
+		local specificSlotMod = {
+			[18564] = 0.5, -- liens du cherchevents
+			[18563] = 0.5, -- liens du cherchevents
+		}
 		
 
 	 if itemEquipLoc and itemName then
@@ -125,7 +130,12 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 		else -- check if token
 			itemEquipLoc = BubbleLoot_G.calculation.SearchToken(itemId)
 			-- print(itemEquipLoc)
-			slotModValue = slotMod[itemEquipLoc]
+			if itemEquipLoc == "INVTYPE_SPECIFIC" then 
+				slotModValue = specificSlotMod[itemId]
+			else
+				slotModValue = slotMod[itemEquipLoc]
+			end
+			
 			if slotModValue then
 				return slotModValue
 			else
@@ -319,4 +329,26 @@ function BubbleLoot_G.calculation.ConvertToTimestamp(dateStr)
     end
 
     return nil  -- Return nil if the date format is invalid
+end
+
+
+
+-- function to calculate the average item score per raid and per players
+function BubbleLoot_G.calculation.getAverageLootScore()
+
+	local N_participation = 0
+	local TotalLootScore = 0
+
+	for _, playerData in pairs(PlayersData) do
+		N_participation = N_participation + playerData["participation"][1]
+		for _, itemData in pairs(playerData["items"]) do
+			for _, lootData in ipairs(itemData[cfg.LOOTDATA]) do
+				if lootData[2] == 1 then TotalLootScore = TotalLootScore +itemData[cfg.ITEM_SCORE] end
+			end
+		end
+	end
+
+	return TotalLootScore/N_participation
+
+
 end

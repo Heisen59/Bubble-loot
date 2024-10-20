@@ -168,7 +168,7 @@ end
 
 local function sendFunction()
 	
-    BubbleLoot_G:Draw()
+    print(BubbleLoot_G.calculation.getAverageLootScore())
 	
 end
 
