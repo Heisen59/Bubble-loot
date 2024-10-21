@@ -166,6 +166,12 @@ local function sendDataToRaid(DBname)
 	
 end
 
+local function cleanPlayerDataBase()
+
+    BubbleLoot_G.storage.CleanPlayersDataBase()
+
+end
+
 local function sendFunction()
 	
     print(BubbleLoot_G.calculation.getAverageLootScore())
@@ -204,6 +210,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		sendData(args)
     elseif command == "sendToRaid" then
 		sendDataToRaid(args)
+    elseif command == "clean" then
+		cleanPlayerDataBase()
     elseif command == "fun" then
 		sendFunction()
     else

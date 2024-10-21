@@ -283,10 +283,14 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 					print("AddPlayerData : try to remove a LootData, but can't find it")
 				end
 			end
+
+			-- check if we need to remove the item and not only the loot
 			
-			
-		
-		
+				
+				if PlayersData[playerName].items[itemId][cfg.LOOTDATA][1] == nil then
+					print("item "..PlayersData[playerName].items[itemId][cfg.ITEMLINK].." from player "..playerName.." is removed !")
+					PlayersData[playerName]["items"][itemId] = nil
+				end
 			
 		else
 			print("function AddPlayerData deleting: error")	
@@ -546,6 +550,24 @@ function BubbleLoot_G.storage.RemovePlayerGlobal(playerName)
 	PlayersData[playerName] = nil
 
 end
+
+
+
+function BubbleLoot_G.storage.CleanPlayersDataBase()
+
+for playerName, playerInfo in pairs(PlayersData) do
+	for itemId, itemInfo in pairs(playerInfo["items"]) do
+		if itemInfo[cfg.LOOTDATA][1] == nil then
+			print("item "..itemInfo[cfg.ITEMLINK].." from player "..playerName.." is removed !")
+			PlayersData[playerName]["items"][itemId] = nil
+		end
+	end
+end
+
+
+
+end
+
 
 
 

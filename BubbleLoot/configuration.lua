@@ -66,6 +66,9 @@ BubbleLoot_G.configuration.SYNC_MSG = {
 }
 
 
+
+-- player data index
+
 -- item data index
 BubbleLoot_G.configuration.ITEMLINK = 1
 BubbleLoot_G.configuration.LOOTDATA = 2
