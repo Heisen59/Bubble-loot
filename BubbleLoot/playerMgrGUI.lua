@@ -19,6 +19,7 @@ local function UpdatePlayerList()
     for playerName, playerData in pairs(PlayersData) do
         local row = playerRows[playerName]
         if row then
+            row.playerScoreLabel:SetText(round2(BubbleLoot_G.calculation.GetPlayerScore(playerName), 1))
             row.valueLabel1:SetText(playerData.participation[1])
             row.valueLabel2:SetText(playerData.participation[2])
             row.valueLabel3:SetText(playerData.participation[3])
@@ -123,7 +124,7 @@ end
 
 -- Create the main frame for the player list (initially hidden)
 local playerMgrFrame = CreateFrame("Frame", "PlayerListFrame", UIParent, "BasicFrameTemplateWithInset")
-playerMgrFrame:SetSize(400, 500)
+playerMgrFrame:SetSize(500, 500)
 playerMgrFrame:SetPoint("CENTER")
 playerMgrFrame:SetMovable(true)  -- Make the frame movable
 playerMgrFrame:EnableMouse(true) -- Enable mouse interaction for moving
@@ -148,8 +149,13 @@ local headerRow = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighligh
 headerRow:SetPoint("LEFT", headerFrame, "LEFT", 20, 0)
 headerRow:SetText("Player")
 
+local dataHeader0 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+dataHeader0:SetPoint("LEFT", headerRow, "RIGHT", 80, 0)
+dataHeader0:SetText("Score")
+dataHeader0:SetJustifyH("CENTER")
+
 local dataHeader1 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-dataHeader1:SetPoint("LEFT", headerRow, "RIGHT", 60, 0)
+dataHeader1:SetPoint("LEFT", dataHeader0, "RIGHT", 60, 0)
 dataHeader1:SetText("Attendance")
 dataHeader1:SetJustifyH("CENTER")
 
@@ -242,11 +248,22 @@ for _, playerName in pairs(SortPlayersData) do
         CreateDropdownMenu(playerName)
     end)
 
+    -- add player score
+    local playerScore =round2(BubbleLoot_G.calculation.GetPlayerScore(playerName), 1)
+    local playerScoreLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    playerScoreLabel:SetPoint("LEFT", playerNameLabel, "RIGHT", 20, 0 )
+    playerScoreLabel:SetText(playerScore)
+	playerScoreLabel:SetWidth(100)  -- Set a fixed width for alignment
+    playerScoreLabel:SetJustifyH("LEFT")  -- Align text to the left
+
+    playerRows[playerName] = playerRows[playerName] or {}
+    playerRows[playerName]["playerScoreLabel"] = playerScoreLabel
+
     -- Loop to create value labels and +/- buttons for each of the three numbers
     for i = 1, 3 do
         -- Value label
         local valueLabel = contentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        valueLabel:SetPoint("LEFT", playerNameLabel, "RIGHT", 30 + (i - 1) * 80, 5)
+        valueLabel:SetPoint("LEFT", playerScoreLabel, "RIGHT", 30 + (i - 1) * 80, 5)
         valueLabel:SetText(playerData.participation[i])
 		valueLabel:SetJustifyH("CENTER")
         playerRows[playerName] = playerRows[playerName] or {}

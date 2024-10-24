@@ -172,9 +172,17 @@ local function cleanPlayerDataBase()
 
 end
 
+
+local function statsFunction()
+	
+    print("Loot score per player and per raid : "..BubbleLoot_G.calculation.getAverageLootScorePerRaid())
+    print("Average loot score : "..BubbleLoot_G.calculation.getAverageLootScore())
+	
+end
+
 local function sendFunction()
 	
-    print(BubbleLoot_G.calculation.getAverageLootScore())
+    print("empty")
 	
 end
 
@@ -212,6 +220,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		sendDataToRaid(args)
     elseif command == "clean" then
 		cleanPlayerDataBase()
+    elseif command == "stats" then
+		statsFunction()
     elseif command == "fun" then
 		sendFunction()
     else

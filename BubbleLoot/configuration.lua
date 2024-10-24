@@ -78,7 +78,7 @@ BubbleLoot_G.configuration.ITEM_SCORE = 5
 
 BubbleLoot_G.configuration.constant = 
 {
-	ATTENDANCE_VALUE  		= 0.6,
+	ATTENDANCE_VALUE  		= 0.63,
 	BENCH_VALUE 			= 0.6,
 	NON_ATTENDANCE_VALUE  	= 1,
 }
@@ -290,6 +290,7 @@ BubbleLoot_G.configuration.tokens =
 ["INVTYPE_NECK"] = 
 {
 19003, -- Tête de Nefarian (neck, ring or offhand, all have the same slotmod value)
+18423, -- Tête d'Ony
 },
 ["INVTYPE_SPECIFIC"] = 
 {

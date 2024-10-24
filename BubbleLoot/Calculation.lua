@@ -135,7 +135,7 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 			else
 				slotModValue = slotMod[itemEquipLoc]
 			end
-			
+
 			if slotModValue then
 				return slotModValue
 			else
@@ -334,16 +334,22 @@ end
 
 
 -- function to calculate the average item score per raid and per players
-function BubbleLoot_G.calculation.getAverageLootScore()
+function BubbleLoot_G.calculation.getAverageLootScorePerRaid()
 
 	local N_participation = 0
 	local TotalLootScore = 0
 
-	for _, playerData in pairs(PlayersData) do
-		N_participation = N_participation + playerData["participation"][1]
-		for _, itemData in pairs(playerData["items"]) do
-			for _, lootData in ipairs(itemData[cfg.LOOTDATA]) do
-				if lootData[2] == 1 then TotalLootScore = TotalLootScore +itemData[cfg.ITEM_SCORE] end
+	for playerName, playerData in pairs(PlayersData) do
+		local playerParticipation = playerData["participation"][1]
+		if playerParticipation >0 then
+			N_participation = N_participation + playerData["participation"][1]
+			for itemId, itemData in pairs(playerData["items"]) do
+				for _, lootData in ipairs(itemData[cfg.LOOTDATA]) do
+					if lootData[2] == 1 then
+						local itemScore = BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)
+						TotalLootScore = TotalLootScore + itemScore 
+					end
+				end
 			end
 		end
 	end
@@ -352,3 +358,26 @@ function BubbleLoot_G.calculation.getAverageLootScore()
 
 
 end
+
+
+-- function to calculate the average item score per raid and per players
+	function BubbleLoot_G.calculation.getAverageLootScore()
+
+
+		local N_player = 0
+		local TotalScore = 0
+
+
+	
+		for playerName, playerData in pairs(PlayersData) do
+			local playerParticipation = playerData["participation"][1]
+			if playerParticipation >0 then
+				N_player = N_player + 1
+				TotalScore = TotalScore + BubbleLoot_G.calculation.GetPlayerScore(playerName)
+			end
+		end
+	
+		return TotalScore/N_player
+	
+	
+	end
