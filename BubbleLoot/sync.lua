@@ -117,7 +117,7 @@ function BubbleLoot_G.sync.BroadcastDataTable(msgType, tbl, targetPlayer)
         local chunkMessage = msgType .. "|" .. isLast .. "|" .. i .. "|" .. totalChunks .. "|" .. chunk
 
         if targetPlayer then
-            --print("Data send to "..targetPlayer)
+            --print("sending data #"..i.." to "..targetPlayer)
             C_ChatInfo.SendAddonMessage(prefix, chunkMessage, "WHISPER", targetPlayer)
         else
             C_Timer.After(1 + (i-1)*delay, function()
@@ -172,10 +172,11 @@ local function checkSender(sender, msgType, receivedTable)
     local playerName, playerRealm = UnitName("player")
     local senderPlayerName, senderPlayerRealm = string.match(sender, "([^%-]+)%-([^%-]+)")
 
-    if senderPlayerName == playerName then        
-        print("discard")
-        return
-    end
+    
+    --if senderPlayerName == playerName then        
+      --  print("discard")
+        --return
+    --end
   
     for _, tempTrustName in ipairs(tempSyncList[cfg.TRUST_LIST]) do
         if sender == tempTrustName then registerNewData(msgType, receivedTable) return end
@@ -189,7 +190,11 @@ local function checkSender(sender, msgType, receivedTable)
 
     
 --print("here")
-    if not BubbleLoot_G.IsGuildOfficer(sender) then return end
+    if not BubbleLoot_G.IsGuildOfficer(sender) then
+        --print("Reject data, not a guild officer")
+        return
+
+    end
     --print("Debug : Secured transfer from guildOfficer desactivated, players still have to get permission to write")
 --print("and here")
     
@@ -247,6 +252,8 @@ end
 
 -- Function to reassemble chunks
 local function ReassembleChunks(sender, msgType, totalChunks)
+    --print("Now reassembling the chunks")
+
     if #receivedChunks[sender] == totalChunks then
         local completeMessage = table.concat(receivedChunks[sender])
         receivedChunks[sender] = nil
@@ -276,7 +283,7 @@ local function HandleChunkedMessage(sender, msgType, isLast, chunkIndex, totalCh
 
     receivedChunks[sender][tonumber(chunkIndex)] = chunkData
 
-    if isLast == "1" then
+    if isLast == "1" then        
         ReassembleChunks(sender, msgType, totalChunks)
     end
 end

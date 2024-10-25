@@ -147,7 +147,8 @@ end
 local function sendData(playerName)
 	
 	--Broadcast everything
-	BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData, playerName)
+	--BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData, playerName)
+    --print("sending data to "..playerName)
 	BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData, playerName)
 	
 end

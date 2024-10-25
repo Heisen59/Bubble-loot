@@ -61,22 +61,32 @@ end
 
 -- Helping function to check if a player is a guild officer
 
-	function BubbleLoot_G.IsGuildOfficer(playerName)
-		GuildRoster()
-		--print(playerName)
-		for i = 1, GetNumGuildMembers() do
-			local name, rank, rankIndex = GetGuildRosterInfo(i)
-			GuildPlayerName, _ = string.match(name, "([^%-]+)%-([^%-]+)")
-			if rankIndex < 6 then
-				--print(GuildPlayerName)
-				--print(rankIndex)
-				if GuildPlayerName and string.lower(GuildPlayerName) == string.lower(playerName) then					
-					return true
-				end
+function BubbleLoot_G.GuildRoster()
+	if _G.GuildRoster then
+		return _G.GuildRoster()
+	else
+		return C_GuildInfo.GuildRoster()
+	end
+	end
+
+function BubbleLoot_G.IsGuildOfficer(playerName)
+	BubbleLoot_G.GuildRoster()
+	--print(playerName)
+	for i = 1, GetNumGuildMembers() do
+		local name, rank, rankIndex = GetGuildRosterInfo(i)
+		--print(name)
+		GuildPlayerName, _ = string.match(name, "([^%-]+)%-([^%-]+)")
+		if rankIndex < 6 then
+			print(GuildPlayerName)
+			print(rankIndex)
+			if GuildPlayerName and (string.lower(GuildPlayerName) == string.lower(playerName) or string.lower(name)== string.lower(playerName)) then					
+				return true
 			end
 		end
-		return false
 	end
+	return false
+end
+
 
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
