@@ -58,11 +58,15 @@ BubbleLoot_G.configuration.RAID_HISTORIC = 2
 BubbleLoot_G.configuration.TRUST_LIST = 1
 BubbleLoot_G.configuration.BLACK_LIST = 2
 BubbleLoot_G.configuration.SYNC_MSG = {
+    RAID_DATA = "RaidData",
+    PLAYERS_DATA = "PlayersData",
+    RAID_AND_PLAYERS_DATA = "RaidPlayersData",
     ADD_PLAYER_DATA_FUNCTION = "AddPlayerDataFunction",
     ADD_RAID_PARTICIPATIOn = "AddRaidParticipationFunction",
     DEMOTE_PLAYER_NEED = "DemoteNeedPlayerFunction",
     MODIFY_ITEM_NEED_IN_DATABASE = "LootNeedToogleFunction",
     MODIFY_BONUS_DATA = "writeOrEditBonusFunction",
+    ASK_SYNC_TO_ML = "AskSyncToML",
 }
 
 
@@ -111,7 +115,8 @@ BubbleLoot_G.configuration.texts = {
     LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
     FORCE_ADD_STR ="force add:", 
     ADD_RAID_PARTICIPATIOn = "Ajoute une participation aux joueurs présents",--"Add a participation to all players in raid",
-    SYNC_WITH_ALL_RAIDERS = "Sync avec les membres du raid",
+    SYNC_WITH_ALL_RAIDERS = "Envoyer sync avec les membres du raid",
+    ASK_SYNC_WITH_ML = "Demander une synchronisation des données avec le ML",
     SHOW_ROSTER_PANEL = "Liste des joueurs",--"Show the roster panel",
     REMOVE_PLAYER = "Retirer joueur",--"Remove player",
     ADD_A_BONUS = "Ajouter Bonus",--"Add a Bonus",

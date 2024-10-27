@@ -67,7 +67,7 @@ function BubbleLoot_G.GuildRoster()
 	else
 		return C_GuildInfo.GuildRoster()
 	end
-	end
+end
 
 function BubbleLoot_G.IsGuildOfficer(playerName)
 	BubbleLoot_G.GuildRoster()
@@ -77,8 +77,8 @@ function BubbleLoot_G.IsGuildOfficer(playerName)
 		--print(name)
 		GuildPlayerName, _ = string.match(name, "([^%-]+)%-([^%-]+)")
 		if rankIndex < 6 then
-			print(GuildPlayerName)
-			print(rankIndex)
+			--print(GuildPlayerName)
+			--print(rankIndex)
 			if GuildPlayerName and (string.lower(GuildPlayerName) == string.lower(playerName) or string.lower(name)== string.lower(playerName)) then					
 				return true
 			end

@@ -145,24 +145,30 @@ local function getPlayerScore(playerName)
 end
 
 local function sendData(playerName)
-	
-	--Broadcast everything
-	--BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData, playerName)
-    --print("sending data to "..playerName)
-	BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData, playerName)
+
+    BubbleLoot_G.sync.PlayersAndRaidBroadcastData(playerName)
 	
 end
+
+local function askForSync(playerName)
+
+    print("Ask for sync")
+    print(playerName)
+    BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ASK_SYNC_TO_ML, 0, playerName)
+
+end
+
 
 
 local function sendDataToRaid(DBname)
 	
 	--Broadcast everything
-    if DBname == "RaidData" then
-        BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData)
+    if DBname == cfg.SYNC_MSG.RAID_DATA then
+        BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_DATA, RaidData)
     end
 
-    if DBname == "PlayersData" then
-        BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData)
+    if DBname == cfg.SYNC_MSG.PLAYERS_DATA then
+        BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.PLAYERS_DATA, PlayersData)
     end
 	
 end
@@ -186,6 +192,8 @@ local function sendFunction()
     print("empty")
 	
 end
+
+
 
 -- Slash commands.
 SLASH_BUBBLELOOT1 = '/bubbleloot'
@@ -225,6 +233,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		statsFunction()
     elseif command == "fun" then
 		sendFunction()
+    elseif command == "askForSync" then
+        askForSync(args)
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

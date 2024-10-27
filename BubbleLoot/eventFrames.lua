@@ -163,20 +163,9 @@ function ShowMinimapContextMenu()
                 info = UIDropDownMenu_CreateInfo()
                 info.text = cfg.texts.ADD_RAID_PARTICIPATIOn
                 info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
-                UIDropDownMenu_AddButton(info, level)
-
-                -- sync data with all raiders
-                info = UIDropDownMenu_CreateInfo()
-                info.text = cfg.texts.SYNC_WITH_ALL_RAIDERS
-                info.func = function() 
-                    BubbleLoot_G.sync.BroadcastDataTable("RaidData", RaidData)
-
-                    C_Timer.After(10,function() BubbleLoot_G.sync.BroadcastDataTable("PlayersData", PlayersData) end)
-                    
-                 end
-                UIDropDownMenu_AddButton(info, level)
-                
+                UIDropDownMenu_AddButton(info, level)                
             end
+
 
             -- Add Modify a player's data
 			info = UIDropDownMenu_CreateInfo()
@@ -202,6 +191,14 @@ function ShowMinimapContextMenu()
 				end
             UIDropDownMenu_AddButton(info, level)
 
+            
+            -- Add sync menu
+            info = UIDropDownMenu_CreateInfo()
+            info.text = "sync menu"
+            info.hasArrow = true -- This tells the menu item to create a submenu
+            info.notCheckable = true
+            info.menuList = "SYNC_SUBMENU" -- Assigns a name to the submenu
+            UIDropDownMenu_AddButton(info, level)
 
             -- Add reset menu
             info = UIDropDownMenu_CreateInfo()
@@ -258,9 +255,37 @@ function ShowMinimapContextMenu()
                     end
                 UIDropDownMenu_AddButton(info, level)
 
+            elseif menuList == "SYNC_SUBMENU" then  
 
-            end
-			
+                if BubbleLoot_G.IsOfficier then
+                    -- sync data with all raiders
+                    info = UIDropDownMenu_CreateInfo()
+                    info.text = cfg.texts.SYNC_WITH_ALL_RAIDERS
+                    info.func = function() 
+                                    BubbleLoot_G.sync.PlayersAndRaidBroadcastData()
+                        
+                                end
+                    UIDropDownMenu_AddButton(info, level)
+                end
+
+                -- ask for a sync with the raid ML
+                info = UIDropDownMenu_CreateInfo()
+                info.text = cfg.texts.ASK_SYNC_WITH_ML
+                info.func = function() 
+                                if IsInRaid() then
+                                    local lootMethod, _, masterLooterPartyID = GetLootMethod()
+                                    if lootMethod == "master" then
+                                        local masterLooterName = GetRaidRosterInfo(masterLooterPartyID + 1)
+                                        BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ASK_SYNC_TO_ML, 0, masterLooterName)                    
+                                    else
+                                        print("Pas de Master Looter")
+                                    end
+                                else
+                                    print("Vous n'êtes pas en raid !")
+                                end
+                            end
+                UIDropDownMenu_AddButton(info, level)
+            end			
         end
     end)
 

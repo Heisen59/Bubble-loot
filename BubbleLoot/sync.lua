@@ -137,12 +137,16 @@ end
 
 -- Function to handle new data after verification
 local function registerNewData(msgType, receivedTable)
-    if msgType == "RaidData" then
+    if msgType == cfg.SYNC_MSG.RAID_DATA then
         RaidData = receivedTable
         print("Updated RaidData info table")
-    elseif msgType == "PlayersData" then
+    elseif msgType == cfg.SYNC_MSG.PLAYERS_DATA then
         PlayersData = receivedTable
         print("Updated PlayersData table")
+    elseif msgType == cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA then
+        RaidData = receivedTable[1]
+        PlayersData = receivedTable[2]
+        print("Updated RaidData and PlayersData table")
     elseif msgType == cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION then
         print("Update PlayersData with a new loot")
         local playerName, itemLink, LootAttribType, DateRemoveItem, exchange, DBTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
@@ -158,7 +162,7 @@ local function registerNewData(msgType, receivedTable)
         BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, forcedTimeStamp)
     elseif msgType == cfg.SYNC_MSG.MODIFY_BONUS_DATA then        
         local playerName, bonusText, score, date, remove, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
-        BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, forcedTimeStamp)
+        BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, forcedTimeStamp)    
     else
         print("Unknown data type: " .. msgType)
     end
@@ -167,6 +171,14 @@ end
 
 -- Function to check sender and display sync trust dialog
 local function checkSender(sender, msgType, receivedTable)
+
+
+    --exception, we don't check these msgType 
+    if msgType == cfg.SYNC_MSG.ASK_SYNC_TO_ML then
+        print("Player "..sender.." is asking for raid data !")
+        BubbleLoot_G.sync.PlayersAndRaidBroadcastData(sender)
+        return
+    end
 
     -- this data comes from me, discard it
     local playerName, playerRealm = UnitName("player")
@@ -289,6 +301,19 @@ local function HandleChunkedMessage(sender, msgType, isLast, chunkIndex, totalCh
 end
 
 
+
+-- Function to sync playersData AND raidData
+function BubbleLoot_G.sync.PlayersAndRaidBroadcastData(playerName)
+
+    local playersRaidData = {RaidData, PlayersData}
+    if playerName then
+        BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA , playersRaidData, playerName)
+    else
+        BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA , playersRaidData)
+    end
+    
+
+end
 
 
 -- Event handler for receiving addon messages
