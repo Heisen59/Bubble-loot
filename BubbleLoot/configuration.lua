@@ -82,14 +82,15 @@ BubbleLoot_G.configuration.ITEM_SCORE = 5
 
 BubbleLoot_G.configuration.constant = 
 {
-	ATTENDANCE_VALUE  		= 0.63,
+	ATTENDANCE_VALUE  		= 0.60,
 	BENCH_VALUE 			= 0.6,
 	NON_ATTENDANCE_VALUE  	= 1,
 }
 
+--print("ATTENDANCE_VALUE set")
 
 BubbleLoot_G.configuration.tau = 3
-BubbleLoot_G.configuration.seuilMultiplicatif = 5
+BubbleLoot_G.configuration.seuilMultiplicatif = 4
 
 -- Cancel table
 BubbleLoot_G.configuration.cancelIndex = 

@@ -427,10 +427,9 @@ local MainAttributionFunction = function(itemLink, itemName, playerName, source,
 		BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType)
 		if UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
 			-- Send the message to the RAID_WARNING channel
-			SendChatMessage(playerName.." has win "..itemName, "RAID_WARNING")
+			SendChatMessage(playerName.." a gagné "..itemName, "RAID_WARNING")
 		else 
-			SendChatMessage(playerName.." has win "..itemName, "RAID")
-			-- print(playerName.." has win "..itemName)
+			SendChatMessage(playerName.." a gagné "..itemName, "RAID")
 			-- print("You must be a raid leader or assistant to send a raid warning.")
 		end
 		if source == "loot" and lootSlot then

@@ -69,6 +69,8 @@ function BubbleLoot_G.GuildRoster()
 	end
 end
 
+BubbleLoot_G.GuildRoster()
+
 function BubbleLoot_G.IsGuildOfficer(playerName)
 	BubbleLoot_G.GuildRoster()
 	--print(playerName)
@@ -88,17 +90,32 @@ function BubbleLoot_G.IsGuildOfficer(playerName)
 end
 
 
+
 -- Include in the minimap compartement. Needs to be global.
 function BubbleLoot_OnAddonCompartmentClick()
     BubbleLoot_G.gui:SetVisibility(not BubbleLootData["SHOWN"])
 end
 
+function BubbleLoot_G.updateAverageLootScore()
+	local averageLootScore = BubbleLoot_G.calculation.getAverageLootScorePerRaid()
+
+	BubbleLoot_G.configuration.constant[1] = averageLootScore
+	BubbleLoot_G.configuration.constant[2] = averageLootScore
+
+	--print("New average score set")
+
+end
+
 -- Initialize self, plugins, saved variables
 function BubbleLoot_G.Initialize(self)
-		-- Set isOfficer
-		local OwnerName, _ = UnitName("player")	
-		--BubbleLoot_G.IsGuildOfficer(OwnerName)
-		BubbleLoot_G.IsOfficier = BubbleLoot_G.IsGuildOfficer(OwnerName) -- BubbleLoot_G.IsGuildOfficer(OwnerName)
+	-- set average score
+	
+	BubbleLoot_G.updateAverageLootScore()
+
+	-- Set isOfficer
+	local OwnerName, _ = UnitName("player")	
+	--BubbleLoot_G.IsGuildOfficer(OwnerName)
+	BubbleLoot_G.IsOfficier = BubbleLoot_G.IsGuildOfficer(OwnerName) -- BubbleLoot_G.IsGuildOfficer(OwnerName)
 
 
     local relativePoint = self.gui:Initialize()
@@ -260,6 +277,12 @@ Getter and setter
 
 function BubbleLoot_G.getNumberOfRaid()
 	return RaidData[cfg.NUMBER_OF_RAID_DONE]
+end
+
+function BubbleLoot_G.GetLastRaidDate()
+
+	return RaidData[cfg.RAID_HISTORIC][1][1]
+
 end
 
 

@@ -212,23 +212,32 @@ end
 function BubbleLoot_G.eventFunctions.OnLoad(self, event, addOnName)
     if addOnName == cfg.ADDON_NAME then
 		--bprint("I'm in SetScript ADDON_LOADED")
-        BubbleLoot_G:Initialize()
+
+        C_Timer.After(1,function()
+            --print("Bubble loot : delayed function")
+                BubbleLoot_G:Initialize()
+        end
+        )
+
+        
 		
 		--print("BubbleLoot_G.eventFunctions.OnLoad")
 		-- items Hooks
-		C_Timer.After(3,function()
+		C_Timer.After(2,function()
 							--print("Bubble loot : delayed function")
 							HookBagItemRightClick()
 						end
 		) -- Set up the hook for bag items after login
 
-
+        C_Timer.After(3,function()
         --LootFrame:HookScript("OnShow", BubbleLoot_G.eventFunctions.HookLootItemRightClick) -- Set up the hook for loot items when the loot window appears
         LootFrame:HookScript("OnShow", BubbleLoot_G.eventFunctions.lootWindowOpen)
         LootFrame:HookScript("OnHide", function ()   DroppedLoot.lootWindowIsOpened = false;  end)
 		
 		-- attendance frame
 		BubbleLoot_G.gui.createAttendanceFrame()
+        end
+        )
     end
 end
 

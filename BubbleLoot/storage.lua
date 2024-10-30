@@ -319,6 +319,8 @@ function BubbleLoot_G.storage.AddPlayerData(playerName, itemLink, LootAttribType
 			 return
 		end
 
+	BubbleLoot_G.updateAverageLootScore()
+
 end
 
 
@@ -367,6 +369,14 @@ end
 
 --Add all raiders a participation
 function BubbleLoot_G.storage.AddRaidParticipation(isFromBroadCast)
+	-- check if last raid added is less than 24h
+
+	local lastRaidDate = BubbleLoot_G.GetLastRaidDate()
+	if BubbleLoot_G.calculation.GetDurationInHoursFromCurrentTime(lastRaidDate) < 12 then
+		print("la participation a déjà été ajouté aujourd'hui !")		
+		return
+	end
+
 	-- Increase the raid counter
 	if(IsInRaid() or true) then
 		BubbleLoot_G.increaseNumberOfRaid()
@@ -399,6 +409,8 @@ function BubbleLoot_G.storage.AddRaidParticipation(isFromBroadCast)
 		print("Boadcast Add raid participation")
 		BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.ADD_RAID_PARTICIPATIOn, 0)
 	end
+
+	BubbleLoot_G.updateAverageLootScore()
 
 end
 
