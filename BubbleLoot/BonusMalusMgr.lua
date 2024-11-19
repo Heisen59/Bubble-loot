@@ -38,8 +38,10 @@ end
 local function UpdateBonusPanel()
         
     -- Clear existing lines
-    for _, child in ipairs({BonusAddon.scrollChild:GetChildren()}) do
-        child:Hide()
+    if BonusAddon.scrollChild then 
+        for _, child in ipairs({BonusAddon.scrollChild:GetChildren()}) do
+            child:Hide()
+        end
     end
     
     -- Create rows for each entry in bonusData
@@ -237,7 +239,71 @@ function BonusAddon:OpenAddBonusPanel(editIndex)
 end
 
 
+-- Function to create the "Add/Edit Bonus" panel
+function BubbleLoot_G.storage.OpenAddBonusPanelForRaid()    
+    -- Create the frame if it doesn't exist yet
+    
+    local addBonusPanel = CreateFrame("Frame", "AddBonusPanel", UIParent, "BasicFrameTemplateWithInset")
+    addBonusPanel:SetSize(300, 200)
+    addBonusPanel:SetPoint("CENTER")
+    addBonusPanel:SetFrameLevel(30)
+    addBonusPanel:SetMovable(true)
+    addBonusPanel:EnableMouse(true)
+    addBonusPanel:RegisterForDrag("LeftButton")
+    addBonusPanel:SetScript("OnDragStart", function(self) self:StartMoving() end)
+    addBonusPanel:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    addBonusPanel.title = addBonusPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+    addBonusPanel.title:SetPoint("CENTER", addBonusPanel.TitleBg, "CENTER", 0, 0)
+    addBonusPanel.title:SetText("Add/Edit Bonus pour le raid")
+
+    -- Input field for bonus text
+    local bonusInput = CreateFrame("EditBox", nil, addBonusPanel, "InputBoxTemplate")
+    bonusInput:SetSize(200, 30)
+    bonusInput:SetPoint("TOP", 0, -40)
+    bonusInput:SetAutoFocus(false)
+
+    -- Input field for score
+    local scoreInput = CreateFrame("EditBox", nil, addBonusPanel, "InputBoxTemplate")
+    scoreInput:SetSize(200, 30)
+    scoreInput:SetPoint("TOP", bonusInput, "BOTTOM", 0, -20)
+    scoreInput:SetAutoFocus(false)
+
+    -- Save Button
+    local saveButton = CreateFrame("Button", nil, addBonusPanel, "UIPanelButtonTemplate")
+    saveButton:SetSize(80, 30)
+    saveButton:SetText("Save")
+    saveButton:SetPoint("BOTTOM", 0, 20)
+    saveButton:SetScript("OnClick", function()
+        local bonusText = bonusInput:GetText()
+        local score = tonumber(scoreInput:GetText())
+        local date = date("%d-%m-%Y à %H:%M:%S")
+
+
+
+        if bonusText and score then
+            -- INSERT BONUS DATA TO ALL RAID PLAYER
+
+            -- Sync it with other players
+            local currentplayerDBTimeStamp = BubbleLoot_G.storage.writeLastPlayerDataBaseTimeStampGlobal()
+            local localBonusTbl = {"", bonusText, score, date, false, currentplayerDBTimeStamp}
+            BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.CODE_RAID_BONUS, localBonusTbl)
+            
+            addBonusPanel:Hide()
+        else
+            print("Invalid input, please enter a valid bonus and score.")
+        end
+    end)
+
+    addBonusPanel = addBonusPanel
+    addBonusPanel.bonusInput = bonusInput
+    addBonusPanel.scoreInput = scoreInput
+
+end
+
+
 function BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, currentplayerDBTimeStamp)
+    
+    BubbleLoot_G.storage.CreateNewPlayerEntry(playerName)
     local bonusDataTable = PlayersData[playerName].BonusMalus or {}
 
     for i, bonus in ipairs(bonusDataTable) do 

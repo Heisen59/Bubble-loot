@@ -108,6 +108,10 @@ local function CreateNewPlayerEntry(playerName)
     end	
 end
 
+function BubbleLoot_G.storage.CreateNewPlayerEntry(playerName)
+	CreateNewPlayerEntry(playerName)
+end
+
 
 -- Get Number of items looted as MS or OS
 function BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, LootAttribType)
@@ -579,6 +583,7 @@ end
 
 
 end
+
 
 
 

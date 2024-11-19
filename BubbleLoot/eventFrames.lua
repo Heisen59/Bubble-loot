@@ -140,6 +140,8 @@ StaticPopupDialogs["CONFIRM_DELETE_DATABASE"] = {
 }
 
 
+
+
 -- Function to display the context menu for the minimap button
 function ShowMinimapContextMenu()
     -- Create a dropdown menu frame
@@ -163,7 +165,14 @@ function ShowMinimapContextMenu()
                 info = UIDropDownMenu_CreateInfo()
                 info.text = cfg.texts.ADD_RAID_PARTICIPATIOn
                 info.func = function() BubbleLoot_G.storage.AddRaidParticipation() end
-                UIDropDownMenu_AddButton(info, level)                
+                UIDropDownMenu_AddButton(info, level)       
+                
+                -- Raid Bonus Menu
+                info = UIDropDownMenu_CreateInfo()
+                info.text = cfg.texts.ADD_BONUS_RAID_PARTICIPATIOn
+                info.func = function() BubbleLoot_G.storage.OpenAddBonusPanelForRaid() end
+                UIDropDownMenu_AddButton(info, level)    
+
             end
 
 

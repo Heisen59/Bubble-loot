@@ -268,21 +268,21 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
         BubbleLoot_G.rollerCollection:Save(name, 9)
         BubbleLoot_G:Draw()
     end
-	if text:lower() == "+1" then
+	if text:lower() == "+1" or string.find(text:lower(), "%+1") ~= nil then
         --print("+1 found")
 		-- Perform some action, e.g., print a message to the player
         --print(playerName .. " has typed +1 in the chat!")
 		BubbleLoot_G.rollerCollection:Save(name, 1)
         BubbleLoot_G:Draw()
     end
-	if text:lower() == "+2" then
+	if text:lower() == "+2" or string.find(text:lower(), "%+2") ~= nil then
         --print("point 4")
 		-- Perform some action, e.g., print a message to the player
         --print(playerName .. " has typed +2 in the chat!")
 		BubbleLoot_G.rollerCollection:Save(name, 2)
         BubbleLoot_G:Draw()
     end
-	if text:lower() == "+3" then
+	if text:lower() == "+3" or string.find(text:lower(), "%+3") ~= nil then
 		BubbleLoot_G.rollerCollection:Save(name, 3)
 		BubbleLoot_G:Draw()
     end

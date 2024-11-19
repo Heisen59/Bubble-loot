@@ -163,6 +163,17 @@ local function registerNewData(msgType, receivedTable)
     elseif msgType == cfg.SYNC_MSG.MODIFY_BONUS_DATA then        
         local playerName, bonusText, score, date, remove, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
         BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, forcedTimeStamp)    
+    elseif msgType == cfg.SYNC_MSG.CODE_RAID_BONUS then        
+        local playerName, bonusText, score, date, remove, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
+        if(IsInRaid() or true) then
+            -- Loop through all raid members
+            local N = GetNumGroupMembers()
+            for i = 1, N do
+                local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+                print("Add bonus to player "..name)
+                BubbleLoot_G.storage.writeOrEditBonus(name, bonusText, score, date, remove, forcedTimeStamp)  
+            end
+        end
     else
         print("Unknown data type: " .. msgType)
     end
@@ -307,6 +318,7 @@ function BubbleLoot_G.sync.PlayersAndRaidBroadcastData(playerName)
 
     local playersRaidData = {RaidData, PlayersData}
     if playerName then
+        print("send data to"..playerName)
         BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA , playersRaidData, playerName)
     else
         BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA , playersRaidData)

@@ -67,6 +67,7 @@ BubbleLoot_G.configuration.SYNC_MSG = {
     MODIFY_ITEM_NEED_IN_DATABASE = "LootNeedToogleFunction",
     MODIFY_BONUS_DATA = "writeOrEditBonusFunction",
     ASK_SYNC_TO_ML = "AskSyncToML",
+    CODE_RAID_BONUS = "CurrentRaid_00",
 }
 
 
@@ -116,6 +117,7 @@ BubbleLoot_G.configuration.texts = {
     LOOT_SEND_BIS_PATERN ="Choisissez %+1/%+2/pass pour",
     FORCE_ADD_STR ="force add:", 
     ADD_RAID_PARTICIPATIOn = "Ajoute une participation aux joueurs présents",--"Add a participation to all players in raid",
+    ADD_BONUS_RAID_PARTICIPATIOn = "Ajoute un bonus aux joueurs présents",--"Add a participation to all players in raid",
     SYNC_WITH_ALL_RAIDERS = "Envoyer sync avec les membres du raid",
     ASK_SYNC_WITH_ML = "Demander une synchronisation des données avec le ML",
     SHOW_ROSTER_PANEL = "Liste des joueurs",--"Show the roster panel",
