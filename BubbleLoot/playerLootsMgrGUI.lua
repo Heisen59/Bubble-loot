@@ -40,6 +40,16 @@ local function OnClickRemove(self, arg1, arg2)
 end
 
 -- Function to handle dropdown selection for Loots
+local function OnClickAddItemToNewRaidList(self, arg1, arg2)
+    --print(arg2 .. ": removed")
+	local playerName = arg1
+	local itemLink = arg2
+	BubbleLoot_G.storage.AddItemToNewRaidList(itemLink)
+	--UpdateLootsList(arg1)	
+	BubbleLoot_G.gui.createLootsMgrFrame(playerName)
+end
+
+-- Function to handle dropdown selection for Loots
 local function OnClickChangeNeed(self, arg1, arg2)
     --print(arg2 .. ": removed")
 	local playerName = arg1
@@ -84,13 +94,25 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
         				} }
 
 
+
+
+
 	if BubbleLoot_G.IsOfficier then
+
+		table.insert(menuItems,{
+			text = cfg.texts.LOOT_MOD_NEW_RAID,
+			func = OnClickAddItemToNewRaidList,
+			arg1 = playerName, 
+			arg2 = itemLink,
+		})
+
+
 		table.insert(menuItems,{
 				text = cfg.texts.LOOT_REMOVE,
 				func = OnClickRemove,
 				arg1 = playerName, 
 				arg2 = {itemLink, lootDropDate},
-			})
+			})	
 
 		
 		table.insert(menuItems,{
@@ -114,7 +136,7 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 	local allPlayersListFromDB = BubbleLoot_G.storage.getAllPlayersFromDB()
 	
 	for _, RecevingPlayer in ipairs(allPlayersListFromDB) do
-		table.insert(menuItems[4].menuList, {
+		table.insert(menuItems[5].menuList, {
 			text = RecevingPlayer,
 			func = function() 
 					
@@ -146,6 +168,9 @@ local LastPlayerLootTypeFilterUsed = {}
 
 -- Create the list of players
 function BubbleLoot_G.gui.createLootsMgrFrame(playerName, refresh)
+
+
+
 
 
 LastPlayerLootTypeFilterUsed[playerName] = LastPlayerLootTypeFilterUsed[playerName] or 1
@@ -237,11 +262,11 @@ end
 	dataHeader2:SetSize(120, 30)
 	
 	local dataHeader3 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", -75, -35)
+    dataHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", -100, -35)
     dataHeader3:SetText("Date")
 	
 	local dataHeader4 = CreateFrame("Button", "ToggleMSOSButton", headerFrame, "UIPanelButtonTemplate") --headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    dataHeader4:SetPoint("LEFT", dataHeader3, "RIGHT", 150, 0)
+    dataHeader4:SetPoint("LEFT", dataHeader3, "RIGHT", 140, 0)
 	dataHeader4:SetSize(60, 30)
     dataHeader4:SetText("MS/OS")
 	-- Set mouse click handler for the item label
@@ -270,7 +295,7 @@ end
 		local CancelButtonHeader3 = CreateFrame("Button", "CancelButton", headerFrame, "UIPanelButtonTemplate")
 		CancelButtonHeader3:SetSize(200, 30)
 		CancelButtonHeader3:SetPoint("LEFT", dataHeader2, "RIGHT", 30, 0)
-		CancelButtonHeader3:SetText("Cancel last deleted item")
+		CancelButtonHeader3:SetText(LastDeletedItemLink) --("Cancel last deleted item")
 		CancelButtonHeader3:EnableMouse(true)
 		CancelButtonHeader3:Show()
 		CancelButtonHeader3:SetScript("OnClick", function(self)
@@ -278,10 +303,19 @@ end
 													BubbleLoot_G.gui.createLootsMgrFrame(playerName)
 												end)
 		
-		local CancelItemLinkHeader4 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-		CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 20, 0)
-		CancelItemLinkHeader4:SetText(LastDeletedItemLink)
-		CancelItemLinkHeader4:Show()
+		CancelButtonHeader3:SetScript("OnEnter", function(self)
+											GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+											GameTooltip:SetText("Cancel Last Deleted Item")
+											GameTooltip:Show()
+										end)
+		CancelButtonHeader3:SetScript("OnLeave", function(self)
+											GameTooltip:Hide()
+										end)										
+
+		--local CancelItemLinkHeader4 = headerFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		--CancelItemLinkHeader4:SetPoint("LEFT", CancelButtonHeader3, "RIGHT", 20, 0)
+		--CancelItemLinkHeader4:SetText(LastDeletedItemLink)
+		--CancelItemLinkHeader4:Show()
 	
 	end
 	
@@ -297,8 +331,20 @@ end
     scrollFrame:SetScrollChild(contentFrame)
 
     -- Create item rows
+	-- sort item by date
+	-- Sort the raids by date
+-- Extract key-value pairs
+	local sortedItems = {}
+	for key, value in pairs(PlayersData[playerName].items) do
+		table.insert(sortedItems, {key = key, value = value})
+	end
+
+   	table.sort(sortedItems, function(a,b) return BubbleLoot_G.calculation.ConvertToTimestamp(a.value[cfg.LOOTDATA][1][1])> BubbleLoot_G.calculation.ConvertToTimestamp(b.value[cfg.LOOTDATA][1][1]) end)
+
     local rowIndex = 0
-    for lootId, itemData in pairs(PlayersData[playerName].items) do
+    for _, keyValue in pairs(sortedItems) do
+		local lootId = keyValue.key
+		local itemData = keyValue.value
         local itemLink = itemData[cfg.ITEMLINK]
 		local itemName = itemLink:match("%[(.+)%]")
 		itemName = "["..itemName.."]"
@@ -323,7 +369,8 @@ end
 				
 				local MSOS = ""
 				if lootData[2] == 1 then MSOS = "+1" else MSOS = "+2" end
-				local itemScore = BubbleLoot_G.storage.getItemScoreFromDB(playerName, lootId)
+				local multiplier = BubbleLoot_G.calculation.GetItemMultiplier(lootId)
+				local itemScore = multiplier*BubbleLoot_G.storage.getItemScoreFromDB(playerName, lootId)
 
 
 				rowIndex = rowIndex + 1
@@ -398,7 +445,7 @@ end
 
 
 function BubbleLoot_G.gui.OpenPlayerLootWindow(playerName)
-
+	
 	BubbleLoot_G.gui.createLootsMgrFrame(playerName, 0, 0)
 	
 

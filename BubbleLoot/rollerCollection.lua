@@ -170,8 +170,10 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 		--print(roller.name)
 		--print(roller.need)
 		--print(roller.score)
-		if(roller.need == 1) then			
-			roller.chance =	tau^(-roller.score)
+		if(roller.need == 1) then
+			local score = 0
+			if roller.score>-2 then score = roller.score else score = -2 end
+			roller.chance =	tau^(-score)
 		else
 			roller.chance = 0
 		end

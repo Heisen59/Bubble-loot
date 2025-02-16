@@ -97,10 +97,10 @@ function BubbleLoot_OnAddonCompartmentClick()
 end
 
 function BubbleLoot_G.updateAverageLootScore()
-	local averageLootScore = BubbleLoot_G.calculation.getAverageLootScorePerRaid()
+	--local averageLootScore = BubbleLoot_G.calculation.getAverageLootScorePerRaid()
 
-	BubbleLoot_G.configuration.constant[1] = averageLootScore
-	BubbleLoot_G.configuration.constant[2] = averageLootScore
+	BubbleLoot_G.configuration.constant[1] = RaidData[cfg.RAID_VALUE]
+	BubbleLoot_G.configuration.constant[2] = RaidData[cfg.RAID_VALUE]
 
 	--print("New average score set")
 
@@ -129,6 +129,9 @@ function BubbleLoot_G.Initialize(self)
 	BubbleLoot_G.initPlayersData(false)
     -- Load saved variables.
 	BubbleLoot_G.initCancelData(false)
+
+	-- Set item raid values table
+	BubbleLoot_G.initItemsRaidValuesData(false)
 	
 	BubbleLootData = BubbleLootData or {}
 	
@@ -200,6 +203,30 @@ function  BubbleLoot_G.initRaiData(forced)
 	if RaidData[cfg.RAID_HISTORIC] == nil then -- Initialize when first loaded.
 		RaidData[cfg.RAID_HISTORIC] = {};
 	end	
+
+	if RaidData[cfg.RAID_VALUE] == nil then -- Initialize when first loaded.
+		print('init raid value')
+		RaidData[cfg.RAID_VALUE] = 0.5;
+	end	
+
+end
+
+
+function BubbleLoot_G.initItemsRaidValuesData(forced)
+	if forced == true then
+		ItemsRaidValues = {}
+	else
+		ItemsRaidValues = ItemsRaidValues or {}
+	end
+
+	if ItemsRaidValues[cfg.CURRENT_VALUE] == nil then
+		ItemsRaidValues[cfg.CURRENT_VALUE] = 1
+	end
+
+	if ItemsRaidValues[cfg.ITEMS] == nil then
+		ItemsRaidValues[cfg.ITEMS] = {}
+	end
+
 
 end
 

@@ -30,6 +30,15 @@ function BubbleLoot_G.calculation.GetPlayerBonus(playerName)
 end
 
 
+function BubbleLoot_G.calculation.GetItemMultiplier(itemId)
+
+	local multiplier = ItemsRaidValues[cfg.ITEMS][itemId]
+
+	if multiplier == nil then return 1 end
+
+	return multiplier
+end
+
 
 function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 
@@ -50,7 +59,8 @@ function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 			for itemId, itemData in pairs(itemsList) do
 				NumberOfItemsLooted = BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, 1) -- only count MS items
 				--print(NumberOfItemsLooted)
-				score = score +  NumberOfItemsLooted * BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)--BubbleLoot_G.calculation.GetItemScore(itemId)
+				local multiplier = BubbleLoot_G.calculation.GetItemMultiplier(itemId)
+				score = score +  NumberOfItemsLooted * BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, true)*multiplier
 			end
 		end
 
@@ -59,25 +69,58 @@ function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 	-- Second, modify this loot score according to attendance
 	local participation = BubbleLoot_G.storage.GetPlayerParticipation(playerName)
 		if(participation) then
-			score = score - cfg.constant.ATTENDANCE_VALUE*participation[cfg.index.ATTENDANCE] - cfg.constant.BENCH_VALUE*participation[cfg.index.BENCH] + cfg.constant.NON_ATTENDANCE_VALUE*participation[cfg.index.NON_ATTENDANCE]
+			score = score - RaidData[cfg.RAID_VALUE]*participation[cfg.index.ATTENDANCE] - RaidData[cfg.RAID_VALUE]*participation[cfg.index.BENCH] + cfg.constant.NON_ATTENDANCE_VALUE*participation[cfg.index.NON_ATTENDANCE]
 		end
 		
 	-- Third : bonus/malus
 	score = score - BubbleLoot_G.calculation.GetPlayerBonus(playerName)
 		
+
+
 	return score
+
+end
+
+local function getRarityModifier(index)
+	local rarityModifiers = {
+		-- Assuming rarity is a number from 1 (common) to 5 (legendary)
+		[0] = 3.5, -- Poor
+		[1] = 3, -- Common
+		[2] = 2.5, -- Uncommon
+		[3] = 1.76, -- Rare
+		[4] = 1.6, -- Epic
+		[5] = 1.4, -- Legendary
+	}
+
+return rarityModifiers[index]
 
 end
 
 function BubbleLoot_G.calculation.GetItemScore(itemId)
 	
-	local ItemSlotMod = BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 
-	return ItemSlotMod
+	local ItemSlotMod, itemLevel,  RarityModifier = BubbleLoot_G.calculation.GetItemScoreInfo(itemId)
+
+
+	if itemLevel == nil then itemLevel = 0 end
+	if RarityModifier == nil then RarityModifier = 0 end
+	if ItemSlotMod == nil then ItemSlotMod = 0 end
+
+	
+
+	-- Calculate score for this item
+    return ItemSlotMod --/ 60 --normalized by 60
+
+
+	-- return ItemSlotMod
 end
 
-function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 
+
+
+function BubbleLoot_G.calculation.GetItemScoreInfo(itemId)
+
+	local ItemSlotMod, itemLevel,  RarityModifier
 	-- print(itemId)
 	
 -- First, try to get item info using the item name
@@ -115,41 +158,36 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
             ["INVTYPE_TABARD"] = 0,
             ["INVTYPE_BAG"] = 0,
             ["INVTYPE_QUIVER"] = 0,
+			["INVTYPE_ZERO"] = 0,
         }
 
-		local specificSlotMod = {
-			[18564] = 0.5, -- liens du cherchevents
-			[18563] = 0.5, -- liens du cherchevents
-		}
+		
 		
 
-	 if itemEquipLoc and itemName then
+	 if itemEquipLoc and itemName  then
 		local slotModValue = slotMod[itemEquipLoc]
 		if slotModValue then
-			return slotModValue
+			ItemSlotMod = slotModValue
 		else -- check if token
-			itemEquipLoc = BubbleLoot_G.calculation.SearchToken(itemId)
-			-- print(itemEquipLoc)
-			if itemEquipLoc == "INVTYPE_SPECIFIC" then 
-				slotModValue = specificSlotMod[itemId]
+			local tokenInfo = BubbleLoot_G.calculation.SearchToken(itemId, itemName)
+			
+			if tokenInfo == nil then
+				print("GetItemSlotMode function : "..itemName.."["..itemId.."] doesn't have any info")	
+				ItemSlotMod = 0
+				itemLevel =  0
+				itemRarity = 0
 			else
-				slotModValue = slotMod[itemEquipLoc]
-			end
-
-			if slotModValue then
-				return slotModValue
-			else
-				print("GetItemSlotMode function : "..itemName.." doesn't have any slot mod")			
-				return 0
+				ItemSlotMod = 	tokenInfo[1]
+				itemLevel = tokenInfo[3]
+				itemRarity = tokenInfo[2]				
 			end
 		end
 	 else	
 		if itemName then 
-			print("GetItemSlotMode function : "..itemName.." doesn't have any itemEquipLoc")			
+			print("GetItemSlotMode function : "..itemName.."["..itemId.."] doesn't have any itemEquipLoc")			
 		else
 			--print(itemId)
-			print("GetItemSlotMode function : item not in cache. Wait for server response.")
-			return nil
+			print("GetItemSlotMode function : item".."["..itemId.."]  not in cache. Wait for server response.")			
 		end		
 	 --[[
 		slotModValue = slotMod[BubbleLoot_G.calculation.SearchToken(item)]
@@ -159,32 +197,28 @@ function BubbleLoot_G.calculation.GetItemSlotMode(itemId)
 			return 0
 		end
 		--]]
+		ItemSlotMod = 0
+		itemLevel =  0
+		itemRarity = 0
 	end
 	
-	return 0
+	local RarityModifier = getRarityModifier(itemRarity)
+
+	return ItemSlotMod, itemLevel,  RarityModifier
 
 end
 
 
 
-function BubbleLoot_G.calculation.SearchToken(itemID)
-	
-	for tokenType, subListToken in pairs(cfg.tokens) do
-	-- print(subListToken)
-		for _, tokenID in ipairs(subListToken)do
-			-- print(tokenType)
-			if itemID == tokenID then
-					--print(tokenType)
-					--print(cfg.tokenLocation[tokenType])
-					return tokenType		
-			end
-		end		
-	end
-	
-	return "Not Found"
 
-
+function BubbleLoot_G.calculation.SearchToken(itemID, itemName)
+	-- print("enter Search token for "..itemName)
+	local itemInfo = cfg.tokens[itemID]
+	if itemInfo == nil then return nil end
+	-- print("itemId "..itemID.." ,"..itemInfo[1].." ,"..itemInfo[2].." ,"..itemInfo[3])
+	return itemInfo
 end
+
 
 
 -- Get the winner from ML /rand 1000 roll
@@ -244,23 +278,23 @@ end
 
 
 function BubbleLoot_G.calculation.GetDurationInHoursFromCurrentTime(dateString1)
-local dateString2 = date("%d-%m-%Y à %H:%M:%S")
+	local dateString2 = date("%d-%m-%Y à %H:%M:%S")
 
- -- Parse both date strings into date tables
- local dateTable1 = BubbleLoot_G.calculation.ParseDateString(dateString1)
- local dateTable2 = BubbleLoot_G.calculation.ParseDateString(dateString2)
- 
- -- Convert both date tables to Unix timestamps
- local timestamp1 = time(dateTable1)
- local timestamp2 = time(dateTable2)
- 
- -- Calculate the difference in seconds
- local differenceInSeconds = math.abs(timestamp2 - timestamp1)
- 
- -- Convert the difference from seconds to hours
- local differenceInHours = differenceInSeconds / 3600
- 
- return differenceInHours
+	-- Parse both date strings into date tables
+	local dateTable1 = BubbleLoot_G.calculation.ParseDateString(dateString1)
+	local dateTable2 = BubbleLoot_G.calculation.ParseDateString(dateString2)
+	
+	-- Convert both date tables to Unix timestamps
+	local timestamp1 = time(dateTable1)
+	local timestamp2 = time(dateTable2)
+	
+	-- Calculate the difference in seconds
+	local differenceInSeconds = math.abs(timestamp2 - timestamp1)
+	
+	-- Convert the difference from seconds to hours
+	local differenceInHours = differenceInSeconds / 3600
+	
+	return differenceInHours
 end
 
 -- Function to calculate duration between two date strings
@@ -310,6 +344,7 @@ end
 
 -- Function to convert date string to a timestamp
 function BubbleLoot_G.calculation.ConvertToTimestamp(dateStr)
+	--print(dateStr)
     -- Use pattern matching to extract day, month, year, hour, min, sec
     local day, month, year, hour, min, sec = dateStr:match("(%d%d)-(%d%d)-(%d%d%d%d) à (%d%d):(%d%d):(%d%d)")
 
@@ -346,7 +381,8 @@ function BubbleLoot_G.calculation.getAverageLootScorePerRaid()
 			for itemId, itemData in pairs(playerData["items"]) do
 				for _, lootData in ipairs(itemData[cfg.LOOTDATA]) do
 					if lootData[2] == 1 then
-						local itemScore = BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)
+						local multiplier = BubbleLoot_G.calculation.GetItemMultiplier(itemId)
+						local itemScore = multiplier*BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)
 						TotalLootScore = TotalLootScore + itemScore 
 					end
 				end

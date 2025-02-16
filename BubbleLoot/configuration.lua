@@ -53,6 +53,11 @@ BubbleLoot_G.configuration.index =
 --raidData index
 BubbleLoot_G.configuration.NUMBER_OF_RAID_DONE = 1
 BubbleLoot_G.configuration.RAID_HISTORIC = 2
+BubbleLoot_G.configuration.RAID_VALUE = 3
+
+-- Items raid value
+BubbleLoot_G.configuration.CURRENT_VALUE = 1
+BubbleLoot_G.configuration.ITEMS = 2
 
 -- Sync data index
 BubbleLoot_G.configuration.TRUST_LIST = 1
@@ -126,13 +131,14 @@ BubbleLoot_G.configuration.texts = {
     EDIT_A_BONUS = "Edit", 
     DEL_A_BONUS = "Del",
     LOOT_REMOVE = "Retirer",--"Remove",
+    LOOT_MOD_NEW_RAID = "Item nouveau raid",--"Remove",
     LOOT_SET_MSOS = "Changer +1/+2",--"set as +1/+2",
     LOOT_GIVE = "Donner au joueur",--"Give to player",
     SHOW_HIDE_MAIN_PANEL = "Montrer/cacher la fenêtre principale", --"Show/hide the main loot window",
     ML_RAND = "/rand 10000",
     PLAYERS_LIST = "Joueurs du roster",
     TOOLTIP_PLAYER_ROSTER = "clic droit sur un joueur pour faire apparaitre le menu",
-    ITEM_VALUE = "Valeur d'item",
+    ITEM_VALUE = "Valeur",
     CONFIRM_DELETE_DB ="Voulez-vous effacer %s ?", -- "Are you sure you want to delete the %s data?",
     CONFIRM = "Confirmer",
     CANCEL = "Annuler",
@@ -199,113 +205,177 @@ BubbleLoot_G.configuration.tokenLocation =
 "INVTYPE_WAIST",
 "INVTYPE_LEGS",
 "INVTYPE_FEET",
+"INVTYPE_CLOAK",
 }
 
+
 BubbleLoot_G.configuration.tokens = 
-{["INVTYPE_HEAD"] = 
 {-- head
-227532,--"Chaperon incandescent",
-227755,-- "Heaume en écailles en fusion",
-227764,-- "Heaume du noyau incendié"
-231711,--Draconian Hood
-231728,--Ancient Helm
-231719,--Primeval Helm
-},
-["INVTYPE_SHOULDER"] = 
-{--Shoulders
-227537,-- "Protège-épaules incandescents",
-227752,-- "Épaulières en écailles en fusion", 
-227762,-- "Protège-épaules du noyau incendié"
-231709,--Draconian Shoulderpads
-231726,--Ancient Shoulderpads
-231717,--Primeval Shoulderpads
-},
-["INVTYPE_CHEST"] = 
-{--Chest
-227535,-- "Robe incandescente",
-227758,-- "Plastron en écailles en fusion",
-227766,-- "Plastron du noyau incendié"
-231714,--Draconian Robe
-231731,--Ancient Chest
-231723,--Primeval Chest
-},
-["INVTYPE_HAND"] = 
-{--Gloves
-227533,-- "Gants incandescents",
-227756,-- "Gants en écailles en fusion",
-227759,-- "Gants du noyau incendié"
-231712,--Draconian Gloves
-231729,--Ancient Gloves
-231720,--Primeval Gloves
-},
-["INVTYPE_WRIST"] = 
-{--Wrist
-227531,-- "Manchettes incandescentes",
-227750,-- "Manchettes en écailles en fusion",
-227760,-- "Manchettes du noyau incendié"
-231707,--Draconian Bindings
-231724,--Ancient Bindings
-231715,--Primeval Bindings
-},
-["INVTYPE_WAIST"] = 
-{--Waist
-227530,-- "Ceinture incandescente",
-227751,-- "Ceinture en écailles en fusion",
-227761,-- "Ceinture du noyau incendié"
-231708,--Draconian Belt
-231725,--Ancient Belt
-231716,--Primeval Belt
-},
-["INVTYPE_LEGS"] = 
-{--Legs
-227534,-- "Jambières incandescentes",
-227754,-- "Jambières en écailles en fusion",
-227763,-- "Jambières du noyau incendié"
-231710,--Draconian Leggings
-231727,--Ancient Leggings
-231718,--Primeval Leggings
-},
-["INVTYPE_FEET"] = 
-{--Boots
-227536,-- "Bottes incandescentes",
-227757,-- "Bottes en écailles en fusion",
-227765,-- "Bottes du noyau incendié"
-231713,--Draconian Boots
-231730, --Ancient Boots
-231721,--Primeval Boots
-},
-["INVTYPE_2HWEAPON"] = 
-{--2H weapon
-231722,-- "Faux du Chaos épuisée",
-230904, --Parchemin : SEENECS ED UEF
-231814, --Cœur chromatique
-},
-["INVTYPE_WEAPONMAINHAND"] = 
-{--1H weapon
-231882,--Reçu de l’engin de suppression
-231452, --Sang du Porteur de Lumière
-229352,--Informations recueillies
-},
-["INVTYPE_TRINKET"] = 
-{--Trinket
-229906,--Écaille de bronze ternie
-},
-["INVTYPE_SHIELD"] = 
-{--SHIELD
-231995, --Scorie d’élémentium durcie
-231378,--Disque doré chatoyant
-},
-["INVTYPE_NECK"] = 
-{
-19003, -- Tête de Nefarian (neck, ring or offhand, all have the same slotmod value)
-18423, -- Tête d'Ony
-},
-["INVTYPE_SPECIFIC"] = 
-{
-    18564, -- liens du cherchevents
-    18563, -- liens du cherchevents
-},
+    [227532] ={1,4, 66 },--"Chaperon incandescent"] ={1,4, 60 },
+    [227755] ={1,4, 66 },-- "Heaume en écailles en fusion"] ={1,4, 60 },
+    [227764] ={1,4, 66 },-- "Heaume du noyau incendié"
+    [231711] ={1,4, 76 },--Draconian Hood
+    [231728] ={1,4, 76 },--Ancient Helm
+    [231719] ={1,4, 76 },--Primeval Helm
+    [20926] ={1,4, 81 }, --Vek'nilash's Circlet
+    [20930] ={1,4, 81 }, --Vek'lor's Diadem
+    [233367] ={1,4, 81 }, -- péritoine intact
+    [233365] ={1,4, 81 }, --Viscères intacts
+    [233368] ={1,4, 81 }, --Entrailles intactes
+    [236236] ={1,4, 88 }, --Naxx
+    [236249] ={1,4, 88 },--Naxx
+    [236241] ={1,4, 88 },--Naxx
+
+    --Shoulders
+    [227537]={1,4, 66 },-- "Protège-épaules incandescents"]={1,4, 60 }
+[227752]={1,4, 66 },-- "Épaulières en écailles en fusion"]={1,4, 60 } 
+[227762]={1,4, 66 },-- "Protège-épaules du noyau incendié"
+[231709]={1,4, 76 },--Draconian Shoulderpads
+[231726]={1,4, 76 },--Ancient Shoulderpads
+[231717]={1,4, 76 },--Primeval Shoulderpads
+[20932]={1,4, 81 }, -- Qiraji Bindings of Dominance
+[20928]={1,4, 81 }, -- Qiraji Bindings of Command
+[233371]={1,4, 81 }, -- Manchettes de souveraineté qiraji (épaux]={1,4, 60 } bottes)
+[233369]={1,4, 81 }, --Manchettes de domination qiraji
+[233370]={1,4, 81 }, --Manchettes de commandement qiraji
+[236240]={1,4, 88 },--Naxx
+[236237]={1,4, 88 },--Naxx
+[236254]={1,4, 88 },--Naxx
+
+--Chest
+[227535]={1,4, 66 },-- "Robe incandescente"]={1,4, 66 },
+[227758]={1,4, 66 },-- "Plastron en écailles en fusion"]={1,4, 66 },
+[227766]={1,4, 66 },-- "Plastron du noyau incendié"
+[231714]={1,4, 76 },--Draconian Robe
+[231731]={1,4, 76 },--Ancient Chest
+[231723]={1,4, 76 },--Primeval Chest
+[20933]={1,4, 81 },  --Husk of the Old God
+[20929]={1,4, 81 }, -- Carapace of the Old God
+[233364]={1,4, 88 }, --Naxx
+[233362]={1,4, 88 }, --Naxx
+[233363]={1,4, 88 },--Naxx--Naxx
+[236251]={1,4, 88 },--Naxx
+[236242]={1,4, 88 },--Naxx
+[236231]={1,4, 88 },--Naxx
+
+----Gloves
+[227533]={0.77,4, 66 },-- "Gants incandescents"]={0.77,4, 66 },
+[227756]={0.77,4, 66 },-- "Gants en écailles en fusion"]={0.77,4, 66 },
+[227759]={0.77,4, 66 },-- "Gants du noyau incendié"
+[231712]={0.77,4, 76 },--Draconian Gloves
+[231729]={0.77,4, 76 },--Ancient Gloves
+[231720]={0.77,4, 76 },--Primeval Gloves
+[236250]={0.77,4, 88 },--Naxx
+[236233]={0.77,4, 88 },--Naxx
+[236243]={0.77,4, 88 },--Naxx
+
+-- wrist
+[227531]={0.5625,4, 66 },-- "Manchettes incandescentes"]={0.5625,4, 66 },
+[227750]={0.5625,4, 66 },-- "Manchettes en écailles en fusion"]={0.5625,4, 66 },
+[227760]={0.5625,4, 66 },-- "Manchettes du noyau incendié"
+[231707]={0.5625,4, 76 },--Draconian Bindings
+[231724]={0.5625,4, 76 },--Ancient Bindings
+[231715]={0.5625,4, 76 },--Primeval Bindings
+[236245]={0.5625,4, 88 },--Naxx
+[236247]={0.5625,4, 88 },--Naxx
+[236235]={0.5625,4, 88 },--Naxx
+
+--Waist
+[227530]={0.77,4, 66 },-- "Ceinture incandescente"]={0.77,4, 66 },
+[227751]={0.77,4, 66 },-- "Ceinture en écailles en fusion"]={0.77,4, 66 },
+[227761]={0.77,4, 66 },-- "Ceinture du noyau incendié"
+[231708]={0.77,4, 76 },--Draconian Belt
+[231725]={0.77,4, 76 },--Ancient Belt
+[231716]={0.77,4, 76 },--Primeval Belt
+[236244]={0.77,4, 88 },--Naxx
+[236232]={0.77,4, 88 },--Naxx
+[236252]={0.77,4, 88 },--Naxx
+
+--legs
+[227534]={1,4, 66 },-- "Jambières incandescentes"]={1,4, 66 },
+[227754]={1,4, 66 },-- "Jambières en écailles en fusion"]={1,4, 66 },
+[227763]={1,4, 66 },-- "Jambières du noyau incendié"
+[231710]={1,4, 76 },--Draconian Leggings
+[231727]={1,4, 76 },--Ancient Leggings
+[231718]={1,4, 76 },--Primeval Leggings
+[20927]={1,4, 81 }, --Ouro's Intact Hide
+[20931]={1,4, 81 }, --Skin of the Great Sandworm
+[236238]={1,4, 88 },--Naxx
+[236246]={1,4, 88 },--Naxx
+[236253]={1,4, 88 },--Naxx
+
+--feet
+[227536]={1,4, 66 },-- "Bottes incandescentes"]={1,4, 66 },
+[227757]={1,4, 66 },-- "Bottes en écailles en fusion"]={1,4, 66 },
+[227765]={1,4, 66 },-- "Bottes du noyau incendié"
+[231713]={1,4, 76 },--Draconian Boots
+[231730]={1,4, 76 }, --Ancient Boots
+[231721]={1,4, 76 },--Primeval Boots
+[236248]={1,4, 88 },--Naxx
+[236239]={1,4, 88 },--Naxx
+[236234]={1,4, 88 },--Naxx
+
+--2H weap
+[231722]={2,4, 79 },-- "Faux du Chaos épuisée"]={2,4, 66 },
+[230904]={2,4, 79 }, --Parchemin : SEENECS ED UEF
+[231814]={2,4, 79 }, --Cœur chromatique
+
+--1h weap
+[231882]={1,4, 79 },--Reçu de l’engin de suppression
+[231452]={1,4, 79 }, --Sang du Porteur de Lumière
+[229352]={1,4, 79 },--Informations recueillies
+[20886]={1,4, 70 }, -- Manche à pointes qiraji
+[20890]={1,4, 70 }, -- Manche orné qiraji
+
+--Trinket
+[229906]={0.7,4, 76 },--Écaille de bronze ternie
+[236350]={0.7,4, 90 }, --naxx
+
+--SHIELD
+[231995]={0.5625,4, 79 }, --Scorie d’élémentium durcie
+[231378]={0.5625,4, 79 },--Disque doré chatoyant
+
+--neck
+[19003]={0.5625,4, 83 }, -- Tête de Nefarian (neck]={0.5625,4, 66 }, ring or offhand]={0.5625,4, 66 }, all have the same slotmod value)
+[18423]={0.5625,4, 74 }, -- Tête d'Ony
+[235048]={0.5625,4, 77 }, -- Tête d'Ossirian
+
+--specific
+[235046]={1,4, 79 }, -- arme impériale qiraji
+[235045]={1,4, 79 }, --Tenue de parade impériale qiraji
+
+--INVTYPE_CLOAK or similar
+[20885]={0.5625,4, 67 }, -- Drapé martial qiraji
+[20889]={0.5625,4, 67 }, -- Drapé royal qiraji
+[20888]={0.5625,4, 65 }, --Anneau de cérémonie qiraji
+[20884]={0.5625,4, 65 }, --Anneau de magistrat qiraji
+[21221]={0.5625,4, 88 }, -- Eye of C-Thun
+
+--ring
+[237381]={0.5625,4, 92 },--Naxx
+
+-- null values, recipe, books, enchant...
+[235513]={0,4, 0 }, --char qiraji
+[235512]={0,4, 0 }, --char qiraji
+[235514]={0,4, 0 },
+[21281]={0,4, 0 }, 
+[21304]={0,4, 0 },
+[21298]={0,4, 0 }, 
+[21288]={0,4, 0 }, 
+[21285]={0,4, 0 }, 
+[21296]={0,4, 0 }, 
+[21297]={0,4, 0 }, 
+[21294]={0,4, 0 },
+[21299]={0,4, 0 },
+[21289]={0,4, 0 },
+[234435]={0,4, 0 }, 
+[234242]={0,4, 0 }, 
+[234221]={0,4, 0 },
+[234265]={0,4, 0 },
+
+
 }
+
 
 
 

@@ -182,6 +182,7 @@ end
 
 local function statsFunction()
 	
+    print("Raid Value : "..cfg.constant[1])
     print("Loot score per player and per raid : "..BubbleLoot_G.calculation.getAverageLootScorePerRaid())
     print("Average loot score : "..BubbleLoot_G.calculation.getAverageLootScore())
 	
@@ -193,6 +194,19 @@ local function sendFunction()
 	
 end
 
+
+local function setRaidValue(value)
+	
+    print("Raid value set to : "..value)
+    cfg.constant[1] = value
+	cfg.constant[2] = value
+
+    RaidData[cfg.RAID_VALUE]= value
+
+
+    print("Raid value set to : "..RaidData[cfg.RAID_VALUE])
+	
+end
 
 
 -- Slash commands.
@@ -235,6 +249,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
 		sendFunction()
     elseif command == "askForSync" then
         askForSync(args)
+    elseif command == "setRaidValue" then
+        setRaidValue(args)
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

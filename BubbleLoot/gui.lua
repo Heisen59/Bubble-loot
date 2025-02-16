@@ -247,6 +247,7 @@ end
 -- Set item header 
 function BubbleLoot_G.gui.setItemHeader(self, item)
 self.itemText:SetText(item)
+--print("Je suis dans setItemHeader")
 end
 
 

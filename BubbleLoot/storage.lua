@@ -21,6 +21,7 @@ function BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
 	if itemScore == nil or itemScore == -1 or itemScore == 0 or itemScore == 0.601 or recalc then
 		-- need calculation
 		local calcItemScore = BubbleLoot_G.calculation.GetItemScore(itemId)
+		--print("player "..playerName.." is associated with an null item score.")
 
 		if calcItemScore == nil then
 			-- recalc and write it later
@@ -33,8 +34,8 @@ function BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, recalc)
 		else
 			-- let's write it in the DB
 
-			if calcItemScore == 0 or calcItemScore == 0.601 then
-				print("getItemScoreFromDB function : "..itemLink.." itemID "..itemId.." have a score of "..calcItemScore)
+			if calcItemScore == 0.601 then
+				print("getItemScoreFromDB function : "..itemLink.." itemID "..itemId.." doesn't have a score")
 			end
 
 			PlayersData[playerName].items[itemId][cfg.ITEM_SCORE] = calcItemScore
@@ -131,6 +132,20 @@ function BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, LootAttribType)
 		end
 		return count
 	end
+
+end
+
+-- function to add a loot id in the ItemsRaidValues list
+function BubbleLoot_G.storage.AddItemToNewRaidList(itemLink)
+	local itemId = tonumber(string.match(itemLink, "item:(%d+):"))
+	print(itemId)
+	
+	if itemId == nil then return end
+
+	local multiplier = ItemsRaidValues[cfg.CURRENT_VALUE]
+	print(multiplier)
+	ItemsRaidValues[cfg.ITEMS][itemId] = multiplier
+	print(ItemsRaidValues[cfg.ITEMS][itemId])
 
 end
 
