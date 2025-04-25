@@ -190,8 +190,25 @@ end
 
 local function sendFunction()
 	
-    print("empty")
-	
+    --print("empty")
+
+    --"19-01-2025 à 21:56:53"
+
+    print("entretien pour changer item +1->+2 si plus agé que 05-02-2025 à 23:59:59")
+
+    local dateToNum = BubbleLoot_G.calculation.ConvertToTimestamp("05-02-2025 à 23:59:59")
+
+    for player, playerData in pairs(PlayersData) do
+        for itemId, itemData in pairs(playerData.items) do
+            for _, lootData in ipairs(itemData[2]) do
+                local itemDateStampe = BubbleLoot_G.calculation.ConvertToTimestamp(lootData[1])
+                    if itemDateStampe< dateToNum then 
+                        print("player: "..player.." item: "..itemData[1].." converted to +2")
+                        lootData[2] = 2 
+                    end
+            end
+        end
+    end	
 end
 
 
@@ -206,6 +223,10 @@ local function setRaidValue(value)
 
     print("Raid value set to : "..RaidData[cfg.RAID_VALUE])
 	
+end
+
+local function getCSVimport()
+    BubbleLoot_G.csv.OpenCSVDialog()
 end
 
 
@@ -251,6 +272,8 @@ SlashCmdList["BUBBLELOOT"] = function(msg, editbox)
         askForSync(args)
     elseif command == "setRaidValue" then
         setRaidValue(args)
+    elseif command == "import" then
+        getCSVimport()
     else
         printError(cfg.texts.SLASH_PARAMETER_ERROR)
     end

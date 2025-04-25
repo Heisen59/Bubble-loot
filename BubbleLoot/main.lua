@@ -26,6 +26,8 @@ BubbleLoot_G.plugins = {}
 BubbleLoot_G.calculation = {}
 --Syncing
 BubbleLoot_G.sync = {}
+--CSV
+BubbleLoot_G.csv = {}
 
 ---
 ---@class Plugin Mandatory plugin interface.
@@ -130,8 +132,14 @@ function BubbleLoot_G.Initialize(self)
     -- Load saved variables.
 	BubbleLoot_G.initCancelData(false)
 
+	--Soft Reserve initialize
+	BubbleLoot_G.initSRData(false)
+
 	-- Set item raid values table
 	BubbleLoot_G.initItemsRaidValuesData(false)
+
+	-- Set autoloot table data
+	BubbleLoot_G.initAutoLootData(false)
 	
 	BubbleLootData = BubbleLootData or {}
 	
@@ -187,6 +195,14 @@ function BubbleLoot_G.initPlayersData(forced)
 	end
 end
 
+function BubbleLoot_G.initSRData(forced)
+	if forced == true then
+		SRData = {}
+	else
+		SRData = SRData or {}
+	end
+end
+
 function  BubbleLoot_G.initRaiData(forced)
 
 	if forced == true then
@@ -228,6 +244,14 @@ function BubbleLoot_G.initItemsRaidValuesData(forced)
 	end
 
 
+end
+
+function BubbleLoot_G.initAutoLootData(forced)
+	if forced == true then
+		AutoLootData = {}
+	else
+		AutoLootData = AutoLootData or {}
+	end
 end
 
 

@@ -14,6 +14,10 @@ Compatibility option
 -- Collection of { unit, need , score} to be used to show data rows.
 BubbleLoot_G.gui.rowPool = {}
 
+BubbleLoot_G.CurrentlyRolledItemId = 0
+
+local hooveringText = nil
+
 -- From "AARRGGBB" to { r, g, b, a } for values between 0 and 1.
 local function hexColorToRGBA(hexString)
     local t = {}
@@ -31,7 +35,7 @@ function BubbleLoot_G.gui.Initialize(self)
     local mainFrame = CreateFrame("Frame", ("%s_MainFrame"):format(cfg.ADDON_NAME),
         UIParent, BackdropTemplateMixin and "BackdropTemplate")
     mainFrame:SetSize(cfg.size.FRAME_WIDTH, cfg.size.EMPTY_HEIGHT)
-    mainFrame:SetPoint("CENTER", UIParent, 0, 0)
+    mainFrame:SetPoint("TOP", UIParent, "TOP", 0, -20)
     -- Mouse
     mainFrame:SetMovable(true)
     mainFrame:EnableMouse(true)
@@ -74,15 +78,57 @@ function BubbleLoot_G.gui.Initialize(self)
     itemHeader:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
     self.itemHeader = itemHeader
 
-	-- ITEM ROLLED
+	-- MS/OS/Pass button
+	-- CrÃ©er les boutons Besoin, CupiditÃ© et Passe
+	local buttons = {}
+	local buttonNames = {"+1", "+2", "pass"}
+	for i, name in ipairs(buttonNames) do
+	   buttons[name] = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
+	   buttons[name]:SetSize(40, 20)  -- Largeur, Hauteur
+	   buttons[name]:SetText(name)
+	   buttons[name]:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 50+ i  * 45, -8)
+	   buttons[name]:SetScript("OnClick", function()  
+			 -- Envoi du message dans le chat de raid
+			 SendChatMessage(name, "RAID")
+			 
+			 --if name =="pass" then				mainFrame:Hide() end
+			 if name =="+2" then				-- Send the command
+				C_Timer.After(1, function()
+									-- Open the Add/Edit panel in edit mode
+									local editBox = ChatFrame1.editBox
+									editBox:SetText("/rand") -- Set the command in the edit box
+									editBox:Show() -- Make sure the edit box is shown
+									editBox:SetFocus() -- Focus on the edit box
+									-- Send the command
+									ChatEdit_SendText(editBox) -- Sends the text as if Enter was pressed
+								end)
+	  		    end
+	   end)
+	end
+
+	-- ITEM Rtext + icon
+
+	-- CrÃ©er une texture pour l'icÃ´ne de l'objet
+	local itemIcon = mainFrame:CreateTexture(nil, "ARTWORK")
+	itemIcon:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 40, -8) -- Offset right and down.
+	itemIcon:SetSize(45, 45)  -- Largeur, Hauteur
+	self.itemIcon = itemIcon
+
+	-- item text
 	local itemText = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
-	itemText:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 40, -8) -- Offset right and down.
+	itemText:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 95, -30) -- Offset right and down.
 	itemText:SetHeight(cfg.size.ROW_HEIGHT)
 	itemText:SetJustifyH("LEFT")
 	itemText:SetJustifyV("TOP")
 	itemText:SetTextColor(hexColorToRGBA(cfg.colors.HEADER))
 	self.itemText = itemText
 
+	BubbleLoot_G.gui.SetItemLinkHover(self)
+
+
+
+
+	-- hide button
 	local hideButton = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
 	-- Create a FontString for text
 	local texthide = hideButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -119,7 +165,7 @@ function BubbleLoot_G.gui.Initialize(self)
 			end)
 	end
 
-	local OffSetDown = -35
+	local OffSetDown = -55
 
 	-- UNIT
     local unitHeader = mainFrame:CreateFontString(nil, "OVERLAY", "SystemFont_Small")
@@ -172,6 +218,38 @@ function BubbleLoot_G.gui.Initialize(self)
     self.needHeader = needHeader
 
     return unitHeader -- relativePoint
+end
+
+-- Set item header 
+function BubbleLoot_G.gui.setItemHeader(self, item)
+	local name, _, _, _, _, _, _, _, _, icon = C_Item.GetItemInfo(item)
+	self.itemIcon:SetTexture(icon)
+	self.itemText:SetText(item)
+	self.itemText:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+	hooveringText = item
+	--print("Je suis dans setItemHeader")
+end
+
+function BubbleLoot_G.gui.SetItemLinkHover(self)
+    if self.itemText and self.itemIcon then
+        -- Fonction pour gérer le survol de la souris
+        local function OnEnter(self)
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:SetHyperlink(hooveringText) --self.GetText())
+            GameTooltip:Show()
+        end
+
+        -- Fonction pour gérer la sortie de la souris
+        local function OnLeave(self)
+            GameTooltip:Hide()
+        end
+
+        -- Associer les fonctions aux événements de survol
+        self.itemText:SetScript("OnEnter", OnEnter)
+        self.itemText:SetScript("OnLeave", OnLeave) 
+		self.itemIcon:SetScript("OnEnter", OnEnter)
+        self.itemIcon:SetScript("OnLeave", OnLeave) 
+    end
 end
 
 
@@ -244,11 +322,7 @@ local function CreateManageNeedDropdownMenu(playerName)
 end
 
 
--- Set item header 
-function BubbleLoot_G.gui.setItemHeader(self, item)
-self.itemText:SetText(item)
---print("Je suis dans setItemHeader")
-end
+
 
 
 -- Handle FontStrings needed for listing rolling players.
@@ -373,16 +447,14 @@ end
 
 -- countdown function
 local function SendCountdownToRaidChat(itemLink)
-    if IsInRaid() or true then  -- Ensure you're in a raid
-
-		BubbleLoot_G.gui:setItemHeader(itemLink)
+    if IsInRaid() or true then  -- Ensure you're in a raid		
 
         local countdown = { "5", "4", "3", "2", "1" }
         local delay = 10  -- Start delay at 0 seconds
 		local channel = "RAID" --"RAID" "SAY" RAID_WARNING
 
 		--SendChatMessage("Now chose +1/+2/+3/pass for "..itemLink.." and /rand if +2/+3. You have "..(delay+5).."s !", channel)
-		SendChatMessage(cfg.texts.LOOT_SEND..itemLink, "RAID_WARNING")
+		SendChatMessage(cfg.texts.LOOT_SEND..itemLink, "RAID_WARNING")-- "RAID_WARNING")
 		SendChatMessage(cfg.texts.LOOT_SEND_BIS..itemLink.." et /rand si +2. Vous avez "..(delay+5).."s !", channel)
 	
         -- Loop through the countdown table
@@ -445,6 +517,35 @@ local MainAttributionFunction = function(itemLink, itemName, playerName, source,
 	end
 end
 
+
+local function AddPlayerToItemAutoLoot(player, itemLink)
+	--local itemName =itemLink:match("%[(.-)%]")
+	local itemId = tonumber(itemLink:match("Hitem:(%d+)"))
+
+	local oldPlayer = AutoLootData[itemId]
+	if oldPlayer then print("Remplace "..oldPlayer.." par "..player.." pour l'item "..itemLink) else print("Ajout de "..player.." pour l'item "..itemLink) end
+
+	AutoLootData[itemId] = player
+
+end
+
+
+local function RemovePlayerToAutoLoot(itemLink)
+
+	
+	local itemId = tonumber(itemLink:match("Hitem:(%d+)"))
+	print(itemLink.." retiré de l'autoloot")
+	AutoLootData[itemId] = nil
+end
+
+local function GetAutoLootInfoText(itemLink)
+
+	local itemId = tonumber(itemLink:match("Hitem:(%d+)"))
+	local player = AutoLootData[itemId]
+
+	if player then 	return "Autoloot pour "..player else return "Pas d'AutoLoot" end
+
+end
 
 -- Function to create the raid members list when right-clicking an item
 function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
@@ -523,6 +624,14 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
                 info.notCheckable = true
                 info.menuList = "OS_SUBMENU" -- Assigns a name to the submenu
                 UIDropDownMenu_AddButton(info, level)
+
+				-- Add main menu entry called autoloot
+				info = UIDropDownMenu_CreateInfo()
+				info.text = "autoloot"
+				info.hasArrow = true -- This tells the menu item to create a submenu
+				info.notCheckable = true
+				info.menuList = "AUTOLOOT_SUBMENU" -- Assigns a name to the submenu
+				UIDropDownMenu_AddButton(info, level)
 				
 				-- Add main menu entry called dez
 				--[[
@@ -585,7 +694,31 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 					info.notCheckable = true
 					info.menuList = "MS_ONLY_RAID_SUBMENU" -- Assigns a name to the submenu
 					UIDropDownMenu_AddButton(info, level)
-				
+				elseif menuList == "AUTOLOOT_SUBMENU" then
+					
+					
+					--Add Title +2					
+					local info = UIDropDownMenu_CreateInfo()
+					info.text = GetAutoLootInfoText(itemLink)
+					info.isTitle = true -- This marks it as a title
+					info.notCheckable = true -- This makes sure the title cannot be checked
+					UIDropDownMenu_AddButton(info, level)
+					
+					-- Add a main menu entry called "All Raid"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "Choisir joueur"
+					info.hasArrow = true -- This tells the menu item to create a submenu
+					info.notCheckable = true
+					info.menuList = "ALL_RAID_SUBMENU_AUTOLOOT" -- Assigns a name to the submenu
+					UIDropDownMenu_AddButton(info, level)
+
+					-- Add a main menu entry called "effacer"
+					info = UIDropDownMenu_CreateInfo()
+					info.text = "Effacer"
+					info.hasArrow = false -- This tells the menu item to create a submenu
+					info.notCheckable = false
+					info.func = function() RemovePlayerToAutoLoot(itemLink)	end -- add function to clear the item from the autoloot data
+					UIDropDownMenu_AddButton(info, level)
 				--[[
 				elseif menuList == "DEZ_SUBMENU" then
 					LootAttribType = 3
@@ -637,19 +770,30 @@ function BubbleLoot_G.gui.ShowItemRaidMemberMenu(source, bag, slot, lootSlot)
 							end
 						end
 					end
-				
+				elseif menuList == "ALL_RAID_SUBMENU_AUTOLOOT" then
+					
+					-- Loop through all raid members
+					local N = GetNumGroupMembers()
+					--N = 5
+					for i = 1, N do
+						local playerName, rank, subgroup, plevel, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+						--local playerName = "TEST"..i
+						if playerName then
+							-- Create a menu item for each raid member
+							local info = UIDropDownMenu_CreateInfo()
+							info.text = playerName
+							info.func = function() print(itemLink)	AddPlayerToItemAutoLoot(playerName, itemLink) end -- Add function to add this player to the item autoloot
+							UIDropDownMenu_AddButton(info, level)
+						end
+					end			
 				end
-			end
-			
+			end			
         end) -- close UIDropDownMenu_Initialize
 
         -- Show the dropdown menu near the cursor
         ToggleDropDownMenu(1, nil, dropdownMenu, "cursor", 3, 3)
     end
 end
-
-
-
 
 
 

@@ -298,13 +298,23 @@ function BubbleLoot_G.eventFunctions.OnChatMsg(self, event, text, playerName)
         end
     end
     ]]--
-    if event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" then
+    if event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event =="CHAT_MSG_GUILD" then
+        
         --Check if the message contains ""Choisissez +1/+2/pass pour "
         if string.find(text,cfg.texts.LOOT_SEND_BIS_PATERN) then
+            
+            local itemLink = text:match("|c%x+|Hitem:.-|h.-|h|r")
             -- Do something when the phrase is found
-			BubbleLoot_G.rollerCollection:Clear()
-			BubbleLoot_G:Draw()
+			BubbleLoot_G.rollerCollection:Clear()   
+			BubbleLoot_G:Draw()                     
+            BubbleLoot_G.gui:setItemHeader(itemLink)
             BubbleLoot_G.gui:SetVisibility(true)
+
+            --Roll frame
+            local itemID = text:match("|Hitem:(%d+):")
+            --print("update itemId rolled to "..itemID)
+            BubbleLoot_G.CurrentlyRolledItemId = tonumber(itemID)
+            --BubbleLoot_G.gui:ShowRollFrame(itemID,15)
             return
         end
     end

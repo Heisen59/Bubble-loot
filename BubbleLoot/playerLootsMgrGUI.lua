@@ -92,19 +92,17 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
             isTitle = true,  -- This makes the text non-clickable and acts as a title
             notCheckable = true,  -- Don't show a checkbox
         				} }
-
-
-
+			
 
 
 	if BubbleLoot_G.IsOfficier then
 
-		table.insert(menuItems,{
-			text = cfg.texts.LOOT_MOD_NEW_RAID,
-			func = OnClickAddItemToNewRaidList,
-			arg1 = playerName, 
-			arg2 = itemLink,
-		})
+		--table.insert(menuItems,{
+		--	text = cfg.texts.LOOT_MOD_NEW_RAID,
+		--	func = OnClickAddItemToNewRaidList,
+		--	arg1 = playerName, 
+		--	arg2 = itemLink,
+		--})
 
 
 		table.insert(menuItems,{
@@ -136,7 +134,7 @@ local function CreateLootDropdownMenu(playerName, itemLink, lootId, lootDropDate
 	local allPlayersListFromDB = BubbleLoot_G.storage.getAllPlayersFromDB()
 	
 	for _, RecevingPlayer in ipairs(allPlayersListFromDB) do
-		table.insert(menuItems[5].menuList, {
+		table.insert(menuItems[4].menuList, {
 			text = RecevingPlayer,
 			func = function() 
 					
@@ -370,7 +368,7 @@ end
 				local MSOS = ""
 				if lootData[2] == 1 then MSOS = "+1" else MSOS = "+2" end
 				local multiplier = BubbleLoot_G.calculation.GetItemMultiplier(lootId)
-				local itemScore = multiplier*BubbleLoot_G.storage.getItemScoreFromDB(playerName, lootId)
+				local itemScore = string.format("%.2f", multiplier*BubbleLoot_G.storage.getItemScoreFromDB(playerName, lootId)) 
 
 
 				rowIndex = rowIndex + 1

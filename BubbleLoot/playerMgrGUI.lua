@@ -51,6 +51,82 @@ local function OnClickBonusMalus(self, arg1)
     BubbleLoot_G.gui.OpenBonusPanelGlobal(arg1)
 end
 
+
+-- Créer une frame principale
+local function CreateSRItemFrame(playerName)
+    local SRframe = CreateFrame("Frame", "ItemDisplayFrame", UIParent, "BasicFrameTemplateWithInset")
+    SRframe:SetSize(300, 200)
+    SRframe:SetPoint("CENTER")
+	-- Background
+
+
+    SRframe:EnableMouse(true)
+    SRframe:SetMovable(true)
+    SRframe:RegisterForDrag("LeftButton")
+    SRframe:SetScript("OnDragStart", SRframe.StartMoving)
+    SRframe:SetScript("OnDragStop", SRframe.StopMovingOrSizing)
+
+    -- Titre de la frame
+    -- Title of the frame
+    SRframe.title = SRframe:CreateFontString(nil, "OVERLAY")
+    SRframe.title:SetFontObject("GameFontHighlight")
+    SRframe.title:SetPoint("CENTER", SRframe.TitleBg, "CENTER", 0, 0)
+    SRframe.title:SetText("SR : "..playerName)
+
+    local itemList
+    -- Liste des items
+    if SRData[playerName] then
+         itemList = SRData[playerName][2]
+    end
+
+    if itemList ~= nil then 
+        -- Créer des lignes pour chaque item
+        for i, itemData in ipairs(itemList) do
+            local itemName = itemData[2]
+            local itemId = itemData[1]
+            local itemNameBis, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = C_Item.GetItemInfo(itemId)
+
+
+            local itemButton = CreateFrame("Button", "ItemButton"..i, SRframe)
+            itemButton:SetPoint("TOPLEFT", 16, -40 - (i - 1) * 40)
+            itemButton:SetSize(32, 32)
+            if itemTexture then
+                itemButton:SetNormalTexture(itemTexture)
+            else
+                itemButton:SetNormalTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+            end
+            
+            if itemLink then
+                itemName = itemNameBis
+                itemButton:SetScript("OnEnter", function(self)
+                        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                        GameTooltip:SetHyperlink(itemLink)
+                        GameTooltip:Show()
+                                    end)
+                itemButton:SetScript("OnLeave", function()
+                        GameTooltip:Hide()
+                                end)
+            else
+                itemLink = itemName
+            end
+
+            local itemNameFontString = itemButton:CreateFontString(nil, "OVERLAY")
+            itemNameFontString:SetFontObject("GameFontHighlight")
+            itemNameFontString:SetPoint("LEFT", itemButton, "RIGHT", 4, 0)
+            itemNameFontString:SetText(itemLink or "Unknown Item")
+
+
+        end
+    end
+
+    return SRframe
+end
+
+local function OnClicklistSR(self, arg1)
+    CreateSRItemFrame(arg1)
+end
+
+
 local function RemovePlayer(self, arg1)
     BubbleLoot_G.gui.RemovePlayerGlobal(arg1)
 end
@@ -96,7 +172,12 @@ local function CreateDropdownMenu(playerName)
             text = "Bonus/Malus",
             func = OnClickBonusMalus,
             arg1 = playerName
-        },        
+        }, 
+        {
+            text = "Liste SR",
+            func = OnClicklistSR,
+            arg1 = playerName
+        },  
     }
 
     if BubbleLoot_G.IsOfficier then

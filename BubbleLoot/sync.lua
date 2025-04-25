@@ -146,7 +146,8 @@ local function registerNewData(msgType, receivedTable)
     elseif msgType == cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA then
         RaidData = receivedTable[1]
         PlayersData = receivedTable[2]
-        print("Updated RaidData and PlayersData table")
+        SRData = receivedTable[3]
+        print("Updated RaidData, PlayersData and SRData table")
     elseif msgType == cfg.SYNC_MSG.ADD_PLAYER_DATA_FUNCTION then
         print("Update PlayersData with a new loot")
         local playerName, itemLink, LootAttribType, DateRemoveItem, exchange, DBTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
@@ -160,6 +161,8 @@ local function registerNewData(msgType, receivedTable)
     elseif msgType == cfg.SYNC_MSG.MODIFY_ITEM_NEED_IN_DATABASE then        
         local playerName, itemLink, lootdate, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4]
         BubbleLoot_G.storage.LootNeedToogle(playerName, itemLink, lootdate, forcedTimeStamp)
+    elseif msgType == cfg.SYNC_MSG.SR_DATA then        
+        SRData = receivedTable[1]
     elseif msgType == cfg.SYNC_MSG.MODIFY_BONUS_DATA then        
         local playerName, bonusText, score, date, remove, forcedTimeStamp = receivedTable[1], receivedTable[2], receivedTable[3], receivedTable[4], receivedTable[5], receivedTable[6]
         BubbleLoot_G.storage.writeOrEditBonus(playerName, bonusText, score, date, remove, forcedTimeStamp)    
@@ -316,7 +319,7 @@ end
 -- Function to sync playersData AND raidData
 function BubbleLoot_G.sync.PlayersAndRaidBroadcastData(playerName)
 
-    local playersRaidData = {RaidData, PlayersData}
+    local playersRaidData = {RaidData, PlayersData, SRData}
     if playerName then
         print("send data to"..playerName)
         BubbleLoot_G.sync.BroadcastDataTable(cfg.SYNC_MSG.RAID_AND_PLAYERS_DATA , playersRaidData, playerName)

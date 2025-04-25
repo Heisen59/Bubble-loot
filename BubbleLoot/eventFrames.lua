@@ -50,6 +50,7 @@ local CHAT_MSG_EVENTS = {
     "CHAT_MSG_RAID",
     "CHAT_MSG_RAID_LEADER",
     "CHAT_MSG_WHISPER",
+    "CHAT_MSG_GUILD",
 }
 
 function BubbleLoot_G.eventFrames.RegisterChatEvents()
@@ -72,6 +73,7 @@ function BubbleLoot_G.eventFrames.RegisterSoloChatEvents()
     passing_EventFrame:RegisterEvent("CHAT_MSG_SAY")	
     passing_EventFrame:RegisterEvent("CHAT_MSG_WHISPER")
     rolling_EventFrame:RegisterEvent("CHAT_MSG_SYSTEM")
+    passing_EventFrame:RegisterEvent("CHAT_MSG_GUILD")
 end
 
 
@@ -319,4 +321,57 @@ MyMinimap:SetScript("OnEvent", function(self, event)
     end
 end)
 
+
+
+
+
+--- AUTOLOOTER
+--- 
+--- -- Function to give item using the raid item attribution system
+local function GiveItemToPlayer()
+    for lootSlot = 1, GetNumLootItems() do
+        local itemLink = GetLootSlotLink(lootSlot)
+        
+        if itemLink then
+            local itemID = tonumber(string.match(itemLink, "item:(%d+):"))
+            
+            local playerName = AutoLootData[itemID]
+            
+            -- Find the raid index for the player
+            for i = 1, GetNumGroupMembers() do
+                local name = GetMasterLootCandidate(lootSlot, i)
+                if name == playerName then
+                    -- Assign the loot to the player
+                    GiveMasterLoot(lootSlot, i)
+                    --print("Gave loot from slot " .. lootSlot .. " to " .. playerName)
+                    return
+                end
+            end
+            print("Player " .. playerName .. " not found in raid.")
+            --if player then
+                --for i = 1, MAX_RAID_MEMBERS do
+                    --local name, _, _, _, _, _, _, _, _, _, _ = GetRaidRosterInfo(i)
+                    --if name == player then
+                      --  GiveMasterLoot(lootSlot, i)
+                        --print("Assigned " .. itemLink .. " to " .. name)
+                      --  return
+                    --end
+                --end
+            --end
+        end
+    end    
+end
+
+
+-- Event handling
+local AutoItemDistributor = CreateFrame("Frame")
+AutoItemDistributor:RegisterEvent("LOOT_OPENED")
+AutoItemDistributor:SetScript("OnEvent", function(self, event, ...)
+    C_Timer.After(0.5, function()
+                            if event == "LOOT_OPENED" then
+                                
+                                GiveItemToPlayer()
+                            end
+                        end)
+end)
 

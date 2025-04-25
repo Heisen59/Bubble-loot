@@ -161,7 +161,7 @@ end
 function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 
 	local chance_sum = 0
-	
+	--print(self)
 	--print("LootChanceRoller")
 
 	-- first, set the highest score, rollers must already be sorted
@@ -171,8 +171,8 @@ function BubbleLoot_G.rollerCollection.LootChanceRoller(self)
 		--print(roller.need)
 		--print(roller.score)
 		if(roller.need == 1) then
-			local score = 0
-			if roller.score>-2 then score = roller.score else score = -2 end
+			local score = roller.score
+			--if roller.score>-2 then score = roller.score else score = -2 end
 			roller.chance =	tau^(-score)
 		else
 			roller.chance = 0
@@ -231,13 +231,13 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
     if roller ~= nil then
         roller:UpdateNeed(need)
 		roller:UpdateRoll(roll)
-
 		--print(need)
 		--print(roll)
 
 		
 		self.isSorted = false
 		self:LootChanceRoller()
+		roller:UpdateSR()
 		
     else
 		if need ~= nil then
@@ -247,8 +247,12 @@ function BubbleLoot_G.rollerCollection.Save(self, name, need, roll)
 			table.insert(self.values, roller)
 			self.isSorted = false
 			self:LootChanceRoller()
+			roller:UpdateSR()
 		end
     end
+
+	
+
 end
 
 -- Update `roller` to increase its need (we want to remove it from the roller.

@@ -60,7 +60,7 @@ function BubbleLoot_G.calculation.GetPlayerScore(playerName, lootscore)
 				NumberOfItemsLooted = BubbleLoot_G.storage.NumberOfItemsMSOS(itemData, 1) -- only count MS items
 				--print(NumberOfItemsLooted)
 				local multiplier = BubbleLoot_G.calculation.GetItemMultiplier(itemId)
-				score = score +  NumberOfItemsLooted * BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId, true)*multiplier
+				score = score +  NumberOfItemsLooted * BubbleLoot_G.storage.getItemScoreFromDB(playerName, itemId)*multiplier 
 			end
 		end
 
@@ -84,12 +84,12 @@ end
 local function getRarityModifier(index)
 	local rarityModifiers = {
 		-- Assuming rarity is a number from 1 (common) to 5 (legendary)
-		[0] = 3.5, -- Poor
-		[1] = 3, -- Common
-		[2] = 2.5, -- Uncommon
-		[3] = 1.76, -- Rare
-		[4] = 1.6, -- Epic
-		[5] = 1.4, -- Legendary
+		[0] = 2.18, -- Poor
+		[1] = 1.88, -- Common
+		[2] = 1.56, -- Uncommon
+		[3] = 1.1, -- Rare
+		[4] = 1, -- Epic
+		[5] = 0.875, -- Legendary
 	}
 
 return rarityModifiers[index]
@@ -103,14 +103,15 @@ function BubbleLoot_G.calculation.GetItemScore(itemId)
 
 
 	if itemLevel == nil then itemLevel = 0 end
-	if RarityModifier == nil then RarityModifier = 0 end
+	if RarityModifier == nil then RarityModifier = 1 end
 	if ItemSlotMod == nil then ItemSlotMod = 0 end
 
 	
 
 	-- Calculate score for this item
-    return ItemSlotMod --/ 60 --normalized by 60
-
+    --return ItemSlotMod --/ 60 --normalized by 60
+	--if itemLevel < 56 then itemLevel = 56 end
+	return ItemSlotMod -- ItemSlotMod*(itemLevel - 55)/11/RarityModifier
 
 	-- return ItemSlotMod
 end
@@ -247,6 +248,7 @@ function BubbleLoot_G.calculation.getTheWinner(roll)
 		print("the winner is "..winner)
 	end
 
+	BubbleLoot_G.CurrentlyRolledItemId = 0
 
 end
 

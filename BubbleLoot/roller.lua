@@ -62,6 +62,18 @@ function methods.UpdateRoll(self, roll)
 
 end
 
+function methods.UpdateSR(self)
+	--print("updating SR")
+	if(SRData[self.name] ~= nil) then
+		for i, data in ipairs(SRData[self.name][2]) do
+			if(data[1] == BubbleLoot_G.CurrentlyRolledItemId) then self.SR = true end
+		end
+	end
+end
+
+
+
+
 -- Update need and set connected flags.
 function methods.UpdateScoreChance(self)
 	
@@ -90,6 +102,8 @@ function methods.MakeNeedText(self)
     if self.need == 9 then
         return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
 	elseif self.need == 1 then
+		-- check if SR
+		if self.SR == true then return "SR" end
 		return self.ColorTextIfMulti("+1", self.needRepeated)
 	elseif self.need == 2 then
 		return self.ColorTextIfMulti("+2", self.needRepeated)
@@ -104,6 +118,8 @@ function methods.MakeRollText(self)
 	-- print(self.roll)
     if self.need == 9 then
         return WrapTextInColorCode(cfg.texts.PASS, cfg.colors.PASS)
+	elseif self.need == 1 then
+		return "/"
 	else
 		if self.repeated then
 			return self.ColorTextIfMulti(tostring(self.roll), self.repeated)
@@ -175,6 +191,7 @@ function BubbleLoot_G.roller.New(name, need, playerInfo)
 		roll = 0,
 		rollChanged = true,
 		scoreTextChanged = true,
+		SR = false,
     }
     -- Add methods.
     for funcName, func in pairs(methods) do

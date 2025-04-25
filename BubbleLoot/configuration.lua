@@ -9,7 +9,7 @@ BubbleLoot_G.configuration.PREFIX = "BubbleLootSync"
 
 --
 BubbleLoot_G.configuration.size = {
-    EMPTY_HEIGHT = 60, -- Header and border: 30 = (5 + 15 + 10)
+    EMPTY_HEIGHT = 80, -- Header and border: 30 = (5 + 15 + 10)
     ROW_HEIGHT = 20,
     FRAME_WIDTH = 440, -- Default value.
 }
@@ -73,6 +73,7 @@ BubbleLoot_G.configuration.SYNC_MSG = {
     MODIFY_BONUS_DATA = "writeOrEditBonusFunction",
     ASK_SYNC_TO_ML = "AskSyncToML",
     CODE_RAID_BONUS = "CurrentRaid_00",
+    SR_DATA = "SRData",
 }
 
 
@@ -95,7 +96,7 @@ BubbleLoot_G.configuration.constant =
 
 --print("ATTENDANCE_VALUE set")
 
-BubbleLoot_G.configuration.tau = 3
+BubbleLoot_G.configuration.tau = 2 --1.44
 BubbleLoot_G.configuration.seuilMultiplicatif = 4
 
 -- Cancel table
